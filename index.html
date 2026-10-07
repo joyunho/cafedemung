@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>카페드멍 재고체크</title>
+<meta name="description" content="카페드멍 재고를 사장님과 직원이 같은 화면에서 함께 적는 앱">
+<meta name="theme-color" content="#f3f5f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141917" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="재고체크">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=Jua&display=swap">
+<style>
+/* 레이아웃: 폰 우선 단일 열. 제목 줄은 스크롤되어 사라지고, 검색·필터·구역 탭 바만 상단에 고정된다.
+   아래로 분류별 항목 목록이 흐르고, 각 항목은 "안뜯은거 / 뜯은거" 두 개의 큰 스테퍼로 입력한다. */
+:root{
+  --bg:#f3f5f0; --surface:#ffffff; --surface-2:#e9ede4; --ink:#1c221e; --muted:#66706a; --line:#d6dcd3;
+  --accent:#2c6b49; --accent-ink:#ffffff; --accent-soft:#deeee4;
+  --warn:#8e5f0b; --warn-soft:#f6ead0; --crit:#b03527; --crit-soft:#f8ded9; --focus:#2c6b49;
+  --shadow:0 1px 2px rgba(22,32,26,.06), 0 6px 18px rgba(22,32,26,.06);
+  --font-display:'Jua','IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --font-body:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  --radius:12px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#141917; --surface:#1c2320; --surface-2:#252d29; --ink:#e6eae4; --muted:#97a29a; --line:#313b35;
+    --accent:#7fcd9d; --accent-ink:#0f2a1c; --accent-soft:#213a2c;
+    --warn:#e6b85c; --warn-soft:#3a3016; --crit:#f2907f; --crit-soft:#432019; --focus:#7fcd9d;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent;padding-top:env(safe-area-inset-top,0px);overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+[hidden]{display:none!important}
+
+.wrap{max-width:720px;margin-inline:auto;padding-inline:16px;padding-block:12px calc(96px + env(safe-area-inset-bottom,0px))}
+
+/* ---- 제목 줄 ---- */
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 4px}
+.brand h1{font-family:var(--font-display);font-weight:400;font-size:28px;letter-spacing:.01em;color:var(--accent);line-height:1.1}
+.brand .right{display:flex;align-items:center;gap:8px}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.sync[data-state="ok"]::before{background:var(--accent)}
+.sync[data-state="saving"]::before,.sync[data-state="retry"]::before,.sync[data-state="offline"]::before{background:var(--warn)}
+.sync[data-state="error"]::before{background:var(--crit)}
+.iconbtn{width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;padding:0}
+.iconbtn svg{width:20px;height:20px}
+.summary{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px;padding-block:2px 10px;font-variant-numeric:tabular-nums;min-height:22px}
+.summary b{color:var(--ink);font-weight:500}
+.summary .s-none{color:var(--crit)}
+.summary .s-warn{color:var(--warn)}
+
+/* ---- 고정 바: 검색 · 필터 · 탭 ---- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding-inline:16px;padding-block:6px 0;box-shadow:0 1px 0 var(--line)}
+.tools{display:flex;gap:8px;align-items:center}
+.search{flex:1;min-width:0;position:relative}
+.search input{width:100%;height:40px;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:0 14px 0 36px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+.chip{height:40px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font-size:14px;text-decoration:none}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip.icon{width:40px;padding:0;justify-content:center}
+.chip svg{width:17px;height:17px}
+.tabs{display:flex;gap:2px;margin-top:8px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 0 auto;height:42px;padding:0 14px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);font-weight:500;white-space:nowrap;border-radius:6px 6px 0 0}
+.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs button .n{font-size:12px;font-weight:400;margin-left:4px;font-variant-numeric:tabular-nums}
+
+/* ---- 목록 ---- */
+main{min-width:0}
+.group{margin-top:18px}
+.group h2{font-size:13.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;display:flex;align-items:baseline;gap:8px;padding:0 4px 6px}
+.group h2 .n{font-weight:400;font-variant-numeric:tabular-nums}
+.group h2 .bad{color:var(--crit);font-weight:500}
+.group ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"head counters" "note counters";gap:4px 12px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item.s-none{box-shadow:inset 4px 0 0 var(--crit)}
+.item.s-last,.item.s-low{box-shadow:inset 4px 0 0 var(--warn)}
+.head{grid-area:head;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.name{border:0;background:transparent;padding:4px 0;text-align:left;font-weight:500;font-size:15.5px;min-width:0;max-width:100%;overflow-wrap:anywhere;border-radius:6px}
+.name::after{content:"";display:inline-block;width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(-45deg);margin-left:7px;opacity:.7;vertical-align:middle}
+.tag{font-size:11.5px;font-weight:600;padding:2px 7px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.tag.s-none{background:var(--crit-soft);color:var(--crit)}
+.tag.s-last,.tag.s-low{background:var(--warn-soft);color:var(--warn)}
+.meta{flex-basis:100%;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.note{grid-area:note;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.note::before{content:"메모 ";opacity:.7}
+.counters{grid-area:counters;display:flex;gap:8px}
+.counter{display:flex;flex-direction:column;align-items:center;gap:2px}
+.counter .lbl{font-size:11px;color:var(--muted);letter-spacing:.02em}
+.stepper{display:inline-flex;align-items:stretch;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);overflow:hidden}
+.stepper button{width:40px;height:42px;border:0;background:transparent;font-size:20px;line-height:1;color:var(--ink)}
+.stepper button:active{background:var(--accent-soft)}
+.stepper input{width:48px;height:42px;border:0;border-inline:1px solid var(--line);background:var(--surface);text-align:center;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;padding:0;-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper input::placeholder{color:var(--muted);font-weight:400}
+.stepper input:focus{outline:none;box-shadow:inset 0 0 0 2px var(--focus)}
+.item.pending .stepper input{background:var(--accent-soft)}
+.item.failed .stepper input{background:var(--crit-soft)}
+@media (max-width:480px){
+  .item{grid-template-columns:1fr;grid-template-areas:"head" "counters" "note";gap:6px}
+  .counters{justify-content:space-between}
+  .counter{flex:1}
+  .stepper{width:100%;justify-content:center}
+  .stepper input{flex:1;max-width:none}
+}
+.addrow{margin-top:14px;display:flex;justify-content:center}
+.addrow button{height:44px;padding:0 18px;border:1px dashed var(--line);border-radius:999px;background:transparent;color:var(--accent);font-weight:500}
+.empty{margin-top:28px;padding:28px 20px;text-align:center;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.empty h3{font-size:16px;color:var(--ink);margin-bottom:6px}
+.banner{margin-top:10px;padding:10px 14px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:13.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.banner.crit{background:var(--crit-soft);color:var(--crit)}
+.banner.info{background:var(--accent-soft);color:var(--accent)}
+.banner .grow{flex:1;min-width:200px}
+.banner .btn{height:34px;padding:0 12px;border-color:transparent;background:var(--surface);color:var(--ink);font-size:13px}
+
+/* ---- 처음 설정 ---- */
+.setup{min-height:70vh;display:flex;align-items:center;justify-content:center;padding-block:20px}
+.card{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px 20px}
+.card h2{font-family:var(--font-display);font-weight:400;font-size:24px;color:var(--accent);margin-bottom:4px}
+.card p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.err{color:var(--crit);font-size:13.5px;margin:-4px 0 12px}
+.btn.wide{width:100%}
+
+/* ---- 바텀 시트 (항목 편집) ---- */
+.scrim{position:fixed;inset:0;background:rgba(10,14,12,.45);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:720px;margin-inline:auto;background:var(--surface);color:var(--ink);border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 30px rgba(0,0,0,.18);max-height:88vh;overflow:auto}
+.sheet h3{font-size:17px;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field span{font-size:12.5px;color:var(--muted)}
+.field input,.field select{height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:0 12px;width:100%}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions{display:flex;gap:8px;align-items:center;margin-top:6px}
+.actions .spacer{flex:1}
+.btn{height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--crit);border-color:transparent;background:transparent}
+.btn.danger.solid{background:var(--crit);color:var(--surface);border-color:var(--crit)}
+.confirm{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--crit-soft);color:var(--crit);display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+.confirm .btn{height:36px}
+@media (prefers-reduced-motion:no-preference){
+  .sheet{animation:rise .18s ease-out}
+  @keyframes rise{from{transform:translateY(16px);opacity:.6}to{transform:none;opacity:1}}
+}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <h1>카페드멍 재고체크</h1>
+    <div class="right">
+      <span class="sync" id="sync" data-state="connecting">연결 중…</span>
+      <button class="iconbtn" id="gearBtn" type="button" title="설정 (이름·PIN)" aria-label="설정">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="setup" id="setup" hidden>
+    <form class="card" id="setupForm" autocomplete="off">
+      <h2>처음 설정</h2>
+      <p id="setupIntro">한 번만 넣어두면 다음부터는 바로 열려요.</p>
+      <label class="field" id="f-url"><span>앱 주소 (Apps Script 웹 앱 URL)</span><input id="s-url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec"></label>
+      <label class="field"><span>PIN</span><input id="s-pin" inputmode="numeric" autocomplete="off" placeholder="가게 공용 비밀번호"></label>
+      <label class="field"><span>내 이름 (누가 고쳤는지 표시돼요)</span><input id="s-name" maxlength="20" placeholder="예: 윤호"></label>
+      <p class="err" id="s-err" hidden></p>
+      <button type="submit" class="btn primary wide" id="s-go">시작하기</button>
+    </form>
+  </section>
+
+  <div id="app" hidden>
+    <div class="summary" id="summary"></div>
+    <div class="banner" id="banner" hidden></div>
+    <div class="banner info" id="install" hidden>
+      <span class="grow" id="installText"></span>
+      <button class="btn" id="installBtn" type="button" hidden>설치</button>
+      <button class="btn" id="installClose" type="button">닫기</button>
+    </div>
+
+    <div class="bar">
+      <div class="tools">
+        <label class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="q" placeholder="항목 검색 (예: 빨대)" autocomplete="off" aria-label="항목 검색">
+        </label>
+        <button class="chip" id="lowBtn" type="button" aria-pressed="false" title="없음·마지막·부족 항목만 보기">부족만</button>
+        <a class="chip icon" id="sheetBtn" target="_blank" rel="noopener" title="구글 시트에서 보기" aria-label="구글 시트에서 보기" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 9v12"/></svg>
+        </a>
+        <button class="chip icon" id="addBtn" type="button" title="항목 추가" aria-label="항목 추가">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <nav class="tabs" id="tabs" role="tablist" aria-label="구역"></nav>
+    </div>
+
+    <main id="list"></main>
+    <div class="addrow" id="addrow" hidden><button type="button" id="addBtn2">+ 이 구역에 항목 추가</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<form class="sheet" id="editor" hidden autocomplete="off">
+  <h3 id="ed-title">항목 편집</h3>
+  <label class="field"><span>이름</span><input id="ed-name" required maxlength="60" placeholder="예: 바닐라시럽"></label>
+  <div class="row2">
+    <label class="field"><span>구역</span><input id="ed-sec" list="ed-secs" maxlength="30" placeholder="예: 윤호 정리"><datalist id="ed-secs"></datalist></label>
+    <label class="field"><span>분류</span><input id="ed-group" list="ed-groups" maxlength="30" placeholder="예: 시럽"><datalist id="ed-groups"></datalist></label>
+  </div>
+  <label class="field"><span>메모</span><input id="ed-note" maxlength="120" placeholder="예: 절반 남으면 수첩에 적기"></label>
+  <label class="field"><span>최소 수량 (안뜯은거가 이보다 적으면 '부족' 표시)</span><input id="ed-min" inputmode="numeric" placeholder="비워두면 표시 안 함"></label>
+  <div class="actions">
+    <button type="button" class="btn danger" id="ed-delete">삭제</button>
+    <span class="spacer"></span>
+    <button type="button" class="btn" id="ed-cancel">취소</button>
+    <button type="submit" class="btn primary" id="ed-save">저장</button>
+  </div>
+  <div class="confirm" id="ed-confirm" hidden>
+    <span>이 항목을 정말 삭제할까요? 시트에서도 행이 지워져요.</span>
+    <button type="button" class="btn danger solid" id="ed-del-yes">삭제</button>
+    <button type="button" class="btn" id="ed-del-no">아니요</button>
+  </div>
+</form>
+<div class="toast" id="toast" hidden></div>
+
+<script src="./config.js"></script>
+<script>
+(() => {
+  'use strict';
+  const CFG = window.CDM_CONFIG || {};
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const store = (k, v) => { try { localStorage.setItem('cdm.' + k, JSON.stringify(v)); } catch (e) { /* 무시 */ } };
+  const load = (k, f) => { try { const v = localStorage.getItem('cdm.' + k); return v === null ? f : JSON.parse(v); } catch (e) { return f; } };
+
+  const configured = !!String(CFG.API_URL || '').trim();
+  const settings = {
+    apiUrl: String(CFG.API_URL || '').trim() || String(load('apiUrl', '') || ''),
+    pin: String(load('pin', '') || ''),
+    name: String(load('name', '') || ''),
+    pollMs: Math.max(3000, Number(CFG.POLL_MS) || 6000),
+  };
+  const state = {
+    docs: new Map(), pending: new Map(), failed: new Set(),
+    tab: String(load('tab', '') || ''), q: '', low: false,
+    loaded: false, sheetUrl: '', lastStructure: '', editing: null, backoff: 0,
+  };
+
+  // ---------- 유틸 ----------
+  const num = v => (typeof v === 'number' && Number.isFinite(v)) ? v : null;
+  const fmtNum = v => v === null ? '' : String(v);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function ago(iso) {
+    if (!iso) return '';
+    const t = Date.parse(iso); if (!Number.isFinite(t)) return '';
+    const s = Math.max(0, (Date.now() - t) / 1000);
+    if (s < 60) return '방금';
+    if (s < 3600) return `${Math.floor(s / 60)}분 전`;
+    if (s < 86400) return `${Math.floor(s / 3600)}시간 전`;
+    if (s < 7 * 86400) return `${Math.floor(s / 86400)}일 전`;
+    const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}`;
+  }
+  function statusOf(d) {
+    const u = num(d.unopened), o = num(d.opened), m = num(d.min);
+    if (u === null) return { key: 'blank', label: '미기입' };
+    if (u <= 0 && (o === null || o <= 0)) return { key: 'none', label: '없음' };
+    if (u <= 0) return { key: 'last', label: '마지막' };
+    if (m !== null && u < m) return { key: 'low', label: '부족' };
+    return { key: '', label: '' };
+  }
+  const LOW_KEYS = new Set(['none', 'last', 'low']);
+  const secOf = d => String(d.section || '').trim() || '기타';
+  const grpOf = d => String(d.group || '').trim() || '기타';
+  function effective(id) {
+    const d = state.docs.get(id); if (!d) return null;
+    const p = state.pending.get(id);
+    return p ? { ...d, ...p } : d;
+  }
+  let toastTimer = 0;
+  function toast(msg, ms = 2400) {
+    const el = $('#toast'); el.textContent = msg; el.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+  }
+  const SYNC_TEXT = { connecting: '연결 중…', ok: '동기화 중', saving: '저장 중…', retry: '다시 시도 중…', offline: '오프라인', error: '연결 안 됨' };
+  function setSync(s, title) {
+    const el = $('#sync'); el.dataset.state = s; el.textContent = SYNC_TEXT[s] || s; el.title = title || '';
+  }
+
+  // ---------- 서버(Apps Script) 호출 ----------
+  class ApiError extends Error { constructor(code, msg) { super(msg || code); this.code = code; } }
+  const ERR = {
+    nourl: '앱 주소가 설정되지 않았어요.',
+    network: '인터넷 연결을 확인해 주세요.',
+    http: '서버가 응답하지 않아요.',
+    notjson: '앱 주소가 잘못됐거나, 배포의 액세스 권한이 "모든 사용자"가 아니에요.',
+    pin: 'PIN이 맞지 않아요.',
+    locked: '다른 저장이 진행 중이에요. 잠시 후 다시 시도해요.',
+    notfound: '다른 사람이 이 항목을 삭제했어요.',
+    badrequest: '요청이 잘못됐어요.',
+    nosheet: '시트에 "재고" 탭이 없어요. Apps Script에서 setup을 실행해 주세요.',
+  };
+  const errText = e => ERR[e && e.code] || ('오류: ' + ((e && e.message) || '알 수 없음'));
+  async function api(action, body = {}) {
+    if (!settings.apiUrl) throw new ApiError('nourl');
+    let res;
+    try {
+      res = await fetch(settings.apiUrl, {
+        method: 'POST', mode: 'cors', redirect: 'follow', cache: 'no-store',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action, pin: settings.pin, by: settings.name, ...body }),
+      });
+    } catch (e) { throw new ApiError('network', e.message); }
+    if (!res.ok) throw new ApiError('http', String(res.status));
+    let json;
+    try { json = await res.json(); } catch (e) { throw new ApiError('notjson'); }
+    if (!json || json.ok !== true) throw new ApiError((json && json.error) || 'error', json && json.message);
+    return json;
+  }
+
+  // ---------- 주기적으로 새로 읽기 ----------
+  let pollTimer = 0, refreshing = false, refreshAgain = false;
+  async function refresh() {
+    if (refreshing) { refreshAgain = true; return; }
+    refreshing = true; clearTimeout(pollTimer);
+    try {
+      const r = await api('list');
+      state.sheetUrl = String(r.sheetUrl || '');
+      const sb = $('#sheetBtn'); sb.hidden = !state.sheetUrl; if (state.sheetUrl) sb.href = state.sheetUrl;
+      applyList(Array.isArray(r.items) ? r.items : []);
+      state.backoff = 0;
+      if (!state.pending.size) setSync('ok');
+    } catch (e) {
+      if (e.code === 'pin') { showSetup('PIN이 맞지 않아요. 다시 입력해 주세요.'); return; }
+      state.backoff = Math.min(state.backoff + 1, 4);
+      setSync(e.code === 'network' ? 'offline' : 'error', errText(e));
+      if (!state.loaded) showLoadError(e);
+    } finally {
+      refreshing = false;
+      if (refreshAgain) { refreshAgain = false; refresh(); } else schedulePoll();
+    }
+  }
+  let lastActivity = Date.now();
+  for (const ev of ['pointerdown', 'keydown']) document.addEventListener(ev, () => { const idle = Date.now() - lastActivity > 120000; lastActivity = Date.now(); if (idle && $('#setup').hidden) refresh(); }, { passive: true });
+  function schedulePoll() {
+    clearTimeout(pollTimer);
+    if (document.hidden || !$('#setup').hidden) return;
+    const base = Date.now() - lastActivity > 120000 ? Math.max(settings.pollMs, 20000) : settings.pollMs;
+    pollTimer = setTimeout(refresh, base * Math.pow(2, state.backoff));
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { clearTimeout(pollTimer); flushAll(); }
+    else if ($('#setup').hidden) refresh();
+  });
+  window.addEventListener('online', () => { if ($('#setup').hidden) refresh(); for (const id of [...state.pending.keys()]) flush(id); });
+  window.addEventListener('offline', () => setSync('offline', ERR.network));
+
+  function applyList(items) {
+    const next = new Map();
+    for (const it of items) if (it && it.id != null) next.set(String(it.id), it);
+    state.docs = next; state.loaded = true;
+    for (const id of state.failed) if (!next.has(id)) state.failed.delete(id);
+    const secs = sectionsList();
+    if (!state.tab || !secs.includes(state.tab)) state.tab = secs[0] || '';
+    render();
+  }
+  function allEffective() {
+    const out = [];
+    for (const id of state.docs.keys()) { const d = effective(id); if (d) out.push({ ...d, id }); }
+    out.sort((a, b) => (num(a.row) ?? 1e9) - (num(b.row) ?? 1e9));
+    return out;
+  }
+  function sectionsList() {
+    const seen = [];
+    for (const d of allEffective()) { const s = secOf(d); if (!seen.includes(s)) seen.push(s); }
+    return seen;
+  }
+
+  // ---------- 보기 계산 ----------
+  function visibleGroups() {
+    const q = state.q.trim().toLowerCase();
+    const cross = !!q || state.low;
+    const all = allEffective();
+    const secs = sectionsList();
+    const gos = new Map();  // (구역, 분류) → 첫 등장 행
+    for (const d of all) { const k = secOf(d) + '\u0000' + grpOf(d); if (!gos.has(k)) gos.set(k, num(d.row) ?? 1e9); }
+    const items = all.filter(d => {
+      if (!cross && secOf(d) !== state.tab) return false;
+      if (q && !String(d.name || '').toLowerCase().includes(q) && !grpOf(d).toLowerCase().includes(q)) return false;
+      if (state.low && !LOW_KEYS.has(statusOf(d).key)) return false;
+      return true;
+    });
+    items.sort((a, b) => secs.indexOf(secOf(a)) - secs.indexOf(secOf(b)) ||
+      gos.get(secOf(a) + '\u0000' + grpOf(a)) - gos.get(secOf(b) + '\u0000' + grpOf(b)) ||
+      (num(a.row) ?? 1e9) - (num(b.row) ?? 1e9));
+    const groups = [];
+    for (const it of items) {
+      const key = secOf(it) + '\u0000' + grpOf(it);
+      let g = groups[groups.length - 1];
+      if (!g || g.key !== key) { g = { key, title: (cross ? secOf(it) + ' · ' : '') + grpOf(it), items: [] }; groups.push(g); }
+      g.items.push(it);
+    }
+    return { groups, cross };
+  }
+
+  // ---------- 그리기 ----------
+  function renderTabs() {
+    const secs = sectionsList(), counts = {};
+    for (const d of allEffective()) counts[secOf(d)] = (counts[secOf(d)] || 0) + 1;
+    const nav = $('#tabs');
+    const key = secs.join('\u0000');
+    if (nav.dataset.key !== key) {
+      nav.innerHTML = secs.map((s, i) => `<button type="button" role="tab" data-sec="${esc(s)}" id="tab-${i}">${esc(s)}<span class="n"></span></button>`).join('');
+      nav.dataset.key = key;
+    }
+    for (const b of nav.querySelectorAll('button')) {
+      b.setAttribute('aria-selected', String(b.dataset.sec === state.tab));
+      b.querySelector('.n').textContent = counts[b.dataset.sec] || '';
+    }
+  }
+  function renderSummary() {
+    const el = $('#summary');
+    if (!state.loaded) { el.innerHTML = ''; return; }
+    let total = 0, none = 0, last = 0, low = 0, blank = 0, latest = null;
+    for (const d of allEffective()) {
+      total++;
+      const k = statusOf(d).key;
+      if (k === 'none') none++; else if (k === 'last') last++; else if (k === 'low') low++; else if (k === 'blank') blank++;
+      if (d.updatedAt && (!latest || d.updatedAt > latest.updatedAt)) latest = d;
+    }
+    const parts = [`항목 <b>${total}</b>`];
+    if (none) parts.push(`<span class="s-none">없음 <b>${none}</b></span>`);
+    if (last) parts.push(`<span class="s-warn">마지막 <b>${last}</b></span>`);
+    if (low) parts.push(`<span class="s-warn">부족 <b>${low}</b></span>`);
+    if (blank) parts.push(`미기입 <b>${blank}</b>`);
+    if (latest) parts.push(`최근 수정 <b>${esc(ago(latest.updatedAt))}</b>${latest.updatedBy ? ' · ' + esc(latest.updatedBy) : ''}`);
+    el.innerHTML = parts.join('<span aria-hidden="true">·</span>');
+  }
+  function counterHTML(id, f, label) {
+    return `<div class="counter"><span class="lbl">${label}</span>
+      <div class="stepper">
+        <button type="button" class="dec" data-f="${f}" aria-label="${label} 하나 빼기">−</button>
+        <input type="text" inputmode="decimal" id="${f}-${esc(id)}" data-f="${f}" placeholder="–" aria-label="${label}">
+        <button type="button" class="inc" data-f="${f}" aria-label="${label} 하나 더하기">+</button>
+      </div></div>`;
+  }
+  function buildRow(it) {
+    const li = document.createElement('li');
+    li.className = 'item'; li.dataset.id = it.id;
+    li.innerHTML = `
+      <div class="head">
+        <button type="button" class="name" id="n-${esc(it.id)}" title="이름·분류·메모 편집"></button>
+        <span class="tag" hidden></span>
+        <span class="meta"></span>
+      </div>
+      <div class="counters">${counterHTML(it.id, 'u', '안뜯은거')}${counterHTML(it.id, 'o', '뜯은거')}</div>
+      <div class="note" hidden></div>`;
+    return li;
+  }
+  function fillRow(li, it) {
+    const st = statusOf(it);
+    li.className = 'item' + (st.key ? ' s-' + st.key : '') + (state.pending.has(it.id) ? ' pending' : '') + (state.failed.has(it.id) ? ' failed' : '');
+    const nameBtn = li.querySelector('.name');
+    const nm = String(it.name || '(이름 없음)');
+    if (nameBtn.textContent !== nm) nameBtn.textContent = nm;
+    const tag = li.querySelector('.tag');
+    tag.hidden = !st.label; tag.textContent = st.label; tag.className = 'tag' + (st.key ? ' s-' + st.key : '');
+    const meta = li.querySelector('.meta');
+    let metaText = '시트에서 가져옴';
+    if (state.failed.has(it.id)) metaText = '저장 안 됨 · 연결되면 다시 저장해요';
+    else if (it.updatedAt) metaText = ago(it.updatedAt) + (it.updatedBy ? ' · ' + String(it.updatedBy) : '');
+    if (meta.textContent !== metaText) meta.textContent = metaText;
+    for (const [f, key] of [['u', 'unopened'], ['o', 'opened']]) {
+      const inp = li.querySelector(`input[data-f="${f}"]`);
+      const v = fmtNum(num(it[key]));
+      if (document.activeElement !== inp && inp.value !== v) inp.value = v;
+    }
+    const note = li.querySelector('.note');
+    const n = String(it.note || '').trim();
+    note.hidden = !n; if (note.textContent !== n) note.textContent = n;
+  }
+  function groupHeadHTML(g) {
+    const bad = g.items.filter(i => statusOf(i).key === 'none').length;
+    return `${esc(g.title)} <span class="n">${g.items.length}</span>${bad ? `<span class="bad">없음 ${bad}</span>` : ''}`;
+  }
+  function render() {
+    renderTabs(); renderSummary();
+    const list = $('#list'), addrow = $('#addrow');
+    if (!state.loaded) { list.innerHTML = `<div class="empty">불러오는 중…</div>`; addrow.hidden = true; state.lastStructure = ''; return; }
+    const { groups, cross } = visibleGroups();
+    addrow.hidden = cross || !state.tab;
+    if (!groups.length) {
+      const msg = state.docs.size === 0
+        ? `<h3>아직 항목이 없어요</h3>구글 시트의 "재고" 탭이 비어 있어요. 오른쪽 위 + 버튼으로 추가하거나, Apps Script에서 setup을 실행해 초기 항목을 넣으세요.`
+        : (state.low ? `<h3>부족한 항목이 없어요</h3>없음·마지막·부족으로 표시된 항목이 없습니다.` : `<h3>검색 결과가 없어요</h3>다른 이름으로 검색해 보세요.`);
+      list.innerHTML = `<div class="empty">${msg}</div>`; state.lastStructure = ''; return;
+    }
+    const structure = groups.map(g => g.key + ':' + g.items.map(i => i.id).join(',')).join('|');
+    if (structure !== state.lastStructure) {
+      const active = document.activeElement;
+      const focusId = active && active.id && list.contains(active) ? active.id : null;
+      const sel = focusId && active.tagName === 'INPUT' ? [active.selectionStart, active.selectionEnd] : null;
+      const frag = document.createDocumentFragment();
+      for (const g of groups) {
+        const sec = document.createElement('section'); sec.className = 'group';
+        sec.innerHTML = `<h2>${groupHeadHTML(g)}</h2><ul></ul>`;
+        const ul = sec.querySelector('ul');
+        for (const it of g.items) { const li = buildRow(it); fillRow(li, it); ul.appendChild(li); }
+        frag.appendChild(sec);
+      }
+      list.replaceChildren(frag);
+      state.lastStructure = structure;
+      if (focusId) { const el = document.getElementById(focusId); if (el) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) { try { el.setSelectionRange(sel[0], sel[1]); } catch (e) { /* 무시 */ } } } }
+    } else {
+      const secs = list.querySelectorAll('.group');
+      groups.forEach((g, i) => {
+        for (const it of g.items) { const li = list.querySelector(`.item[data-id="${CSS.escape(it.id)}"]`); if (li) fillRow(li, it); }
+        const h = secs[i] && secs[i].querySelector('h2'); if (h) { const html = groupHeadHTML(g); if (h.innerHTML !== html) h.innerHTML = html; }
+      });
+    }
+  }
+  function refreshRow(id) {
+    const li = $('#list').querySelector(`.item[data-id="${CSS.escape(id)}"]`);
+    const it = effective(id); if (li && it) fillRow(li, { ...it, id });
+    renderSummary();
+  }
+  setInterval(() => { if (state.loaded && !document.hidden) { renderSummary(); for (const li of $('#list').querySelectorAll('.item')) { const it = effective(li.dataset.id); if (it) fillRow(li, { ...it, id: li.dataset.id }); } } }, 60000);
+
+  // ---------- 저장 (잠깐 모았다가 한 번에) ----------
+  const timers = new Map(), chains = new Map(), retries = new Map();
+  function edit(id, patch) {
+    if (!state.docs.has(id)) return;
+    const cur = state.pending.get(id) || {};
+    state.pending.set(id, { ...cur, ...patch });
+    state.failed.delete(id);
+    refreshRow(id);
+    clearTimeout(timers.get(id));
+    timers.set(id, setTimeout(() => flush(id), 650));
+  }
+  function flush(id) {
+    clearTimeout(timers.get(id)); timers.delete(id);
+    const patch = state.pending.get(id); if (!patch) return;
+    const prev = chains.get(id) || Promise.resolve();
+    const run = prev.then(async () => {
+      if (state.pending.get(id) !== patch) return;
+      setSync('saving');
+      try {
+        const r = await api('update', { id, patch });
+        if (r.item && r.item.id != null) state.docs.set(id, r.item);
+        if (state.pending.get(id) === patch) state.pending.delete(id);
+        retries.delete(id); state.failed.delete(id);
+        if (!state.pending.size) setSync('ok');
+        refreshRow(id);
+      } catch (e) { await writeFailed(e, id); }
+    });
+    chains.set(id, run.catch(() => {}));
+  }
+  function flushAll() { for (const id of [...timers.keys()]) flush(id); }
+  window.addEventListener('pagehide', flushAll);
+  async function writeFailed(e, id) {
+    if (e.code === 'pin') { showSetup('PIN이 맞지 않아요. 다시 입력해 주세요.'); return; }
+    if (e.code === 'notfound') { state.pending.delete(id); toast(ERR.notfound); refresh(); return; }
+    if (e.code === 'badrequest' || e.code === 'nosheet') { state.pending.delete(id); toast(errText(e), 4000); refreshRow(id); return; }
+    const n = (retries.get(id) || 0) + 1; retries.set(id, n);
+    if (n <= 4) { setSync('retry', errText(e)); setTimeout(() => flush(id), 800 * n + Math.random() * 600); return; }
+    state.failed.add(id); retries.delete(id);
+    setSync(e.code === 'network' ? 'offline' : 'error', errText(e));
+    refreshRow(id);
+    toast('저장이 안 돼요. ' + errText(e), 4000);
+  }
+
+  // ---------- 처음 설정 / PIN ----------
+  function showSetup(err) {
+    clearTimeout(pollTimer);
+    $('#f-url').hidden = configured;
+    $('#s-url').value = configured ? '' : settings.apiUrl;
+    $('#s-pin').value = settings.pin; $('#s-name').value = settings.name;
+    const e = $('#s-err'); e.hidden = !err; e.textContent = err || '';
+    $('#setupIntro').textContent = state.loaded ? '이름이나 PIN을 바꿀 수 있어요.' : '한 번만 넣어두면 다음부터는 바로 열려요.';
+    $('#app').hidden = true; $('#setup').hidden = false; $('#sync').hidden = true;
+    setTimeout(() => { (configured || settings.apiUrl ? $('#s-pin') : $('#s-url')).focus(); }, 50);
+  }
+  $('#setupForm').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const url = configured ? settings.apiUrl : $('#s-url').value.trim();
+    const pin = $('#s-pin').value.trim(), name = $('#s-name').value.trim();
+    if (!url || !/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) { $('#s-err').hidden = false; $('#s-err').textContent = '앱 주소는 https://script.google.com/macros/s/…/exec 형태여야 해요.'; return; }
+    if (!pin) { $('#s-err').hidden = false; $('#s-err').textContent = 'PIN을 입력해 주세요.'; return; }
+    if (!name) { $('#s-err').hidden = false; $('#s-err').textContent = '이름을 입력해 주세요.'; return; }
+    settings.apiUrl = url; settings.pin = pin; settings.name = name;
+    if (!configured) store('apiUrl', url);
+    store('pin', pin); store('name', name);
+    $('#setup').hidden = true; $('#app').hidden = false; $('#sync').hidden = false;
+    setSync('connecting'); render(); refresh();
+  });
+  $('#gearBtn').addEventListener('click', () => showSetup());
+  function showLoadError(e) {
+    $('#list').innerHTML = `<div class="empty"><h3>불러오지 못했어요</h3>${esc(errText(e))}<br><br><button type="button" class="btn" id="retryBtn">다시 시도</button> <button type="button" class="btn" id="setupBtn">설정 바꾸기</button></div>`;
+    $('#retryBtn').addEventListener('click', () => { $('#list').innerHTML = `<div class="empty">불러오는 중…</div>`; refresh(); });
+    $('#setupBtn').addEventListener('click', () => showSetup());
+  }
+
+  // ---------- 항목 편집 ----------
+  const ed = { form: $('#editor'), scrim: $('#scrim'), title: $('#ed-title'), name: $('#ed-name'), sec: $('#ed-sec'), secs: $('#ed-secs'), group: $('#ed-group'), groups: $('#ed-groups'), note: $('#ed-note'), min: $('#ed-min'), del: $('#ed-delete'), confirm: $('#ed-confirm') };
+  function fillLists() {
+    ed.secs.innerHTML = sectionsList().map(s => `<option value="${esc(s)}"></option>`).join('');
+    const seen = new Set();
+    for (const d of allEffective()) if (secOf(d) === ed.sec.value.trim()) seen.add(grpOf(d));
+    ed.groups.innerHTML = [...seen].map(g => `<option value="${esc(g)}"></option>`).join('');
+  }
+  ed.sec.addEventListener('input', fillLists);
+  function openEditor(id, section) {
+    const it = id ? effective(id) : null;
+    state.editing = { id: id || null };
+    ed.title.textContent = it ? '항목 편집' : '항목 추가';
+    ed.name.value = it ? String(it.name || '') : '';
+    ed.sec.value = it ? secOf(it) : (section || state.tab || '');
+    fillLists();
+    ed.group.value = it ? grpOf(it) : '';
+    ed.note.value = it ? String(it.note || '') : '';
+    ed.min.value = it ? fmtNum(num(it.min)) : '';
+    ed.del.hidden = !it; ed.confirm.hidden = true;
+    ed.scrim.hidden = false; ed.form.hidden = false;
+    setTimeout(() => ed.name.focus(), 50);
+  }
+  function closeEditor() { ed.form.hidden = true; ed.scrim.hidden = true; state.editing = null; }
+  $('#ed-cancel').addEventListener('click', closeEditor);
+  ed.scrim.addEventListener('click', closeEditor);
+  ed.del.addEventListener('click', () => { ed.confirm.hidden = false; });
+  $('#ed-del-no').addEventListener('click', () => { ed.confirm.hidden = true; });
+  $('#ed-del-yes').addEventListener('click', async () => {
+    const id = state.editing && state.editing.id; if (!id) return;
+    closeEditor(); setSync('saving');
+    try { await api('delete', { id }); state.pending.delete(id); state.docs.delete(id); toast('삭제했어요'); render(); setSync('ok'); }
+    catch (e) { if (e.code === 'notfound') { state.docs.delete(id); render(); } toast('삭제하지 못했어요. ' + errText(e), 4000); }
+    refresh();
+  });
+  ed.form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const name = ed.name.value.trim(); if (!name) { ed.name.focus(); return; }
+    const minRaw = ed.min.value.trim(); const min = minRaw === '' ? null : Number(minRaw);
+    if (minRaw !== '' && !Number.isFinite(min)) { ed.min.focus(); toast('최소 수량은 숫자로 적어주세요'); return; }
+    const patch = { name, section: ed.sec.value.trim() || '기타', group: ed.group.value.trim() || '기타', note: ed.note.value.trim(), min };
+    const id = state.editing && state.editing.id;
+    closeEditor();
+    if (id) { edit(id, patch); flush(id); return; }
+    setSync('saving');
+    try {
+      const r = await api('add', { item: patch });
+      if (r.item && r.item.id != null) state.docs.set(String(r.item.id), r.item);
+      toast('추가했어요'); setSync('ok');
+      if (!state.q && !state.low) { state.tab = patch.section; store('tab', state.tab); }
+      render();
+    } catch (e) { toast('추가하지 못했어요. ' + errText(e), 4000); setSync('error', errText(e)); }
+  });
+
+  // ---------- 이벤트 ----------
+  const list = $('#list');
+  list.addEventListener('click', ev => {
+    const btn = ev.target.closest('button'); if (!btn) return;
+    const li = btn.closest('.item'); if (!li) return;
+    const id = li.dataset.id;
+    if (btn.classList.contains('name')) { openEditor(id); return; }
+    const f = btn.dataset.f; if (!f) return;
+    const key = f === 'u' ? 'unopened' : 'opened';
+    const it = effective(id); if (!it) return;
+    const cur = num(it[key]);
+    const next = btn.classList.contains('inc') ? (cur === null ? 1 : cur + 1) : (cur === null ? 0 : Math.max(0, cur - 1));
+    edit(id, { [key]: next });
+  });
+  list.addEventListener('change', ev => {
+    const inp = ev.target; if (!(inp instanceof HTMLInputElement) || !inp.dataset.f) return;
+    const li = inp.closest('.item'); if (!li) return;
+    const id = li.dataset.id, key = inp.dataset.f === 'u' ? 'unopened' : 'opened';
+    const raw = inp.value.trim().replace(/,/g, '');
+    if (raw === '') { edit(id, { [key]: null }); return; }
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n < 0) { const it = effective(id); inp.value = it ? fmtNum(num(it[key])) : ''; toast('숫자만 적어주세요'); return; }
+    edit(id, { [key]: Math.round(n * 10) / 10 });
+  });
+  list.addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target instanceof HTMLInputElement) ev.target.blur(); });
+  list.addEventListener('focusin', ev => { if (ev.target instanceof HTMLInputElement) ev.target.select(); });
+  $('#tabs').addEventListener('click', ev => {
+    const b = ev.target.closest('button[data-sec]'); if (!b) return;
+    state.tab = b.dataset.sec; store('tab', state.tab); render(); window.scrollTo({ top: 0 });
+  });
+  const qInput = $('#q');
+  qInput.addEventListener('input', () => { state.q = qInput.value; render(); });
+  $('#lowBtn').addEventListener('click', ev => { state.low = !state.low; ev.currentTarget.setAttribute('aria-pressed', String(state.low)); render(); });
+  $('#addBtn').addEventListener('click', () => openEditor(null, state.tab));
+  $('#addBtn2').addEventListener('click', () => openEditor(null, state.tab));
+  document.addEventListener('keydown', ev => { if (ev.key === 'Escape') closeEditor(); });
+
+  // ---------- 홈 화면 설치 안내 ----------
+  const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let installEvt = null;
+  function showInstall(kind) {
+    if (standalone || load('installHintDismissed', false)) return;
+    const box = $('#install'), txt = $('#installText'), btn = $('#installBtn');
+    if (kind === 'ios') { txt.textContent = '앱처럼 쓰려면: Safari 아래 공유 버튼 → "홈 화면에 추가"'; btn.hidden = true; }
+    else { txt.textContent = '홈 화면에 설치하면 앱처럼 바로 열려요.'; btn.hidden = false; }
+    box.hidden = false;
+  }
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; showInstall('android'); });
+  $('#installBtn').addEventListener('click', async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) { /* 무시 */ } installEvt = null; $('#install').hidden = true; });
+  $('#installClose').addEventListener('click', () => { $('#install').hidden = true; store('installHintDismissed', true); });
+  if (isIOS) showInstall('ios');
+
+  // ---------- 시작 ----------
+  if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
+  if (!settings.apiUrl || !settings.pin || !settings.name) showSetup();
+  else { $('#app').hidden = false; render(); refresh(); }
+})();
+</script>
+</body>
+</html>
