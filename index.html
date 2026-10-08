@@ -1006,12 +1006,11 @@ main{min-width:0}
     $('#setup').hidden = true; $('#app').hidden = false; $('#sync').hidden = false; $('#gearBtn').hidden = false;
     render();
     if (!S.cfg.code) return;
-    await connect();
-    if (fresh) { S.cfg.hints.needSentAt = now(); saveCfg(); requestSnapshot(); }
+    await connect();   // 처음이면 syncTick이 상대 폰에 전체 데이터를 요청한다
   }
   async function switchCode(code) {
     closeStream(); S.cfg.code = code; S.lastId = ''; S.lastIdAt = 0; S.peers = {}; S.cfg.hints.needSentAt = 0; S.dirtySinceSnap = true; S.lastSchedSnapAt = 0; saveCfg(); saveStore(true);
-    await connect(); requestSnapshot(); render();
+    await connect(); render();
   }
 
   // ---------- 설정 시트 ----------

@@ -134,8 +134,9 @@ try {
   await setupPhone(C, '알바');
   await C.waitForFunction(() => { const el = document.querySelector('#u-yy-001'); return el && el.value === '122'; }, null, { timeout: 25000 });
   check(true, 'C가 과거 수정(탄산수 122)을 받음');
+  await C.waitForFunction(() => { const s = JSON.parse(localStorage.getItem('cdm.store') || '{"items":[]}'); const it = s.items.find(i => i.id === 'yy-002'); return !!(it && it.unopened === 7); }, null, { timeout: 10000 });
   const cStore = await storeOf(C);
-  check(cStore.items.find(i => i.id === 'yy-002').unopened === 7, 'C에 yy-002=7');
+  check(cStore.items.find(i => i.id === 'yy-002').unopened === 7, 'C에 yy-002=7 (저장소에도 반영)');
   check(cStore.items.find(i => i.name === '테스트 시럽').t.d > 0, 'C에도 삭제 반영');
 
   console.log('11) 설정 시트 · 표 복사');
