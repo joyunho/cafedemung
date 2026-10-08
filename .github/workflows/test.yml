@@ -1,0 +1,24 @@
+# 앱 동작 검사: 가짜 ntfy 서버와 실제 크롬으로 전체 흐름을 돌려본다.
+name: Smoke test
+on:
+  push:
+    branches: [main, claude/inventory-app]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null
+          npm i --no-audit --no-fund playwright@1 >/dev/null
+          npx playwright install --with-deps chromium
+      - name: Run smoke test
+        env:
+          REAL_NTFY: "1"
+        run: node tests/smoke.mjs
