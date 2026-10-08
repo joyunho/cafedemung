@@ -1,0 +1,25 @@
+# main에 올리면 앱 파일만 모아 gh-pages 브랜치에 게시한다. GitHub Pages는 gh-pages 브랜치를 그대로 서비스한다.
+name: Deploy app
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect site files
+        run: |
+          mkdir -p _site
+          cp -r index.html config.js sw.js manifest.webmanifest icons .nojekyll _site/
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          force_orphan: true
