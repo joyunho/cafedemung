@@ -44,6 +44,7 @@
 | `index.html` | 앱 전체 (화면, 저장, 동기화) |
 | `config.js` | 중계 서버 주소 등 설정 |
 | `sw.js`, `manifest.webmanifest`, `icons/` | 홈 화면 설치(PWA)용 |
+| `404.html` | 주소 뒤에 글자가 잘못 붙어 열려도 앱 첫 화면으로 보냄 (연결 코드 유지) |
 | `img/sources.json` | 항목별 사진 출처와 검색어 |
 | `img/items/`, `img/manifest.json`, `img/CREDITS.md` | 자동으로 만들어지는 사진 썸네일, 목록, 출처 표 |
 | `tools/fetch_images.py`, `.github/workflows/images.yml` | 사진을 받아 썸네일로 줄이는 스크립트와 자동 실행 |
