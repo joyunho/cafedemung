@@ -43,7 +43,7 @@ yy-042	망고스무디	cached	File:Fresh-mango-smoothie 01.jpg	https://commons.w
 yy-043	딸기스무디	cached	File:Strawberry smoothie with perls.jpg	https://commons.wikimedia.org/wiki/File:Strawberry_smoothie_with_perls.jpg
 yy-044	기라델리 초코 소스	cached	Ghirardelli Premium chocolate sauce	https://world.openfoodfacts.org/product/0747599619021
 yy-045	기라델리 카라멜 소스	cached	Ghirardelli Premium Sauce Caramel	https://world.openfoodfacts.org/product/0747599413926
-yy-046	분다버그 자몽	main	Bundaberg Pink Grapefruit Sparkling Soft Drink	https://world.openfoodfacts.org/product/9311493004286
+yy-046	분다버그 자몽	cached	Bundaberg Pink Grapefruit Sparkling Soft Drink	https://world.openfoodfacts.org/product/9311493004286
 yy-047	분다버그 레몬,라임	cached	Bundaberg Bundaberg Lemon, Lime & Bitters	https://world.openfoodfacts.org/product/9311493002428
 pk-001	아이스컵	cached	File:Mr Jimmy - Starbuck Iced Coffee - Jakarta, Indonesia.jpg	https://commons.wikimedia.org/wiki/File:Mr_Jimmy_-_Starbuck_Iced_Coffee_-_Jakarta,_Indonesia.jpg
 pk-002	핫컵	cached	File:Hot Stopper in the lid of a paper coffee cup with a cardboard sleeve.jpeg	https://commons.wikimedia.org/wiki/File:Hot_Stopper_in_the_lid_of_a_paper_coffee_cup_with_a_cardboard_sleeve.jpeg
