@@ -46,6 +46,21 @@ try {
   check((await A.textContent('#summary')).includes('항목 108'), '요약에 항목 108: ' + (await A.textContent('#summary')).trim());
   check(await A.isVisible('#pairHint'), '연결 안내 배너 표시');
 
+  console.log('1b) 제품 사진');
+  const man = await fetch(APP + 'img/manifest.json').then(r => (r.ok ? r.json() : null)).catch(() => null);
+  const firstImgId = man ? Object.keys(man.items || {}).find(id => id.startsWith('yy-')) : null;
+  if (firstImgId) {
+    await A.waitForFunction(id => { const im = document.querySelector(`.item[data-id="${id}"] .thumb img`); return !!(im && im.complete && im.naturalWidth > 0); }, firstImgId, { timeout: 15000 });
+    const withImg = await A.$$eval('.item .thumb img', els => els.length);
+    check(withImg >= 20, `입력 화면에 사진 ${withImg}개 (목록 ${Object.keys(man.items).length}개)`);
+  } else console.log('  skip 사진 목록(img/manifest.json)이 아직 없음');
+  check((await A.$$('.item .thumb')).length === 47, '모든 항목에 사진 칸 있음');
+  await A.click('.item[data-id="yy-001"] .thumb'); await A.waitForSelector('#viewer:not([hidden])');
+  check((await A.textContent('#vw-name')) === '탄산수', '사진 크게 보기: ' + (await A.textContent('#vw-name')));
+  check((await A.textContent('#vw-credit')).length > 5, '사진 설명/출처 표시: ' + (await A.textContent('#vw-credit')).slice(0, 60));
+  await A.click('#vw-close');
+  check(await A.isHidden('#viewer'), '크게 보기 닫힘');
+
   console.log('2) 폰 B 링크로 연결');
   const B = await phone('B', { hash: '#j=' + code });
   await B.waitForSelector('#setup:not([hidden])');
@@ -88,6 +103,11 @@ try {
   check((await B.$$('#table table.grid')).length === 3, '구역별 표 3개');
   check((await B.$$('#table tr.row')).length === 108, '표 행 108개');
   check((await B.$$('#table .orders li')).length >= 10, '주문 목록 항목 ' + (await B.$$('#table .orders li')).length + '개');
+  check((await B.$$('#table tr.row .mini')).length === 108, '표의 모든 행에 사진 칸');
+  await B.click('#table tr.row[data-id="yh-001"] .mini'); await B.waitForSelector('#viewer:not([hidden])');
+  check((await B.textContent('#vw-name')) === '망고', '표에서 사진 누르면 크게 보기');
+  await B.click('#vw-close');
+  check(await B.isVisible('#table'), '크게 보기 닫아도 표 화면 유지');
   await B.click('#copyOrdersBtn'); await B.waitForSelector('#toast:not([hidden])');
   check((await B.textContent('#toast')).includes('복사'), '주문 목록 복사 토스트: ' + (await B.textContent('#toast')));
   await B.click('#table tr.row[data-id="yh-007"]'); await B.waitForSelector('#list:not([hidden])');
@@ -104,6 +124,20 @@ try {
   await A.click('#ed-delete'); await A.click('#ed-del-yes');
   await B.waitForFunction(id => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === id); return !!(it && it.t.d > 0); }, newId, { timeout: 20000 });
   check(true, '삭제가 B에 전파');
+
+  console.log('7b) 사진 주소 직접 넣기 → 다른 폰에 전달');
+  const customImg = APP + 'icons/icon-192.png';
+  await A.click('#tabs button[data-sec="윤영 정리"]');
+  await A.click('.item[data-id="yy-003"] .name'); await A.waitForSelector('#editor:not([hidden])');
+  await A.fill('#ed-img', 'javascript:alert(1)'); await A.click('#ed-save');
+  check(await A.isVisible('#editor'), '잘못된 사진 주소는 저장 안 됨');
+  await A.fill('#ed-img', customImg);
+  check(await A.$eval('#ed-img-prev img', im => im.getAttribute('src')) === customImg, '편집 화면에 사진 미리보기');
+  await A.click('#ed-save');
+  await A.waitForFunction(src => { const im = document.querySelector('.item[data-id="yy-003"] .thumb img'); return !!(im && im.getAttribute('src') === src); }, customImg, { timeout: 5000 });
+  check(true, 'A 화면 사진이 바뀜');
+  await B.waitForFunction(src => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-003'); return !!(it && it.img === src); }, customImg, { timeout: 20000 });
+  check(true, 'B에 바뀐 사진 주소 도착');
 
   console.log('8) 오프라인 수정 후 복구');
   offlinePhase = true;
