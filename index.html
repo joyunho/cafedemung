@@ -237,7 +237,7 @@ main{min-width:0}
   <section class="setup" id="setup" hidden>
     <form class="cardbox" id="setupForm" autocomplete="off">
       <h2 id="setupTitle">처음 설정</h2>
-      <p id="setupIntro">이름만 넣으면 바로 시작돼요. 재고 목록은 기존 시트에서 옮겨 둔 108개가 들어 있어요.</p>
+      <p id="setupIntro">이름만 넣으면 바로 시작돼요. 재고 목록은 기존 시트에서 옮겨 둔 101개가 들어 있어요.</p>
       <label class="field"><span>내 이름 (누가 고쳤는지 표시돼요)</span><input id="s-name" maxlength="20" placeholder="예: 윤호"></label>
       <label class="field" id="f-code"><span>가게 코드 (사장님 폰에 이미 있으면 그 코드)</span><input id="s-code" autocapitalize="characters" autocomplete="off" placeholder="비워두면 새로 만들어요"></label>
       <p class="err" id="s-err" hidden></p>
@@ -487,7 +487,7 @@ main{min-width:0}
     ['yh-027','윤호 정리','쉬폰·포장','쉬폰 비닐 1호',0,null,''],
     ['yh-028','윤호 정리','쉬폰·포장','냅킨',12,null,''],
   ];
-  const SEC_BASE = { '윤영 정리': 0, '포장·소모품': 1000, '윤호 정리': 2000 };
+  const SEC_BASE = { '윤영 정리': 0, '과일·케이크': 500, '포장·소모품': 1000, '윤호 정리': 2000 };
   function seedItems() {
     const m = new Map(); const counters = {};
     for (const r of SEED) {
@@ -533,7 +533,9 @@ main{min-width:0}
   const grpOf = d => String(d.group || '').trim() || '기타';
   const isDeleted = it => (it.t.d || 0) > 0 && it.t.d >= Math.max(it.t.u || 0, it.t.o || 0, it.t.m || 0);
   const lastTouched = it => Math.max(it.t.u || 0, it.t.o || 0, it.t.m || 0);
-  const lastBy = it => { const t = it.t, b = it.b; const mx = lastTouched(it); if (!mx) return ''; return mx === t.u ? b.u : mx === t.o ? b.o : b.m; };
+  // 화면에 보여줄 수정 시각: 배치 정리만 거친 시트 값(아주 작은 시각)은 '고친 적 없음'으로 본다
+  const editedAt = it => { const ts = lastTouched(it); return ts > 1e12 ? ts : 0; };
+  const lastBy = it => { const t = it.t, b = it.b; const mx = editedAt(it); if (!mx) return ''; return mx === t.u ? b.u : mx === t.o ? b.o : b.m; };
   let toastTimer = 0;
   function toast(msg, ms = 2400) { const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms); }
   const SYNC_TEXT = { connecting: '연결 중…', ok: '동기화 중', sending: '보내는 중…', retry: '다시 연결 중…', offline: '오프라인', error: '연결 안 됨' };
@@ -542,6 +544,52 @@ main{min-width:0}
   function newCode() { const a = new Uint8Array(12); crypto.getRandomValues(a); const s = Array.from(a, x => CODE_ALPHABET[x % CODE_ALPHABET.length]).join(''); return s.slice(0, 4) + '-' + s.slice(4, 8) + '-' + s.slice(8, 12); }
   function normCode(s) { const t = String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); return t.length >= 8 ? t.slice(0, 4) + '-' + t.slice(4, 8) + '-' + t.slice(8, 12) : ''; }
   function newId(prefix) { const a = new Uint8Array(4); crypto.getRandomValues(a); return prefix + now().toString(36) + Array.from(a, x => (x % 36).toString(36)).join(''); }
+
+  // ---------- 배치 정리: 사장님이 임시로 만든 '윤호 정리' 목록을 종류별로 나눈다 ----------
+  // 폰마다 한 번 실행한다. 바꾸는 시각은 "그 항목의 마지막 시각 + 1"로 정해서, 같은 데이터를 가진 폰은
+  // 언제 실행하든 똑같은 결과를 내고, 정리 뒤에 실제로 고친 값은 항상 이긴다.
+  const LAYOUT_V = 1;
+  const LAYOUT_FROM = '윤호 정리';
+  const LAYOUT_MOVE = [ // [id, 구역, 분류, 순서]
+    ['yh-001','과일·케이크','냉동과일',510], ['yh-002','과일·케이크','냉동과일',520], ['yh-003','과일·케이크','냉동과일',530], ['yh-004','과일·케이크','냉동과일',540],
+    ['yh-005','과일·케이크','과일청·베이스',610], ['yh-016','과일·케이크','과일청·베이스',620], ['yh-017','과일·케이크','과일청·베이스',630], ['yh-018','과일·케이크','과일청·베이스',640],
+    ['yh-019','과일·케이크','과일청·베이스',650], ['yh-020','과일·케이크','과일청·베이스',660], ['yh-021','과일·케이크','과일청·베이스',670], ['yh-015','과일·케이크','과일청·베이스',680],
+    ['yh-007','과일·케이크','케이크',710], ['yh-008','과일·케이크','케이크',720], ['yh-009','과일·케이크','케이크',730], ['yh-010','과일·케이크','케이크',740],
+    ['yh-011','과일·케이크','케이크',750], ['yh-012','과일·케이크','케이크',760], ['yh-013','과일·케이크','케이크',770], ['yh-014','과일·케이크','케이크',780],
+    ['yh-006','과일·케이크','아이스크림',810],
+  ];
+  const LAYOUT_MERGE = [ // [없앨 항목, 숫자를 더할 항목]: 포장·소모품에 이미 있는 같은 물건
+    ['yh-026','pk-028'], ['yh-027','pk-029'], ['yh-022','pk-030'], ['yh-023','pk-031'], ['yh-025','pk-032'], ['yh-024','pk-033'], ['yh-028','pk-026'],
+  ];
+  const sumCount = (a, b) => { a = num(a); b = num(b); return a === null && b === null ? null : (a || 0) + (b || 0); };
+  // 바뀐 항목 id를 보낼 순서대로 돌려준다: 없앤 것 → 숫자 더한 것 → 옮긴 것.
+  // (없앤 것이 먼저 가야 다른 폰이 더한 숫자만 받고 없앨 항목은 남아 두 번 세는 일이 없다)
+  function applyLayout(items) {
+    const gone = [], summed = [], moved = [];
+    for (const [fromId, toId] of LAYOUT_MERGE) {
+      const a = items.get(fromId), b = items.get(toId);
+      if (!a || !b || isDeleted(a) || isDeleted(b)) continue;
+      const ts = Math.max(lastTouched(a), lastTouched(b), a.t.d || 0) + 1;
+      if (num(a.unopened) !== null) { b.unopened = sumCount(b.unopened, a.unopened); b.t.u = ts; }
+      if (num(a.opened) !== null) { b.opened = sumCount(b.opened, a.opened); b.t.o = ts; }
+      a.t.d = ts;
+      gone.push(fromId); summed.push(toId);
+    }
+    for (const [id, section, group, order] of LAYOUT_MOVE) {
+      const it = items.get(id);
+      if (!it || isDeleted(it) || it.section !== LAYOUT_FROM) continue;   // 이미 직접 옮긴 건 그대로 둔다
+      it.section = section; it.group = group; it.order = order; it.t.m = (it.t.m || 0) + 1;
+      moved.push(id);
+    }
+    return [...gone, ...summed, ...moved];
+  }
+  function migrateLayout() {
+    if ((S.cfg.layout || 0) >= LAYOUT_V) return;
+    const changed = applyLayout(S.items);
+    for (const id of changed) { S.dirty.delete(id); S.dirty.add(id); }
+    if (changed.length) { S.dirtySinceSnap = true; saveStore(true); }
+    S.cfg.layout = LAYOUT_V; saveCfg();
+  }
 
   // ---------- 사진 ----------
   // 기본 사진은 img/manifest.json 목록(GitHub Actions가 무료 라이선스 사진으로 만든 썸네일),
@@ -875,14 +923,14 @@ main{min-width:0}
       total++;
       const k = statusOf(d).key;
       if (k === 'none') none++; else if (k === 'last') last++; else if (k === 'low') low++; else if (k === 'blank') blank++;
-      const lt = lastTouched(d); if (lt && (!latest || lt > lastTouched(latest))) latest = d;
+      const lt = editedAt(d); if (lt && (!latest || lt > editedAt(latest))) latest = d;
     }
     const parts = [`항목 <b>${total}</b>`];
     if (none) parts.push(`<span class="s-none">없음 <b>${none}</b></span>`);
     if (last) parts.push(`<span class="s-warn">마지막 <b>${last}</b></span>`);
     if (low) parts.push(`<span class="s-warn">부족 <b>${low}</b></span>`);
     if (blank) parts.push(`미기입 <b>${blank}</b>`);
-    if (latest) parts.push(`최근 수정 <b>${esc(ago(lastTouched(latest)))}</b>${lastBy(latest) ? ' · ' + esc(lastBy(latest)) : ''}`);
+    if (latest) parts.push(`최근 수정 <b>${esc(ago(editedAt(latest)))}</b>${lastBy(latest) ? ' · ' + esc(lastBy(latest)) : ''}`);
     const pl = peerLine(); if (pl) parts.push(`연결된 폰 ${pl}`);
     el.innerHTML = parts.join('<span aria-hidden="true">·</span>');
     $('#pairHint').hidden = Object.keys(S.peers).length > 0 || !!S.cfg.hints.pair;
@@ -918,7 +966,7 @@ main{min-width:0}
     const th = li.querySelector('.thumb'); const pk = picKey(it);
     if (th.dataset.k !== pk) { th.dataset.k = pk; th.innerHTML = picHTML(it); }
     const tag = li.querySelector('.tag'); tag.hidden = !st.label; tag.textContent = st.label; tag.className = 'tag' + (st.key ? ' s-' + st.key : '');
-    const meta = li.querySelector('.meta'); const lt = lastTouched(it);
+    const meta = li.querySelector('.meta'); const lt = editedAt(it);
     const metaText = lt ? ago(lt) + (lastBy(it) ? ' · ' + lastBy(it) : '') + (S.dirty.has(it.id) ? ' · 보내는 중' : '') : '시트에서 가져옴';
     if (meta.textContent !== metaText) meta.textContent = metaText;
     for (const [f, key] of [['u', 'unopened'], ['o', 'opened']]) { const inp = li.querySelector(`input[data-f="${f}"]`); const v = fmtNum(num(it[key])); if (document.activeElement !== inp && inp.value !== v) inp.value = v; }
@@ -969,8 +1017,7 @@ main{min-width:0}
   function orderText() {
     const d = new Date(); const lines = [`카페드멍 주문 목록 (${d.getMonth() + 1}/${d.getDate()})`];
     const groups = groupsOf(orderList(), true);
-    let lastSec = '';
-    for (const g of groups) { if (g.section !== lastSec) { lines.push(`[${g.section}]`); lastSec = g.section; } for (const it of g.items) { const st = statusOf(it); lines.push(`- ${it.name}: ${st.label} (안뜯 ${fmtNum(num(it.unopened)) || '-'} / 뜯 ${fmtNum(num(it.opened)) || '-'})`); } }
+    for (const g of groups) { lines.push(`[${g.section} · ${g.group}]`); for (const it of g.items) { const st = statusOf(it); lines.push(`- ${it.name}: ${st.label} (안뜯 ${fmtNum(num(it.unopened)) || '-'} / 뜯 ${fmtNum(num(it.opened)) || '-'})`); } }
     if (groups.length === 0) lines.push('부족한 항목이 없어요.');
     return lines.join('\n');
   }
@@ -992,7 +1039,7 @@ main{min-width:0}
       for (const g of groups) {
         html += `<tr class="grp"><td colspan="5">${esc(g.group)}</td></tr>`;
         for (const it of g.items) {
-          const st = statusOf(it); const u = num(it.unopened), o = num(it.opened); const lt = lastTouched(it);
+          const st = statusOf(it); const u = num(it.unopened), o = num(it.opened); const lt = editedAt(it);
           html += `<tr class="row${st.key ? ' s-' + st.key : ''}" data-id="${esc(it.id)}"><td class="p"><button type="button" class="mini" aria-label="${esc(it.name)} 사진 크게 보기">${picHTML(it)}</button></td><td><span class="nm">${esc(it.name)}${st.label ? ` <span class="tag s-${st.key}">${st.label}</span>` : ''}</span></td><td class="n${u === null ? ' blank' : ''}${st.key ? ' s-' + st.key : ''}">${u === null ? '–' : u}</td><td class="n${o === null ? ' blank' : ''}">${o === null ? '–' : o}</td><td class="m" title="${esc(lastBy(it))}">${lt ? esc(ago(lt)) + (lastBy(it) ? ' ' + esc(lastBy(it)) : '') : '시트'}</td></tr>`;
         }
       }
@@ -1032,7 +1079,7 @@ main{min-width:0}
   }
   function tsvText() {
     const rows = [['구역', '분류', '항목', '안뜯은거', '뜯은거', '메모', '최소수량', '마지막 수정', '수정한 사람']];
-    for (const g of groupsOf(liveItems(), true)) for (const d of g.items) rows.push([g.section, g.group, d.name, fmtNum(num(d.unopened)), fmtNum(num(d.opened)), d.note || '', fmtNum(num(d.min)), lastTouched(d) ? new Date(lastTouched(d)).toLocaleString('ko-KR') : '', lastBy(d)]);
+    for (const g of groupsOf(liveItems(), true)) for (const d of g.items) rows.push([g.section, g.group, d.name, fmtNum(num(d.unopened)), fmtNum(num(d.opened)), d.note || '', fmtNum(num(d.min)), editedAt(d) ? new Date(editedAt(d)).toLocaleString('ko-KR') : '', lastBy(d)]);
     return rows.map(r => r.map(c => String(c).replace(/[\t\n\r]+/g, ' ')).join('\t')).join('\n');
   }
   function backup() {
@@ -1060,7 +1107,7 @@ main{min-width:0}
     $('#app').hidden = true; $('#setup').hidden = false; $('#sync').hidden = true; $('#gearBtn').hidden = true;
     $('#s-name').value = S.cfg.name || '';
     if (joinCode) { $('#setupTitle').textContent = '가게에 연결'; $('#setupIntro').textContent = `가게 코드 ${joinCode}로 연결돼요. 이름만 넣으면 돼요.`; $('#f-code').hidden = true; $('#s-code').value = joinCode; }
-    else { $('#setupTitle').textContent = '처음 설정'; $('#f-code').hidden = false; $('#s-code').value = ''; }
+    else { $('#setupTitle').textContent = '처음 설정'; $('#setupIntro').textContent = `이름만 넣으면 바로 시작돼요. 재고 목록은 기존 시트에서 옮겨 둔 ${liveItems().length}개가 들어 있어요.`; $('#f-code').hidden = false; $('#s-code').value = ''; }
     setTimeout(() => $('#s-name').focus(), 50);
   }
   $('#setupForm').addEventListener('submit', async ev => {
@@ -1137,8 +1184,8 @@ main{min-width:0}
   $('#resetBtn').addEventListener('click', () => { $('#resetConfirm').hidden = false; });
   $('#resetNo').addEventListener('click', () => { $('#resetConfirm').hidden = true; });
   $('#resetYes').addEventListener('click', () => {
-    const seed = seedItems(); const ts = now();
-    for (const [id, s] of seed) { const it = S.items.get(id) || s; it.unopened = s.unopened; it.opened = s.opened; it.t.u = ts; it.t.o = ts; it.b.u = S.cfg.name; it.b.o = S.cfg.name; if (isDeleted(it)) { it.t.m = ts; it.b.m = S.cfg.name; } S.items.set(id, it); S.dirty.add(id); }
+    const seed = seedItems(); applyLayout(seed); const ts = now();
+    for (const [id, s] of seed) { if (isDeleted(s)) continue; /* 배치 정리로 다른 항목에 합쳐진 것 */ const it = S.items.get(id) || s; it.unopened = s.unopened; it.opened = s.opened; it.t.u = ts; it.t.o = ts; it.b.u = S.cfg.name; it.b.o = S.cfg.name; if (isDeleted(it)) { it.t.m = ts; it.b.m = S.cfg.name; } S.items.set(id, it); S.dirty.add(id); }
     S.dirtySinceSnap = true; saveStore(); scheduleDelta(); closeSheets(); render(); toast('시트 값으로 되돌렸어요');
   });
 
@@ -1235,6 +1282,7 @@ main{min-width:0}
   // ---------- 시작 ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
   loadStore();
+  migrateLayout();
   loadImages();
   if (!S.cfg.deviceId) { S.cfg.deviceId = newId('d'); saveCfg(); }
   const join = pendingJoinCode();

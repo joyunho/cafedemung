@@ -15,8 +15,10 @@ const storeOf = page => page.evaluate(() => JSON.parse(localStorage.getItem('cdm
 const { log, close } = await startServers({ appPort: APP_PORT, ntfyPort: NTFY_PORT, delayScale: 5e-5 });
 const browser = await chromium.launch();
 
-async function phone(name, { ntfy = MOCK, hash = '', scheme = 'light' } = {}) {
+async function phone(name, { ntfy = MOCK, hash = '', scheme = 'light', init = null } = {}) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: scheme, locale: 'ko-KR' });
+  // init: [저장소, 설정] JSON. 처음 열 때만 넣어서 '예전에 쓰던 폰'을 흉내낸다.
+  if (init) await ctx.addInitScript(([st, cfg]) => { if (!localStorage.getItem('cdm.store')) { localStorage.setItem('cdm.store', st); localStorage.setItem('cdm.settings', cfg); } }, init);
   await ctx.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
   await ctx.route('**/config.js', route => route.fulfill({ contentType: 'text/javascript', body: `window.CDM_CONFIG={NTFY:${JSON.stringify(ntfy)},POLL_MS:15000};` }));
   const page = await ctx.newPage();
@@ -43,7 +45,7 @@ try {
   check(/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code), '가게 코드 생성: ' + code);
   check((await A.$$('#tabs button')).length === 3, '구역 탭 3개');
   check((await A.$$('.item')).length === 47, '첫 구역(윤영 정리) 항목 47개');
-  check((await A.textContent('#summary')).includes('항목 108'), '요약에 항목 108: ' + (await A.textContent('#summary')).trim());
+  check((await A.textContent('#summary')).includes('항목 101'), '요약에 항목 101: ' + (await A.textContent('#summary')).trim());
   check(await A.isVisible('#pairHint'), '연결 안내 배너 표시');
 
   console.log('1b) 제품 사진');
@@ -60,6 +62,23 @@ try {
   check((await A.textContent('#vw-credit')).length > 5, '사진 설명/출처 표시: ' + (await A.textContent('#vw-credit')).slice(0, 60));
   await A.click('#vw-close');
   check(await A.isHidden('#viewer'), '크게 보기 닫힘');
+
+  console.log('1c) 배치 정리 (윤호 정리 → 과일·케이크 / 포장·소모품)');
+  const tabNames = await A.$$eval('#tabs button', bs => bs.map(b => b.dataset.sec));
+  check(tabNames.join('/') === '윤영 정리/과일·케이크/포장·소모품', '구역 탭: ' + tabNames.join(' / '));
+  const stA = await storeOf(A); const itA = id => stA.items.find(i => i.id === id);
+  const gone = it => (it.t.d || 0) > 0 && it.t.d >= Math.max(it.t.u || 0, it.t.o || 0, it.t.m || 0);
+  check(itA('pk-028').unopened === 38 && gone(itA('yh-026')), '쉬폰 비닐 미니 합침 (28+10=38): ' + itA('pk-028').unopened);
+  check(itA('pk-026').unopened === 12 && itA('pk-026').opened === 1 && gone(itA('yh-028')), '냅킨 합침 (0+12, 뜯은거 1)');
+  check(itA('pk-033').unopened === 11 && itA('pk-032').unopened === 19, 'OPP 봉투 합침 (25*18: 4+7, 15*18: 10+9)');
+  check(itA('yh-001').section === '과일·케이크' && itA('yh-001').group === '냉동과일', '망고 → 과일·케이크 / 냉동과일');
+  check(itA('yh-015').group === '과일청·베이스' && itA('yh-006').group === '아이스크림', '레몬주스 → 과일청·베이스, 아포가또 → 아이스크림');
+  check(!stA.items.some(i => i.section === '윤호 정리' && !gone(i)), "'윤호 정리'에 남은 항목 없음");
+  await A.click('#tabs button[data-sec="과일·케이크"]');
+  const grpA = await A.$$eval('#list .group h2', hs => hs.map(h => h.textContent.trim()));
+  check(grpA.length === 4 && grpA[0].startsWith('냉동과일') && grpA[2].startsWith('케이크'), '과일·케이크 분류: ' + grpA.join(', '));
+  check((await A.textContent('.item[data-id="yh-001"] .meta')) === '시트에서 가져옴' && !(await A.textContent('#summary')).includes('최근 수정'), '정리만 한 항목엔 수정 시각을 안 붙임');
+  await A.click('#tabs button[data-sec="윤영 정리"]');
 
   console.log('2) 폰 B 링크로 연결');
   const B = await phone('B', { hash: '#j=' + code });
@@ -101,17 +120,19 @@ try {
   const tableText = await B.textContent('#table');
   check(tableText.includes('주문 목록'), '주문 목록 카드');
   check((await B.$$('#table table.grid')).length === 3, '구역별 표 3개');
-  check((await B.$$('#table tr.row')).length === 108, '표 행 108개');
+  check((await B.$$('#table tr.row')).length === 101, '표 행 101개');
   check((await B.$$('#table .orders li')).length >= 10, '주문 목록 항목 ' + (await B.$$('#table .orders li')).length + '개');
-  check((await B.$$('#table tr.row .mini')).length === 108, '표의 모든 행에 사진 칸');
+  check((await B.$$('#table tr.row .mini')).length === 101, '표의 모든 행에 사진 칸');
   await B.click('#table tr.row[data-id="yh-001"] .mini'); await B.waitForSelector('#viewer:not([hidden])');
   check((await B.textContent('#vw-name')) === '망고', '표에서 사진 누르면 크게 보기');
   await B.click('#vw-close');
   check(await B.isVisible('#table'), '크게 보기 닫아도 표 화면 유지');
   await B.click('#copyOrdersBtn'); await B.waitForSelector('#toast:not([hidden])');
   check((await B.textContent('#toast')).includes('복사'), '주문 목록 복사 토스트: ' + (await B.textContent('#toast')));
+  const copied = await B.evaluate(() => navigator.clipboard.readText()).catch(() => '');
+  if (copied) check(copied.includes('[과일·케이크 · 케이크]'), '주문 목록에 분류까지 표시');
   await B.click('#table tr.row[data-id="yh-007"]'); await B.waitForSelector('#list:not([hidden])');
-  check((await B.$eval('#tabs button[aria-selected="true"]', b => b.dataset.sec)) === '윤호 정리', '표에서 항목을 누르면 해당 구역으로 이동');
+  check((await B.$eval('#tabs button[aria-selected="true"]', b => b.dataset.sec)) === '과일·케이크', '표에서 항목을 누르면 해당 구역으로 이동');
   check(await B.$eval('.item[data-id="yh-007"]', el => el.classList.contains('flash')), '이동한 항목 강조');
 
   console.log('7) 항목 추가/삭제 전파');
@@ -186,6 +207,34 @@ try {
   check((await inputVal(C, '#u-yy-001')) === '122', '새로고침 후에도 122 유지');
   const D = await phone('D', { scheme: 'dark' });
   check(await D.isVisible('#setup'), '다크 모드에서 설정 화면 표시');
+
+  console.log('12b) 예전 배치로 쓰던 폰: 열면 한 번만 정리되고, 새로 연결한 폰도 같은 숫자');
+  const code2 = 'OLDL-AYOU-T234';
+  const oldItems = [
+    { id: 'pk-028', name: '쉬폰 비닐 미니', section: '포장·소모품', group: '쉬폰 포장', note: '', min: null, order: 1210, unopened: 30, opened: 1, t: { u: 1000, o: 0, m: 0, d: 0 }, b: { u: '윤호', o: '', m: '' } },
+    { id: 'yh-026', name: '쉬폰 비닐 미니', section: '윤호 정리', group: '쉬폰·포장', note: '', min: null, order: 2250, unopened: 12, opened: null, t: { u: 2000, o: 0, m: 0, d: 0 }, b: { u: '윤호', o: '', m: '' } },
+    { id: 'yh-001', name: '망고', section: '윤호 정리', group: '냉동과일·청', note: '', min: null, order: 2010, unopened: 3, opened: 1, t: { u: 0, o: 0, m: 500, d: 0 }, b: { u: '', o: '', m: '윤호' } },
+  ];
+  const oldStore = { v: 1, items: oldItems, lastId: '', lastIdAt: 0, peers: {}, lastSnapAt: 0, lastSchedSnapAt: 0, dirtySinceSnap: false, daily: { day: '', n: 0 }, dirty: [] };
+  const oldCfg = { name: '옛폰', code: code2, deviceId: 'dOLDPHONE', view: 'list', tab: '윤호 정리', hints: { pair: true, install: true } };
+  const E = await phone('E', { init: [JSON.stringify(oldStore), JSON.stringify(oldCfg)] });
+  await E.waitForSelector('.item', { timeout: 20000 });
+  const stE = await storeOf(E); const itE = id => stE.items.find(i => i.id === id);
+  check(itE('pk-028').unopened === 42 && itE('pk-028').t.u === 2001 && gone(itE('yh-026')), '고친 숫자끼리 합침 (30+12=42): ' + itE('pk-028').unopened);
+  check(itE('yh-001').section === '과일·케이크' && itE('yh-001').t.m === 501, '옛 폰의 망고도 과일·케이크로');
+  check((await E.$$eval('#tabs button', bs => bs.map(b => b.dataset.sec))).join('/') === '윤영 정리/과일·케이크/포장·소모품', '옛 폰 구역 탭 3개');
+  await E.reload(); await E.waitForSelector('.item', { timeout: 20000 });
+  check((await storeOf(E)).items.find(i => i.id === 'pk-028').unopened === 42, '다시 열어도 두 번 더하지 않음');
+  const F = await phone('F', { hash: '#j=' + code2 });
+  await setupPhone(F, '사장님2');
+  await F.waitForFunction(() => { const s = JSON.parse(localStorage.getItem('cdm.store') || '{"items":[]}'); const it = s.items.find(i => i.id === 'pk-028'); return !!(it && it.unopened === 42); }, null, { timeout: 25000 });
+  const stF = await storeOf(F);
+  check(!stF.items.some(i => i.section === '윤호 정리' && !gone(i)), "새 폰에도 '윤호 정리' 없음, 숫자 42로 맞춰짐");
+  await F.click('#gearBtn'); await F.waitForSelector('#settings:not([hidden])');
+  await F.click('#resetBtn'); await F.click('#resetYes');
+  await F.waitForFunction(() => { const s = JSON.parse(localStorage.getItem('cdm.store')); const it = s.items.find(i => i.id === 'pk-028'); return !!(it && it.unopened === 38); }, null, { timeout: 5000 }).catch(() => {});
+  const stF2 = await storeOf(F); const itF2 = id => stF2.items.find(i => i.id === id);
+  check(itF2('pk-028').unopened === 38 && gone(itF2('yh-026')) && !stF2.items.some(i => i.section === '윤호 정리' && !gone(i)), '시트 값으로 초기화해도 합친 상태 유지 (38)');
 
   if (process.env.REAL_NTFY === '1') {
     console.log('13) 실제 ntfy.sh로 동기화 (실패해도 치명적 아님)');
