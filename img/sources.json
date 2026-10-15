@@ -46,7 +46,7 @@
   "yy-043": {"name": "딸기스무디", "commons_file": "File:Strawberry smoothie with perls.jpg"},
   "yy-044": {"name": "기라델리 초코 소스", "off": "0747599619021"},
   "yy-045": {"name": "기라델리 카라멜 소스", "off": "0747599413926"},
-  "yy-046": {"name": "분다버그 자몽", "off": "9311493004286"},
+  "yy-046": {"name": "분다버그 자몽", "off": "9311493004286", "fit": "cover", "focus": [0.42, 0.5]},
   "yy-047": {"name": "분다버그 레몬,라임", "off": "9311493002428"},
 
   "pk-001": {"name": "아이스컵", "commons_file": "File:Mr Jimmy - Starbuck Iced Coffee - Jakarta, Indonesia.jpg"},
