@@ -5,6 +5,7 @@ on:
     branches: [main, claude/inventory-app]
     paths:
       - img/sources.json
+      - img/review/candidates.json
       - tools/fetch_images.py
       - .github/workflows/images.yml
   workflow_dispatch:
@@ -33,6 +34,9 @@ jobs:
         run: pip install --quiet "pillow>=11,<13"
       - name: Fetch and resize images
         run: python tools/fetch_images.py --review ${{ inputs.force && '--force' || '' }}
+      - name: Candidate sheets for review
+        if: hashFiles('img/review/candidates.json') != ''
+        run: python tools/fetch_images.py --candidates img/review/candidates.json
       - name: Commit images
         run: |
           git config user.name "github-actions[bot]"

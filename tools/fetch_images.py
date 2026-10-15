@@ -16,6 +16,7 @@ img/manifest.json (앱이 읽는 목록)과 img/CREDITS.md (출처 표기)도 �
 공통 옵션: "pick"(기본 1), "fit"("cover" 꽉 채우기 / "contain" 여백 두기), "focus"([x, y] 0~1, cover일 때 중심), "crop"([좌, 위, 우, 아래] 0~1)
 
 사용: python tools/fetch_images.py [--force] [--only id ...] [--review]
+      python tools/fetch_images.py --candidates img/review/candidates.json   (후보 비교표만 만들기)
 """
 import argparse
 import hashlib
@@ -287,12 +288,75 @@ def write_review(items, man, picks):
     (REVIEW / 'picks.txt').write_text('\n'.join(picks) + '\n', encoding='utf-8')
 
 
+def make_candidates(path):
+    """후보 비교표: {"items": {"id": ["검색어", ...]}} 마다 커먼즈 후보 8장을 한 줄로 늘어놓는다.
+    결과는 img/review/cand-N.jpg (줄마다 항목 id, 칸마다 번호) 와 cand.txt (id, 번호, 정확한 파일 이름)."""
+    spec = json.loads(Path(path).read_text(encoding='utf-8'))
+    rows, lines = [], []
+    for iid, queries in spec.get('items', {}).items():
+        seen, cands = set(), []
+        for q in queries:
+            try:
+                pages = commons_query({'generator': 'search', 'gsrsearch': q + ' filetype:bitmap', 'gsrnamespace': '6',
+                                       'gsrlimit': '12', 'iiurlwidth': '240'})
+                for p, ii in usable_commons(pages):
+                    if p['title'] in seen:
+                        continue
+                    seen.add(p['title'])
+                    cands.append((p['title'], ii.get('thumburl') or ii['url']))
+                    if len(cands) >= 8:
+                        break
+            except Exception as e:  # noqa: BLE001
+                print(f'cand {iid} "{q}": {e}')
+            if len(cands) >= 8:
+                break
+            time.sleep(0.3)
+        imgs = []
+        for i, (title, url) in enumerate(cands, 1):
+            try:
+                im = Image.open(io.BytesIO(http_get(url)))
+                im = ImageOps.exif_transpose(im).convert('RGB')
+                im = ImageOps.fit(im, (146, 146), Image.LANCZOS)
+            except Exception as e:  # noqa: BLE001
+                print(f'cand {iid} #{i}: {e}')
+                im = None
+            imgs.append(im)
+            lines.append(f'{iid}\t{i}\t{title}')
+        rows.append((iid, imgs))
+        print(f'cand {iid}: {len(imgs)}개')
+    REVIEW.mkdir(parents=True, exist_ok=True)
+    for f in REVIEW.glob('cand-*.jpg'):
+        f.unlink()
+    tile, lab, per = 150, 110, 6
+    font, big = load_font(18), load_font(22)
+    for n, start in enumerate(range(0, len(rows), per), 1):
+        chunk = rows[start:start + per]
+        sheet = Image.new('RGB', (lab + 8 * tile, len(chunk) * (tile + 24)), (40, 40, 40))
+        draw = ImageDraw.Draw(sheet)
+        for r, (iid, imgs) in enumerate(chunk):
+            y = r * (tile + 24)
+            draw.text((6, y + 62), iid, fill=(255, 255, 255), font=big)
+            for i, im in enumerate(imgs):
+                x = lab + i * tile
+                if im is not None:
+                    sheet.paste(im, (x + 2, y + 2))
+                else:
+                    draw.rectangle((x + 2, y + 2, x + tile - 2, y + tile - 2), fill=(120, 20, 20))
+                draw.text((x + 6, y + tile + 2), str(i + 1), fill=(255, 230, 0), font=font)
+        sheet.save(REVIEW / f'cand-{n}.jpg', 'JPEG', quality=82)
+    (REVIEW / 'cand.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--force', action='store_true', help='이미 받은 사진도 다시 받기')
     ap.add_argument('--only', nargs='*', default=[], help='이 항목만 다시 받기')
     ap.add_argument('--review', action='store_true', help='img/review/ 에 검토용 모음 사진 만들기')
+    ap.add_argument('--candidates', metavar='JSON', help='후보 비교표만 만들기 (img/review/candidates.json 형식)')
     args = ap.parse_args()
+    if args.candidates:
+        make_candidates(args.candidates)
+        return 0
 
     src = json.loads(SOURCES.read_text(encoding='utf-8'))
     items = src['items']
