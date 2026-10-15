@@ -1,0 +1,108 @@
+yy-001	탄산수	FAIL	LookupError: commons "sparkling water glass bubbles": 쓸 수 있는 결과 0개	
+yy-002	수입멸균우유	main	File:22-07-2017 Carton of UHT Milk of Matinal brand.JPG	https://commons.wikimedia.org/wiki/File:22-07-2017_Carton_of_UHT_Milk_of_Matinal_brand.JPG
+yy-003	애플스파클링	alt1	File:Martinelli's Sparkling Cider Bottle (54765113282).jpg	https://commons.wikimedia.org/wiki/File:Martinelli%27s_Sparkling_Cider_Bottle_(54765113282).jpg
+yy-004	애플 기본	main	Martinelli's 100% pure apple juice from US grown fresh apples	https://world.openfoodfacts.org/product/04124498
+yy-005	유기농딸기	alt1	File:Binggrae Banana Flavored Milk 03.jpg	https://commons.wikimedia.org/wiki/File:Binggrae_Banana_Flavored_Milk_03.jpg
+yy-006	유기농바나나	alt1	File:Banana milk.jpg	https://commons.wikimedia.org/wiki/File:Banana_milk.jpg
+yy-007	유기농코코아	alt1	File:Chocolate milk (441196553).jpg	https://commons.wikimedia.org/wiki/File:Chocolate_milk_(441196553).jpg
+yy-008	유기농딸기주스	main	File:Garden strawberry (Fragaria × ananassa) single2.jpg	https://commons.wikimedia.org/wiki/File:Garden_strawberry_(Fragaria_%C3%97_ananassa)_single2.jpg
+yy-009	유기농오렌지주스	main	File:Orange juice 1 edit1.jpg	https://commons.wikimedia.org/wiki/File:Orange_juice_1_edit1.jpg
+yy-010	유기농포도주스	main	File:Glass of grape juice.jpeg	https://commons.wikimedia.org/wiki/File:Glass_of_grape_juice.jpeg
+yy-011	뽀로로딸기	main	Seoul F&B Pororo’s Favorite Strawberry Milk	https://world.openfoodfacts.org/product/8809350881091
+yy-012	뽀로로밀크	FAIL	HTTPError: HTTP Error 503: Service Temporarily Unavailable / LookupError: off_search "뽀로로": 사진 있는 결과 1개 / LookupError: commons "Pororo drink": 쓸 수 있는 결과 0개	
+yy-013	립톤아이스티	FAIL	HTTPError: HTTP Error 503: Service Temporarily Unavailable / HTTPError: HTTP Error 503: Service Temporarily Unavailable	
+yy-014	펌킨페이스트	main	File:Pumpkin Puree Drained (4107746280).jpg	https://commons.wikimedia.org/wiki/File:Pumpkin_Puree_Drained_(4107746280).jpg
+yy-015	캐모마일	main	File:Glass of chamomile tea.jpg	https://commons.wikimedia.org/wiki/File:Glass_of_chamomile_tea.jpg
+yy-016	녹차	main	File:1sen t bag im.jpg	https://commons.wikimedia.org/wiki/File:1sen_t_bag_im.jpg
+yy-017	얼그레이	main	File:Frisch aufgebrühter EarlGrey Tee.jpg	https://commons.wikimedia.org/wiki/File:Frisch_aufgebr%C3%BChter_EarlGrey_Tee.jpg
+yy-018	페퍼민트	main	File:Moroccan Mint Tea - 1.jpg	https://commons.wikimedia.org/wiki/File:Moroccan_Mint_Tea_-_1.jpg
+yy-019	루이보스	main	File:Frisch aufgebrühter Rooibos.jpg	https://commons.wikimedia.org/wiki/File:Frisch_aufgebr%C3%BChter_Rooibos.jpg
+yy-020	헤이즐넛시럽	main	Monin Monin Syrup Hazelnut	https://world.openfoodfacts.org/product/3052910055325
+yy-021	바닐라시럽	main	Monin Monin Vanilla 700mL	https://world.openfoodfacts.org/product/3052910056469
+yy-022	카라멜시럽	main	Monin Caramel	https://world.openfoodfacts.org/product/3052910006907
+yy-023	설탕시럽	main	Monin, Monin Sugar Cane Monin Pure Cane Sugar Syrup 700mL	https://world.openfoodfacts.org/product/3052910056384
+yy-024	블루시럽(블루 큐라소)	alt1	File:Vodka and Blue Curacao (with Brilliant Blue FCF).jpg	https://commons.wikimedia.org/wiki/File:Vodka_and_Blue_Curacao_(with_Brilliant_Blue_FCF).jpg
+yy-025	딸기잼	main	File:Exploding Strawberry Jar.JPG	https://commons.wikimedia.org/wiki/File:Exploding_Strawberry_Jar.JPG
+yy-026	미니웨하스	main	File:Lubin Baugin - Still-Life with Wafer Biscuits (Le Dessert de Gaufrettes) - WGA1516.jpg	https://commons.wikimedia.org/wiki/File:Lubin_Baugin_-_Still-Life_with_Wafer_Biscuits_(Le_Dessert_de_Gaufrettes)_-_WGA1516.jpg
+yy-027	아몬드	main	File:Sliced almonds in a supermarket.jpg	https://commons.wikimedia.org/wiki/File:Sliced_almonds_in_a_supermarket.jpg
+yy-028	발사믹	main	File:Olive oil and balsamic vinegar combined dispenser.jpg	https://commons.wikimedia.org/wiki/File:Olive_oil_and_balsamic_vinegar_combined_dispenser.jpg
+yy-029	오곡파우더	main	File:Misu 1.jpg	https://commons.wikimedia.org/wiki/File:Misu_1.jpg
+yy-030	녹차파우더	main	File:Matcha tea latte with rosetta latte art.jpg	https://commons.wikimedia.org/wiki/File:Matcha_tea_latte_with_rosetta_latte_art.jpg
+yy-031	쑥파우더	main	File:Korean.dessert-Tteok-Jeolpyeon-dotori-ssuk-01.jpg	https://commons.wikimedia.org/wiki/File:Korean.dessert-Tteok-Jeolpyeon-dotori-ssuk-01.jpg
+yy-032	초코파우더	main	File:Theobroma cacao flower 01.JPG	https://commons.wikimedia.org/wiki/File:Theobroma_cacao_flower_01.JPG
+yy-033	쿠앤크파우더	main	File:Cookies and Cream Shake.jpg	https://commons.wikimedia.org/wiki/File:Cookies_and_Cream_Shake.jpg
+yy-034	요거트파우더	main	File:Joghurt.jpg	https://commons.wikimedia.org/wiki/File:Joghurt.jpg
+yy-035	시나몬스틱	main	File:Gewuerze 004 2024 08 10.jpg	https://commons.wikimedia.org/wiki/File:Gewuerze_004_2024_08_10.jpg
+yy-036	시나몬분말	main	File:Ground Cinnamon Powder and a Cinnamon Stick.jpg	https://commons.wikimedia.org/wiki/File:Ground_Cinnamon_Powder_and_a_Cinnamon_Stick.jpg
+yy-037	쿠앤크분태	main	File:Crushing oreos.jpg	https://commons.wikimedia.org/wiki/File:Crushing_oreos.jpg
+yy-038	아이스티 피치	main	File:Peach iced tea with orange slices.jpg	https://commons.wikimedia.org/wiki/File:Peach_iced_tea_with_orange_slices.jpg
+yy-039	아이스티 레몬	main	File:Iced lemon tea - Rawlab Juice & Tea.jpg	https://commons.wikimedia.org/wiki/File:Iced_lemon_tea_-_Rawlab_Juice_%26_Tea.jpg
+yy-040	바닐라빈 파우더	main	File:Vanilla 6beans.JPG	https://commons.wikimedia.org/wiki/File:Vanilla_6beans.JPG
+yy-041	제로 스윗 복숭아 아이스티	main	File:Peach iced tea.jpg	https://commons.wikimedia.org/wiki/File:Peach_iced_tea.jpg
+yy-042	망고스무디	main	File:Fresh-mango-smoothie 01.jpg	https://commons.wikimedia.org/wiki/File:Fresh-mango-smoothie_01.jpg
+yy-043	딸기스무디	main	File:Strawberry smoothie with perls.jpg	https://commons.wikimedia.org/wiki/File:Strawberry_smoothie_with_perls.jpg
+yy-044	기라델리 초코 소스	main	Ghirardelli Premium chocolate sauce	https://world.openfoodfacts.org/product/0747599619021
+yy-045	기라델리 카라멜 소스	main	Ghirardelli Premium Sauce Caramel	https://world.openfoodfacts.org/product/0747599413926
+yy-046	분다버그 자몽	main	Bundaberg Pink Grapefruit Sparkling Soft Drink	https://world.openfoodfacts.org/product/9311493004286
+yy-047	분다버그 레몬,라임	main	Bundaberg Lemon, lime & Bitter	https://world.openfoodfacts.org/product/9311493002336
+pk-001	아이스컵	main	File:Mr Jimmy - Starbuck Iced Coffee - Jakarta, Indonesia.jpg	https://commons.wikimedia.org/wiki/File:Mr_Jimmy_-_Starbuck_Iced_Coffee_-_Jakarta,_Indonesia.jpg
+pk-002	핫컵	main	File:Paper coffee cup, Novosibirsk 02.jpg	https://commons.wikimedia.org/wiki/File:Paper_coffee_cup,_Novosibirsk_02.jpg
+pk-003	돔뚜껑	main	File:DFC 0821 Iced chocolate drink in a clear plastic cup with a green straw set against a colorful bokeh background.jpg	https://commons.wikimedia.org/wiki/File:DFC_0821_Iced_chocolate_drink_in_a_clear_plastic_cup_with_a_green_straw_set_against_a_colorful_bokeh_background.jpg
+pk-004	플랫뚜껑	FAIL	LookupError: commons "flat lid plastic cup straw": 쓸 수 있는 결과 0개	
+pk-005	무타공(구멍 없는 뚜껑)	main	File:Pistachios gelato Milkshakes - domed plastic cup.jpg	https://commons.wikimedia.org/wiki/File:Pistachios_gelato_Milkshakes_-_domed_plastic_cup.jpg
+pk-006	핫뚜껑	main	File:A small cup of coffee.JPG	https://commons.wikimedia.org/wiki/File:A_small_cup_of_coffee.JPG
+pk-007	캐리어	main	File:A Company 504th patrol 120507-A-QJ324-016.jpg	https://commons.wikimedia.org/wiki/File:A_Company_504th_patrol_120507-A-QJ324-016.jpg
+pk-008	스무디빨대	main	File:A paper straw for bubble tea and the popular straw.jpg	https://commons.wikimedia.org/wiki/File:A_paper_straw_for_bubble_tea_and_the_popular_straw.jpg
+pk-009	일반빨대	main	File:Eight drinking straws (4273846588).jpg	https://commons.wikimedia.org/wiki/File:Eight_drinking_straws_(4273846588).jpg
+pk-010	포장빨대	main	File:BK Meal.JPG	https://commons.wikimedia.org/wiki/File:BK_Meal.JPG
+pk-011	손잡이종이백	main	File:Balap Karung.jpg	https://commons.wikimedia.org/wiki/File:Balap_Karung.jpg
+pk-012	와이드종이백	main	File:Albert Heijn paper shopping bag (2019) 03.jpg	https://commons.wikimedia.org/wiki/File:Albert_Heijn_paper_shopping_bag_(2019)_03.jpg
+pk-013	크라프트지 별대	main	File:India - Varanasi paper bag maker - 0078.jpg	https://commons.wikimedia.org/wiki/File:India_-_Varanasi_paper_bag_maker_-_0078.jpg
+pk-014	크라프트지 특대	main	File:White paper bag on white and black background.jpg	https://commons.wikimedia.org/wiki/File:White_paper_bag_on_white_and_black_background.jpg
+pk-015	실링지	FAIL	LookupError: commons "bubble tea cup sealing": 쓸 수 있는 결과 0개	
+pk-016	컵홀더(핫)	main	File:Coffee-cup-sleeve.jpg	https://commons.wikimedia.org/wiki/File:Coffee-cup-sleeve.jpg
+pk-017	컵홀더(아이스)	main	File:Coffee cup lid.jpg	https://commons.wikimedia.org/wiki/File:Coffee_cup_lid.jpg
+pk-018	포크	main	File:Curryking-4612.jpg	https://commons.wikimedia.org/wiki/File:Curryking-4612.jpg
+pk-019	나이프	main	File:Plastic Knife Mould.jpg	https://commons.wikimedia.org/wiki/File:Plastic_Knife_Mould.jpg
+pk-020	배달봉투	main	File:Plastic shopping bag of Sakae.JPG	https://commons.wikimedia.org/wiki/File:Plastic_shopping_bag_of_Sakae.JPG
+pk-021	검정봉투	main	File:Black plastic bag on white counter.jpg	https://commons.wikimedia.org/wiki/File:Black_plastic_bag_on_white_counter.jpg
+pk-022	분리수거봉투	FAIL	LookupError: commons "transparent garbage bag": 쓸 수 있는 결과 0개	
+pk-023	프렛즐	main	File:Clara Peeters - Still Life with Cheeses, Almonds and Pretzels.jpg	https://commons.wikimedia.org/wiki/File:Clara_Peeters_-_Still_Life_with_Cheeses,_Almonds_and_Pretzels.jpg
+pk-024	쿠앤크	main	File:Oreo-Two-Cookies.jpg	https://commons.wikimedia.org/wiki/File:Oreo-Two-Cookies.jpg
+pk-025	옥수수	main	File:Puffcorn Example Frito Lay.jpg	https://commons.wikimedia.org/wiki/File:Puffcorn_Example_Frito_Lay.jpg
+pk-026	냅킨	main	File:Table utensils wrapped in a paper napkin 2.jpg	https://commons.wikimedia.org/wiki/File:Table_utensils_wrapped_in_a_paper_napkin_2.jpg
+pk-027	빌지(영수증 용지)	main	File:Paper Roll Holders.jpg	https://commons.wikimedia.org/wiki/File:Paper_Roll_Holders.jpg
+pk-028	쉬폰 비닐 미니	main	File:Chiffon cake 02.jpg	https://commons.wikimedia.org/wiki/File:Chiffon_cake_02.jpg
+pk-030	쉬폰 미니 받침	main	File:Robert Pohle, Cake Board, 1935-1942, NGA 24734.jpg	https://commons.wikimedia.org/wiki/File:Robert_Pohle,_Cake_Board,_1935-1942,_NGA_24734.jpg
+pk-032	15*18 OPP 봉투	main	File:Dupont-baby-bag-advert (8080777436).jpg	https://commons.wikimedia.org/wiki/File:Dupont-baby-bag-advert_(8080777436).jpg
+yh-001	망고(냉동)	FAIL	LookupError: commons "frozen mango chunks": 쓸 수 있는 결과 0개	
+yh-002	블루베리(냉동)	main	File:Frozen blueberries (9586505754).jpg	https://commons.wikimedia.org/wiki/File:Frozen_blueberries_(9586505754).jpg
+yh-003	레드커런트	main	File:Redcurrant (Ribes rubrum) fruits.jpg	https://commons.wikimedia.org/wiki/File:Redcurrant_(Ribes_rubrum)_fruits.jpg
+yh-004	복숭아(냉동)	main	File:Peach Slices (3824702094).jpg	https://commons.wikimedia.org/wiki/File:Peach_Slices_(3824702094).jpg
+yh-005	딸기청	main	File:Pari fermier noel 2016 22.jpg	https://commons.wikimedia.org/wiki/File:Pari_fermier_noel_2016_22.jpg
+yh-006	아포가또 아이스크림	main	File:Affogato.JPG	https://commons.wikimedia.org/wiki/File:Affogato.JPG
+yh-007	딸기 케이크	main	File:Shortcake slice 2.jpg	https://commons.wikimedia.org/wiki/File:Shortcake_slice_2.jpg
+yh-008	초코 케이크	main	File:Piece of chocolate cake on a white plate decorated with chocolate sauce.jpg	https://commons.wikimedia.org/wiki/File:Piece_of_chocolate_cake_on_a_white_plate_decorated_with_chocolate_sauce.jpg
+yh-009	초코딸기 케이크	main	File:Cupcakes, chocolate and strawberry flavour.jpg	https://commons.wikimedia.org/wiki/File:Cupcakes,_chocolate_and_strawberry_flavour.jpg
+yh-010	고구마 케이크	main	File:Sweet potato ice cream and castela cake (42314902224).jpg	https://commons.wikimedia.org/wiki/File:Sweet_potato_ice_cream_and_castela_cake_(42314902224).jpg
+yh-011	포레스트 케이크	main	File:Black Forest gateau.jpg	https://commons.wikimedia.org/wiki/File:Black_Forest_gateau.jpg
+yh-012	치즈 케이크	main	File:Cheesecake with slice cut out.jpg	https://commons.wikimedia.org/wiki/File:Cheesecake_with_slice_cut_out.jpg
+yh-013	우유 케이크	main	File:Rum and Raisin Ice cream cake. Made fresh in-store (27335721587).jpg	https://commons.wikimedia.org/wiki/File:Rum_and_Raisin_Ice_cream_cake._Made_fresh_in-store_(27335721587).jpg
+yh-014	오레오 케이크	main	File:Oreo cake for St. Patrick's Day at Safeway.jpg	https://commons.wikimedia.org/wiki/File:Oreo_cake_for_St._Patrick%27s_Day_at_Safeway.jpg
+yh-015	레몬주스	main	File:Pineapple juice mixed with pear-lemon-chia seeds-2860722.jpg	https://commons.wikimedia.org/wiki/File:Pineapple_juice_mixed_with_pear-lemon-chia_seeds-2860722.jpg
+yh-016	복숭아 베이스	main	File:PeachesInSyrup.jpg	https://commons.wikimedia.org/wiki/File:PeachesInSyrup.jpg
+yh-017	레몬 베이스	main	File:American cookery (1915) (14781587661).jpg	https://commons.wikimedia.org/wiki/File:American_cookery_(1915)_(14781587661).jpg
+yh-018	자몽 베이스	main	File:Dried grapefruit slices.jpg	https://commons.wikimedia.org/wiki/File:Dried_grapefruit_slices.jpg
+yh-019	청포도 베이스	main	File:Solaris grapes in Chateaux Luna vineyard 24.jpg	https://commons.wikimedia.org/wiki/File:Solaris_grapes_in_Chateaux_Luna_vineyard_24.jpg
+yh-020	블루베리 베이스	main	File:Fruits jam variants.jpg	https://commons.wikimedia.org/wiki/File:Fruits_jam_variants.jpg
+yh-021	참외 베이스	main	File:Korean melon-Chamoe-01.jpg	https://commons.wikimedia.org/wiki/File:Korean_melon-Chamoe-01.jpg
+pk-029	쉬폰 비닐 1호	same	pk-028	
+pk-031	쉬폰 1호 받침	same	pk-030	
+pk-033	25*18 OPP 봉투	same	pk-032	
+yh-022	쉬폰 받침 미니	same	pk-030	
+yh-023	쉬폰 받침 1호	same	pk-030	
+yh-024	18x25 봉투	same	pk-032	
+yh-025	18x15 봉투	same	pk-032	
+yh-026	쉬폰 비닐 미니	same	pk-028	
+yh-027	쉬폰 비닐 1호	same	pk-028	
+yh-028	냅킨	same	pk-026	

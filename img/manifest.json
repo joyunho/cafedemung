@@ -1,0 +1,914 @@
+{
+ "version": 1,
+ "items": {
+  "yy-002": {
+   "file": "yy-002.webp",
+   "key": "f6d264359bb1",
+   "v": "d940afd7",
+   "title": "File:22-07-2017 Carton of UHT Milk of Matinal brand.JPG",
+   "credit": "Kolforn ( Kolforn ) I'd appreciate if you could mail me (Kolforn@gmail.com) if you want to use this picture out of the W",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:22-07-2017_Carton_of_UHT_Milk_of_Matinal_brand.JPG"
+  },
+  "yy-003": {
+   "file": "yy-003.webp",
+   "key": "a9db1dea9dc7",
+   "v": "d62c0947",
+   "title": "File:Martinelli's Sparkling Cider Bottle (54765113282).jpg",
+   "credit": "kellywritershouse",
+   "license": "CC BY 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Martinelli%27s_Sparkling_Cider_Bottle_(54765113282).jpg"
+  },
+  "yy-004": {
+   "file": "yy-004.webp",
+   "key": "984a0ab13a87",
+   "v": "626fde06",
+   "title": "Martinelli's 100% pure apple juice from US grown fresh apples",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/04124498"
+  },
+  "yy-005": {
+   "file": "yy-005.webp",
+   "key": "9f831e8b9cb2",
+   "v": "e394000f",
+   "title": "File:Binggrae Banana Flavored Milk 03.jpg",
+   "credit": "KOREA.NET",
+   "license": "CC BY-SA 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Binggrae_Banana_Flavored_Milk_03.jpg"
+  },
+  "yy-006": {
+   "file": "yy-006.webp",
+   "key": "d3c97c8f6d2e",
+   "v": "ee1d347e",
+   "title": "File:Banana milk.jpg",
+   "credit": "Đậu tương",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Banana_milk.jpg"
+  },
+  "yy-007": {
+   "file": "yy-007.webp",
+   "key": "5fa85d26b3bd",
+   "v": "3eb9cfe7",
+   "title": "File:Chocolate milk (441196553).jpg",
+   "credit": "Simon Law from Montréal, QC, Canada",
+   "license": "CC BY-SA 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Chocolate_milk_(441196553).jpg"
+  },
+  "yy-008": {
+   "file": "yy-008.webp",
+   "key": "68485ae75bd8",
+   "v": "12afa58f",
+   "title": "File:Garden strawberry (Fragaria × ananassa) single2.jpg",
+   "credit": "Ivar Leidus",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Garden_strawberry_(Fragaria_%C3%97_ananassa)_single2.jpg"
+  },
+  "yy-009": {
+   "file": "yy-009.webp",
+   "key": "3dae7a7d8d5a",
+   "v": "280ebc0a",
+   "title": "File:Orange juice 1 edit1.jpg",
+   "credit": "Agency of the United States Department of Agriculture Edited Version by: Arad",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:Orange_juice_1_edit1.jpg"
+  },
+  "yy-010": {
+   "file": "yy-010.webp",
+   "key": "3914804f7c6c",
+   "v": "951f062e",
+   "title": "File:Glass of grape juice.jpeg",
+   "credit": "Oyp",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Glass_of_grape_juice.jpeg"
+  },
+  "yy-011": {
+   "file": "yy-011.webp",
+   "key": "eb39d0bd6934",
+   "v": "28ec4cdd",
+   "title": "Seoul F&B Pororo’s Favorite Strawberry Milk",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/8809350881091"
+  },
+  "yy-014": {
+   "file": "yy-014.webp",
+   "key": "eada99f557b5",
+   "v": "14dbca45",
+   "title": "File:Pumpkin Puree Drained (4107746280).jpg",
+   "credit": "Veganbaking.net from USA",
+   "license": "CC BY-SA 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Pumpkin_Puree_Drained_(4107746280).jpg"
+  },
+  "yy-015": {
+   "file": "yy-015.webp",
+   "key": "6011bac69e48",
+   "v": "a10a58ad",
+   "title": "File:Glass of chamomile tea.jpg",
+   "credit": "Greg",
+   "license": "CC BY-SA 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Glass_of_chamomile_tea.jpg"
+  },
+  "yy-016": {
+   "file": "yy-016.webp",
+   "key": "345e92445516",
+   "v": "84bfb5f2",
+   "title": "File:1sen t bag im.jpg",
+   "credit": "Maruyama Tea Products Corporation",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:1sen_t_bag_im.jpg"
+  },
+  "yy-017": {
+   "file": "yy-017.webp",
+   "key": "e751d77d21f3",
+   "v": "bd53fb5e",
+   "title": "File:Frisch aufgebrühter EarlGrey Tee.jpg",
+   "credit": "soultea.de /André Helbig",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Frisch_aufgebr%C3%BChter_EarlGrey_Tee.jpg"
+  },
+  "yy-018": {
+   "file": "yy-018.webp",
+   "key": "b446a34f90dc",
+   "v": "1bff556a",
+   "title": "File:Moroccan Mint Tea - 1.jpg",
+   "credit": "Sarkar Sayantan",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Moroccan_Mint_Tea_-_1.jpg"
+  },
+  "yy-019": {
+   "file": "yy-019.webp",
+   "key": "2d62bae80a5d",
+   "v": "9052497a",
+   "title": "File:Frisch aufgebrühter Rooibos.jpg",
+   "credit": "soultea.de /André Helbig",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Frisch_aufgebr%C3%BChter_Rooibos.jpg"
+  },
+  "yy-020": {
+   "file": "yy-020.webp",
+   "key": "17a7ef9b3ffe",
+   "v": "dbcfe2e4",
+   "title": "Monin Monin Syrup Hazelnut",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/3052910055325"
+  },
+  "yy-021": {
+   "file": "yy-021.webp",
+   "key": "0d1dd2732aac",
+   "v": "152b3473",
+   "title": "Monin Monin Vanilla 700mL",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/3052910056469"
+  },
+  "yy-022": {
+   "file": "yy-022.webp",
+   "key": "3ce2e667dba1",
+   "v": "44566e03",
+   "title": "Monin Caramel",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/3052910006907"
+  },
+  "yy-023": {
+   "file": "yy-023.webp",
+   "key": "00d51b5cac42",
+   "v": "d1b3083d",
+   "title": "Monin, Monin Sugar Cane Monin Pure Cane Sugar Syrup 700mL",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/3052910056384"
+  },
+  "yy-024": {
+   "file": "yy-024.webp",
+   "key": "959d534cf510",
+   "v": "d0c6ebba",
+   "title": "File:Vodka and Blue Curacao (with Brilliant Blue FCF).jpg",
+   "credit": "Soldier of Wasteland",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Vodka_and_Blue_Curacao_(with_Brilliant_Blue_FCF).jpg"
+  },
+  "yy-025": {
+   "file": "yy-025.webp",
+   "key": "08935e5fe32e",
+   "v": "9af62812",
+   "title": "File:Exploding Strawberry Jar.JPG",
+   "credit": "Hughespr",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:Exploding_Strawberry_Jar.JPG"
+  },
+  "yy-026": {
+   "file": "yy-026.webp",
+   "key": "58b35e6fe38d",
+   "v": "04cd38eb",
+   "title": "File:Lubin Baugin - Still-Life with Wafer Biscuits (Le Dessert de Gaufrettes) - WGA1516.jpg",
+   "credit": "Lubin Baugin",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:Lubin_Baugin_-_Still-Life_with_Wafer_Biscuits_(Le_Dessert_de_Gaufrettes)_-_WGA1516.jpg"
+  },
+  "yy-027": {
+   "file": "yy-027.webp",
+   "key": "4cefd9007028",
+   "v": "5ea09e26",
+   "title": "File:Sliced almonds in a supermarket.jpg",
+   "credit": "Ypsilon from Finland",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Sliced_almonds_in_a_supermarket.jpg"
+  },
+  "yy-028": {
+   "file": "yy-028.webp",
+   "key": "e766080b7326",
+   "v": "01f43c9c",
+   "title": "File:Olive oil and balsamic vinegar combined dispenser.jpg",
+   "credit": "Qualiesin",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Olive_oil_and_balsamic_vinegar_combined_dispenser.jpg"
+  },
+  "yy-029": {
+   "file": "yy-029.webp",
+   "key": "4f23be9a7438",
+   "v": "5aa44bde",
+   "title": "File:Misu 1.jpg",
+   "credit": "Hyeon-Jeong Suk",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Misu_1.jpg"
+  },
+  "yy-030": {
+   "file": "yy-030.webp",
+   "key": "3288bd6d5482",
+   "v": "c87fd724",
+   "title": "File:Matcha tea latte with rosetta latte art.jpg",
+   "credit": "Irvan Ary Maulana",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Matcha_tea_latte_with_rosetta_latte_art.jpg"
+  },
+  "yy-031": {
+   "file": "yy-031.webp",
+   "key": "a0b3afb5b45c",
+   "v": "fb4587a7",
+   "title": "File:Korean.dessert-Tteok-Jeolpyeon-dotori-ssuk-01.jpg",
+   "credit": "Origianl copyright holder is User:Jmabel",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Korean.dessert-Tteok-Jeolpyeon-dotori-ssuk-01.jpg"
+  },
+  "yy-032": {
+   "file": "yy-032.webp",
+   "key": "3075eb6f2027",
+   "v": "e3d2847b",
+   "title": "File:Theobroma cacao flower 01.JPG",
+   "credit": "H. Zell",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Theobroma_cacao_flower_01.JPG"
+  },
+  "yy-033": {
+   "file": "yy-033.webp",
+   "key": "ae8ff150effc",
+   "v": "71a4eb1a",
+   "title": "File:Cookies and Cream Shake.jpg",
+   "credit": "TheSpoonShadow",
+   "license": "CC BY 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Cookies_and_Cream_Shake.jpg"
+  },
+  "yy-034": {
+   "file": "yy-034.webp",
+   "key": "270ffc0e5a87",
+   "v": "58d2043b",
+   "title": "File:Joghurt.jpg",
+   "credit": "No machine-readable author provided. Rainer Zenz assumed (based on copyright claims).",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Joghurt.jpg"
+  },
+  "yy-035": {
+   "file": "yy-035.webp",
+   "key": "20aeb238c0cd",
+   "v": "d8dde7fb",
+   "title": "File:Gewuerze 004 2024 08 10.jpg",
+   "credit": "Friedrich Haag",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Gewuerze_004_2024_08_10.jpg"
+  },
+  "yy-036": {
+   "file": "yy-036.webp",
+   "key": "9fc7e5f00dd9",
+   "v": "f1e28eef",
+   "title": "File:Ground Cinnamon Powder and a Cinnamon Stick.jpg",
+   "credit": "formulatehealth",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Ground_Cinnamon_Powder_and_a_Cinnamon_Stick.jpg"
+  },
+  "yy-037": {
+   "file": "yy-037.webp",
+   "key": "9b0f760714be",
+   "v": "bde995c2",
+   "title": "File:Crushing oreos.jpg",
+   "credit": "Camille Stenhouse",
+   "license": "CC BY 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Crushing_oreos.jpg"
+  },
+  "yy-038": {
+   "file": "yy-038.webp",
+   "key": "6645e363f967",
+   "v": "c8f2f843",
+   "title": "File:Peach iced tea with orange slices.jpg",
+   "credit": "Baoothersks",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Peach_iced_tea_with_orange_slices.jpg"
+  },
+  "yy-039": {
+   "file": "yy-039.webp",
+   "key": "83dfb8f3f982",
+   "v": "59881beb",
+   "title": "File:Iced lemon tea - Rawlab Juice & Tea.jpg",
+   "credit": "Andy Li",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Iced_lemon_tea_-_Rawlab_Juice_%26_Tea.jpg"
+  },
+  "yy-040": {
+   "file": "yy-040.webp",
+   "key": "08fc51e871b2",
+   "v": "ed15a55c",
+   "title": "File:Vanilla 6beans.JPG",
+   "credit": "B.navez",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Vanilla_6beans.JPG"
+  },
+  "yy-041": {
+   "file": "yy-041.webp",
+   "key": "eaa13a90f5b4",
+   "v": "af8ea946",
+   "title": "File:Peach iced tea.jpg",
+   "credit": "Baoothersks",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Peach_iced_tea.jpg"
+  },
+  "yy-042": {
+   "file": "yy-042.webp",
+   "key": "c18c71fe2a91",
+   "v": "38ed3244",
+   "title": "File:Fresh-mango-smoothie 01.jpg",
+   "credit": "Vivekpat30",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Fresh-mango-smoothie_01.jpg"
+  },
+  "yy-043": {
+   "file": "yy-043.webp",
+   "key": "9a055a2b23ea",
+   "v": "af805ad7",
+   "title": "File:Strawberry smoothie with perls.jpg",
+   "credit": "Anidae",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Strawberry_smoothie_with_perls.jpg"
+  },
+  "yy-044": {
+   "file": "yy-044.webp",
+   "key": "f78af4e43f4f",
+   "v": "1341d78b",
+   "title": "Ghirardelli Premium chocolate sauce",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/0747599619021"
+  },
+  "yy-045": {
+   "file": "yy-045.webp",
+   "key": "20581683e5dd",
+   "v": "ec9cc762",
+   "title": "Ghirardelli Premium Sauce Caramel",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/0747599413926"
+  },
+  "yy-046": {
+   "file": "yy-046.webp",
+   "key": "fe1ea99337f4",
+   "v": "7d176a4b",
+   "title": "Bundaberg Pink Grapefruit Sparkling Soft Drink",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/9311493004286"
+  },
+  "yy-047": {
+   "file": "yy-047.webp",
+   "key": "e61cf691fb11",
+   "v": "cf4725af",
+   "title": "Bundaberg Lemon, lime & Bitter",
+   "credit": "Open Food Facts contributors",
+   "license": "CC BY-SA 3.0",
+   "page": "https://world.openfoodfacts.org/product/9311493002336"
+  },
+  "pk-001": {
+   "file": "pk-001.webp",
+   "key": "91c99a44dfa2",
+   "v": "549a5c7b",
+   "title": "File:Mr Jimmy - Starbuck Iced Coffee - Jakarta, Indonesia.jpg",
+   "credit": "Wiki.cullin",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Mr_Jimmy_-_Starbuck_Iced_Coffee_-_Jakarta,_Indonesia.jpg"
+  },
+  "pk-002": {
+   "file": "pk-002.webp",
+   "key": "e920835ea8f2",
+   "v": "d17d497e",
+   "title": "File:Paper coffee cup, Novosibirsk 02.jpg",
+   "credit": "К.Артём.1",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Paper_coffee_cup,_Novosibirsk_02.jpg"
+  },
+  "pk-003": {
+   "file": "pk-003.webp",
+   "key": "59f7eb3b0101",
+   "v": "0d0964f3",
+   "title": "File:DFC 0821 Iced chocolate drink in a clear plastic cup with a green straw set against a colorful bokeh background.jpg",
+   "credit": "PattayaPatrol",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:DFC_0821_Iced_chocolate_drink_in_a_clear_plastic_cup_with_a_green_straw_set_against_a_colorful_bokeh_background.jpg"
+  },
+  "pk-005": {
+   "file": "pk-005.webp",
+   "key": "ea3c0ca3748e",
+   "v": "b855ff5b",
+   "title": "File:Pistachios gelato Milkshakes - domed plastic cup.jpg",
+   "credit": "karendotcom127 from New York, USA",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Pistachios_gelato_Milkshakes_-_domed_plastic_cup.jpg"
+  },
+  "pk-006": {
+   "file": "pk-006.webp",
+   "key": "d27990097078",
+   "v": "bfb9d02f",
+   "title": "File:A small cup of coffee.JPG",
+   "credit": "Julius Schorzman",
+   "license": "CC BY-SA 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:A_small_cup_of_coffee.JPG"
+  },
+  "pk-007": {
+   "file": "pk-007.webp",
+   "key": "c1bd87fcc46d",
+   "v": "8543f7fd",
+   "title": "File:A Company 504th patrol 120507-A-QJ324-016.jpg",
+   "credit": "Sgt. Gustavo Olgiati",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:A_Company_504th_patrol_120507-A-QJ324-016.jpg"
+  },
+  "pk-008": {
+   "file": "pk-008.webp",
+   "key": "0a956281e5fa",
+   "v": "5dd8a448",
+   "title": "File:A paper straw for bubble tea and the popular straw.jpg",
+   "credit": "WrS.tm.pl",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:A_paper_straw_for_bubble_tea_and_the_popular_straw.jpg"
+  },
+  "pk-009": {
+   "file": "pk-009.webp",
+   "key": "bb031a26f8a9",
+   "v": "2f6b2938",
+   "title": "File:Eight drinking straws (4273846588).jpg",
+   "credit": "Horia Varlan from Bucharest, Romania",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Eight_drinking_straws_(4273846588).jpg"
+  },
+  "pk-010": {
+   "file": "pk-010.webp",
+   "key": "37093575920b",
+   "v": "a5961a7a",
+   "title": "File:BK Meal.JPG",
+   "credit": "Terence Ong",
+   "license": "CC BY 2.5",
+   "page": "https://commons.wikimedia.org/wiki/File:BK_Meal.JPG"
+  },
+  "pk-011": {
+   "file": "pk-011.webp",
+   "key": "aca7857e9503",
+   "v": "f4dc2c2e",
+   "title": "File:Balap Karung.jpg",
+   "credit": "Irsam Soetarto",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Balap_Karung.jpg"
+  },
+  "pk-012": {
+   "file": "pk-012.webp",
+   "key": "0dfba999f216",
+   "v": "ed90acce",
+   "title": "File:Albert Heijn paper shopping bag (2019) 03.jpg",
+   "credit": "Donald Trung Quoc Don (Chữ Hán: 徵國單) - Wikimedia Commons . ( Want to use this image? )",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Albert_Heijn_paper_shopping_bag_(2019)_03.jpg"
+  },
+  "pk-013": {
+   "file": "pk-013.webp",
+   "key": "1857e64d2eb6",
+   "v": "52a5b9b5",
+   "title": "File:India - Varanasi paper bag maker - 0078.jpg",
+   "credit": "Jorge Royan",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:India_-_Varanasi_paper_bag_maker_-_0078.jpg"
+  },
+  "pk-014": {
+   "file": "pk-014.webp",
+   "key": "ec1f73c59e6b",
+   "v": "7a614a06",
+   "title": "File:White paper bag on white and black background.jpg",
+   "credit": "Jeffrey Beall from Denver, Colorado, USA",
+   "license": "CC BY-SA 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:White_paper_bag_on_white_and_black_background.jpg"
+  },
+  "pk-016": {
+   "file": "pk-016.webp",
+   "key": "10dd105984bd",
+   "v": "5cfbf9a2",
+   "title": "File:Coffee-cup-sleeve.jpg",
+   "credit": "Nirzar",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Coffee-cup-sleeve.jpg"
+  },
+  "pk-017": {
+   "file": "pk-017.webp",
+   "key": "65f6532dfa9b",
+   "v": "83cc74e2",
+   "title": "File:Coffee cup lid.jpg",
+   "credit": "Nirzar",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Coffee_cup_lid.jpg"
+  },
+  "pk-018": {
+   "file": "pk-018.webp",
+   "key": "ae8991c21ee8",
+   "v": "dde85491",
+   "title": "File:Curryking-4612.jpg",
+   "credit": "Superbass",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Curryking-4612.jpg"
+  },
+  "pk-019": {
+   "file": "pk-019.webp",
+   "key": "1f424bea97c1",
+   "v": "ffa86d4b",
+   "title": "File:Plastic Knife Mould.jpg",
+   "credit": "Dudhatrajesh",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Plastic_Knife_Mould.jpg"
+  },
+  "pk-020": {
+   "file": "pk-020.webp",
+   "key": "9ae96266edb6",
+   "v": "bf72dc38",
+   "title": "File:Plastic shopping bag of Sakae.JPG",
+   "credit": "Tokumeigakarinoaoshima",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Plastic_shopping_bag_of_Sakae.JPG"
+  },
+  "pk-021": {
+   "file": "pk-021.webp",
+   "key": "b1b9b1128caf",
+   "v": "3a732994",
+   "title": "File:Black plastic bag on white counter.jpg",
+   "credit": "999real",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Black_plastic_bag_on_white_counter.jpg"
+  },
+  "pk-023": {
+   "file": "pk-023.webp",
+   "key": "e0f3cbe16475",
+   "v": "fe76d4ff",
+   "title": "File:Clara Peeters - Still Life with Cheeses, Almonds and Pretzels.jpg",
+   "credit": "Clara Peeters",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:Clara_Peeters_-_Still_Life_with_Cheeses,_Almonds_and_Pretzels.jpg"
+  },
+  "pk-024": {
+   "file": "pk-024.webp",
+   "key": "53371daf1d6e",
+   "v": "1ada47ca",
+   "title": "File:Oreo-Two-Cookies.jpg",
+   "credit": "Evan-Amos",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:Oreo-Two-Cookies.jpg"
+  },
+  "pk-025": {
+   "file": "pk-025.webp",
+   "key": "fe587a7352f1",
+   "v": "b75ccba4",
+   "title": "File:Puffcorn Example Frito Lay.jpg",
+   "credit": "Ll1324",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Puffcorn_Example_Frito_Lay.jpg"
+  },
+  "pk-026": {
+   "file": "pk-026.webp",
+   "key": "8dc6c5a5a600",
+   "v": "06481eef",
+   "title": "File:Table utensils wrapped in a paper napkin 2.jpg",
+   "credit": "Ser Amantio di Nicolao",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Table_utensils_wrapped_in_a_paper_napkin_2.jpg"
+  },
+  "pk-027": {
+   "file": "pk-027.webp",
+   "key": "396d29fb63ea",
+   "v": "3ddbb10c",
+   "title": "File:Paper Roll Holders.jpg",
+   "credit": "tony_duell",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Paper_Roll_Holders.jpg"
+  },
+  "pk-028": {
+   "file": "pk-028.webp",
+   "key": "06956f0cbae7",
+   "v": "7b8cdc34",
+   "title": "File:Chiffon cake 02.jpg",
+   "credit": "Snp at Japanese Wikipedia",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Chiffon_cake_02.jpg"
+  },
+  "pk-030": {
+   "file": "pk-030.webp",
+   "key": "faca9e89c9f6",
+   "v": "6a1f3330",
+   "title": "File:Robert Pohle, Cake Board, 1935-1942, NGA 24734.jpg",
+   "credit": "Robert Pohle",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Robert_Pohle,_Cake_Board,_1935-1942,_NGA_24734.jpg"
+  },
+  "pk-032": {
+   "file": "pk-032.webp",
+   "key": "8890a236001a",
+   "v": "20194ffc",
+   "title": "File:Dupont-baby-bag-advert (8080777436).jpg",
+   "credit": "1950sUnlimited",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Dupont-baby-bag-advert_(8080777436).jpg"
+  },
+  "yh-002": {
+   "file": "yh-002.webp",
+   "key": "39fd9d169636",
+   "v": "ed78251b",
+   "title": "File:Frozen blueberries (9586505754).jpg",
+   "credit": "Ruth Hartnup from Vancouver, Canada",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Frozen_blueberries_(9586505754).jpg"
+  },
+  "yh-003": {
+   "file": "yh-003.webp",
+   "key": "2884ae099398",
+   "v": "c70abe43",
+   "title": "File:Redcurrant (Ribes rubrum) fruits.jpg",
+   "credit": "Ivar Leidus",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Redcurrant_(Ribes_rubrum)_fruits.jpg"
+  },
+  "yh-004": {
+   "file": "yh-004.webp",
+   "key": "093fc1822646",
+   "v": "298949f0",
+   "title": "File:Peach Slices (3824702094).jpg",
+   "credit": "Neil Conway from Oakland, USA",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Peach_Slices_(3824702094).jpg"
+  },
+  "yh-005": {
+   "file": "yh-005.webp",
+   "key": "7c340d37402c",
+   "v": "9752cabb",
+   "title": "File:Pari fermier noel 2016 22.jpg",
+   "credit": "JJ Georges",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Pari_fermier_noel_2016_22.jpg"
+  },
+  "yh-006": {
+   "file": "yh-006.webp",
+   "key": "bc373db02a20",
+   "v": "fbb6bb61",
+   "title": "File:Affogato.JPG",
+   "credit": "VR38DETT",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:Affogato.JPG"
+  },
+  "yh-007": {
+   "file": "yh-007.webp",
+   "key": "23899868cc56",
+   "v": "233e0915",
+   "title": "File:Shortcake slice 2.jpg",
+   "credit": "Shisma",
+   "license": "CC BY 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Shortcake_slice_2.jpg"
+  },
+  "yh-008": {
+   "file": "yh-008.webp",
+   "key": "5c4ad45b1a8e",
+   "v": "505861a3",
+   "title": "File:Piece of chocolate cake on a white plate decorated with chocolate sauce.jpg",
+   "credit": "Daria Yakovleva Minor edits made by Subsidiary account",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Piece_of_chocolate_cake_on_a_white_plate_decorated_with_chocolate_sauce.jpg"
+  },
+  "yh-009": {
+   "file": "yh-009.webp",
+   "key": "0b3665cf0661",
+   "v": "2f163ffc",
+   "title": "File:Cupcakes, chocolate and strawberry flavour.jpg",
+   "credit": "Marc-Lautenbacher",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Cupcakes,_chocolate_and_strawberry_flavour.jpg"
+  },
+  "yh-010": {
+   "file": "yh-010.webp",
+   "key": "150a29cb079c",
+   "v": "c346ce02",
+   "title": "File:Sweet potato ice cream and castela cake (42314902224).jpg",
+   "credit": "T.Tseng",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Sweet_potato_ice_cream_and_castela_cake_(42314902224).jpg"
+  },
+  "yh-011": {
+   "file": "yh-011.webp",
+   "key": "d3e24a5d6b4e",
+   "v": "9b08d823",
+   "title": "File:Black Forest gateau.jpg",
+   "credit": "Mikelo",
+   "license": "CC BY-SA 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Black_Forest_gateau.jpg"
+  },
+  "yh-012": {
+   "file": "yh-012.webp",
+   "key": "442379511017",
+   "v": "773e3ee3",
+   "title": "File:Cheesecake with slice cut out.jpg",
+   "credit": "Martin van Dam",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Cheesecake_with_slice_cut_out.jpg"
+  },
+  "yh-013": {
+   "file": "yh-013.webp",
+   "key": "91e8419e4959",
+   "v": "864447ca",
+   "title": "File:Rum and Raisin Ice cream cake. Made fresh in-store (27335721587).jpg",
+   "credit": "Cold Rock ice creamery aspley from Aspley, Australia",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Rum_and_Raisin_Ice_cream_cake._Made_fresh_in-store_(27335721587).jpg"
+  },
+  "yh-014": {
+   "file": "yh-014.webp",
+   "key": "4cb7ec957c94",
+   "v": "d67593fc",
+   "title": "File:Oreo cake for St. Patrick's Day at Safeway.jpg",
+   "credit": "Ser Amantio di Nicolao",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Oreo_cake_for_St._Patrick%27s_Day_at_Safeway.jpg"
+  },
+  "yh-015": {
+   "file": "yh-015.webp",
+   "key": "9d9601e41f22",
+   "v": "c4134875",
+   "title": "File:Pineapple juice mixed with pear-lemon-chia seeds-2860722.jpg",
+   "credit": "public domain",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Pineapple_juice_mixed_with_pear-lemon-chia_seeds-2860722.jpg"
+  },
+  "yh-016": {
+   "file": "yh-016.webp",
+   "key": "8815851ba287",
+   "v": "8dcc3339",
+   "title": "File:PeachesInSyrup.jpg",
+   "credit": "Ken Hammond",
+   "license": "Public domain",
+   "page": "https://commons.wikimedia.org/wiki/File:PeachesInSyrup.jpg"
+  },
+  "yh-017": {
+   "file": "yh-017.webp",
+   "key": "7930ca363477",
+   "v": "e752f7e4",
+   "title": "File:American cookery (1915) (14781587661).jpg",
+   "credit": "Internet Archive Book Images",
+   "license": "No restrictions",
+   "page": "https://commons.wikimedia.org/wiki/File:American_cookery_(1915)_(14781587661).jpg"
+  },
+  "yh-018": {
+   "file": "yh-018.webp",
+   "key": "d6c161a6af6d",
+   "v": "b7fd70dc",
+   "title": "File:Dried grapefruit slices.jpg",
+   "credit": "Fumikas Sagisavas",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Dried_grapefruit_slices.jpg"
+  },
+  "yh-019": {
+   "file": "yh-019.webp",
+   "key": "96e241c352b6",
+   "v": "62bd333b",
+   "title": "File:Solaris grapes in Chateaux Luna vineyard 24.jpg",
+   "credit": "W.carter",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Solaris_grapes_in_Chateaux_Luna_vineyard_24.jpg"
+  },
+  "yh-020": {
+   "file": "yh-020.webp",
+   "key": "a43d070ff045",
+   "v": "3226c09b",
+   "title": "File:Fruits jam variants.jpg",
+   "credit": "毒島みるく",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Fruits_jam_variants.jpg"
+  },
+  "yh-021": {
+   "file": "yh-021.webp",
+   "key": "be34ecef1322",
+   "v": "5f3ef7b3",
+   "title": "File:Korean melon-Chamoe-01.jpg",
+   "credit": "hutch",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Korean_melon-Chamoe-01.jpg"
+  },
+  "pk-029": {
+   "file": "pk-028.webp",
+   "key": "same:pk-028",
+   "v": "7b8cdc34",
+   "title": "File:Chiffon cake 02.jpg",
+   "credit": "Snp at Japanese Wikipedia",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Chiffon_cake_02.jpg"
+  },
+  "pk-031": {
+   "file": "pk-030.webp",
+   "key": "same:pk-030",
+   "v": "6a1f3330",
+   "title": "File:Robert Pohle, Cake Board, 1935-1942, NGA 24734.jpg",
+   "credit": "Robert Pohle",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Robert_Pohle,_Cake_Board,_1935-1942,_NGA_24734.jpg"
+  },
+  "pk-033": {
+   "file": "pk-032.webp",
+   "key": "same:pk-032",
+   "v": "20194ffc",
+   "title": "File:Dupont-baby-bag-advert (8080777436).jpg",
+   "credit": "1950sUnlimited",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Dupont-baby-bag-advert_(8080777436).jpg"
+  },
+  "yh-022": {
+   "file": "pk-030.webp",
+   "key": "same:pk-030",
+   "v": "6a1f3330",
+   "title": "File:Robert Pohle, Cake Board, 1935-1942, NGA 24734.jpg",
+   "credit": "Robert Pohle",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Robert_Pohle,_Cake_Board,_1935-1942,_NGA_24734.jpg"
+  },
+  "yh-023": {
+   "file": "pk-030.webp",
+   "key": "same:pk-030",
+   "v": "6a1f3330",
+   "title": "File:Robert Pohle, Cake Board, 1935-1942, NGA 24734.jpg",
+   "credit": "Robert Pohle",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Robert_Pohle,_Cake_Board,_1935-1942,_NGA_24734.jpg"
+  },
+  "yh-024": {
+   "file": "pk-032.webp",
+   "key": "same:pk-032",
+   "v": "20194ffc",
+   "title": "File:Dupont-baby-bag-advert (8080777436).jpg",
+   "credit": "1950sUnlimited",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Dupont-baby-bag-advert_(8080777436).jpg"
+  },
+  "yh-025": {
+   "file": "pk-032.webp",
+   "key": "same:pk-032",
+   "v": "20194ffc",
+   "title": "File:Dupont-baby-bag-advert (8080777436).jpg",
+   "credit": "1950sUnlimited",
+   "license": "CC BY 2.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Dupont-baby-bag-advert_(8080777436).jpg"
+  },
+  "yh-026": {
+   "file": "pk-028.webp",
+   "key": "same:pk-028",
+   "v": "7b8cdc34",
+   "title": "File:Chiffon cake 02.jpg",
+   "credit": "Snp at Japanese Wikipedia",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Chiffon_cake_02.jpg"
+  },
+  "yh-027": {
+   "file": "pk-028.webp",
+   "key": "same:pk-028",
+   "v": "7b8cdc34",
+   "title": "File:Chiffon cake 02.jpg",
+   "credit": "Snp at Japanese Wikipedia",
+   "license": "CC BY-SA 3.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Chiffon_cake_02.jpg"
+  },
+  "yh-028": {
+   "file": "pk-026.webp",
+   "key": "same:pk-026",
+   "v": "06481eef",
+   "title": "File:Table utensils wrapped in a paper napkin 2.jpg",
+   "credit": "Ser Amantio di Nicolao",
+   "license": "CC BY-SA 4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Table_utensils_wrapped_in_a_paper_napkin_2.jpg"
+  }
+ }
+}
