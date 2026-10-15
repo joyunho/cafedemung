@@ -132,7 +132,8 @@ try {
   check((await B.textContent('#vw-name')) === '망고', '표에서 사진 누르면 크게 보기');
   await B.click('#vw-close');
   check(await B.isVisible('#table'), '크게 보기 닫아도 표 화면 유지');
-  await B.click('#copyOrdersBtn'); await B.waitForSelector('#toast:not([hidden])');
+  await B.click('#copyOrdersBtn');
+  await B.waitForFunction(() => { const t = document.querySelector('#toast'); return !t.hidden && t.textContent.includes('복사'); }, null, { timeout: 5000 }).catch(() => {});
   check((await B.textContent('#toast')).includes('복사'), '주문 목록 복사 토스트: ' + (await B.textContent('#toast')));
   const copied = await B.evaluate(() => navigator.clipboard.readText()).catch(() => '');
   if (copied) check(copied.includes('[과일·케이크 · 케이크]'), '주문 목록에 분류까지 표시');
@@ -203,7 +204,8 @@ try {
   await C.click('#gearBtn'); await C.waitForSelector('#settings:not([hidden])');
   check((await C.textContent('#codeBox')) === code, '설정에 가게 코드 표시');
   check((await C.textContent('#peersLine')).includes('윤호') || (await C.textContent('#peersLine')).includes('사장님'), '연결된 폰 목록: ' + (await C.textContent('#peersLine')).trim());
-  await C.click('#copyTableBtn'); await C.waitForSelector('#toast:not([hidden])');
+  await C.click('#copyTableBtn');
+  await C.waitForFunction(() => { const t = document.querySelector('#toast'); return !t.hidden && t.textContent.includes('복사'); }, null, { timeout: 5000 }).catch(() => {});
   check((await C.textContent('#toast')).includes('복사'), '표 복사 토스트');
   await C.click('#st-cancel');
 
@@ -289,6 +291,7 @@ try {
     try {
       const realCode = 'T' + Math.random().toString(36).slice(2, 13).toUpperCase().replace(/[^A-Z0-9]/g, 'X').padEnd(11, 'X');
       const R1 = await phone('R1', { ntfy: 'https://ntfy.sh' }); await setupPhone(R1, '윤호', realCode);
+      await R1.click('#sh-start');   // 새 코드의 첫 폰: 시트 숫자로 시작
       const R2 = await phone('R2', { ntfy: 'https://ntfy.sh' }); await setupPhone(R2, '사장님', realCode);
       await R1.locator('.item[data-id="yy-003"] button.inc[data-f="u"]').click();
       await R2.waitForFunction(() => document.querySelector('#u-yy-003').value === '17', null, { timeout: 40000 });
