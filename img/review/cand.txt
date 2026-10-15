@@ -1,264 +1,64 @@
-yy-001	1	File:San Pellegrino bottle for sparkling water .jpg
-yy-001	2	File:Acquissima Passion natural sparkling mineral water.jpg
-yy-001	3	File:Sparkling-bottled-water.jpg
-yy-001	4	File:Sparkling Ice Lemonade Flavored Water.jpg
-yy-001	5	File:Bottled sparkling water.jpg
-yy-001	6	File:Bottle of Vess Sparkling Seltzer Water - DPLA - 18f722737af1be7c17886f6dc42b5c34 (page 1).jpg
-yy-001	7	File:Bottle of Vess Sparkling Seltzer Water - DPLA - 18f722737af1be7c17886f6dc42b5c34 (page 2).jpg
-yy-001	8	File:Bludenz-Fohrenburg-old sparkling water bottles-02ASD.jpg
-yy-006	1	File:Binggrae Banana Flavored Milk 03.jpg
-yy-006	2	File:Binggrae Banana Flavored Milk 04 (15723530512).jpg
-yy-006	3	File:Binggrae Banana Flavored Milk 03 (15723530812).jpg
-yy-006	4	File:Binggrae Banana Flavored Milk 01 (15723531232).jpg
-yy-006	5	File:Binggrae Banana Flavored Milk 02 (15720063811).jpg
-yy-006	6	File:Bananamilk.jpg
-yy-006	7	File:Banana milk.jpg
-yy-006	8	File:Various flavors of soy milk for sale in Tokyo area Oct 14 2018.jpeg
-yy-026	1	File:Lubin Baugin - Still-Life with Wafer Biscuits (Le Dessert de Gaufrettes) - WGA1516.jpg
-yy-026	2	File:Milk flavored peanut wafer biscuits.jpg
-yy-026	3	File:Lubin Baugin, il dessert di cialde, 1630-35 ca..JPG
-yy-026	4	File:Knoppers milk flavored peanut wafer biscuits.jpg
-yy-026	5	File:Lubin Baugin 001.jpg
-yy-026	6	File:Assorted biscuits Khong Guan.JPG
-yy-026	7	File:Cundo cantaloupe flavored wafers.jpg
-yy-026	8	File:Loacker Quadratini, napolitaner.jpg
-yy-027	1	File:Pumpkin Seeds, Almond Flakes and Pine Nuts - Breakfast - Holiday Inn - Whitechapel.jpg
-yy-027	2	File:DSC 7219 Decadent tiramisu slice topped with whipped cream toasted almond flakes and an edible violet on a white plate.jpg
-yy-027	3	File:Breakfast - Greek Yogurt with chia seeds, sunflower seeds, almond flakes and walnuts - Holiday Inn - Bloomsbury - London 2026-06-05.jpg
-yy-027	4	File:Almond Croissant - Caffè Nero 2026-05-28.jpg
-yy-027	5	File:Lithic. Knapped or flaked waste flake (FindID 1003537).jpg
-yy-027	6	File:Chocolate & Almond Croissant - GAIL's Bakery 2025-12-21.jpg
-yy-027	7	File:Iced Almond Croissant Latte - M&S Café, Worthing 2026-06-05.jpg
-yy-027	8	File:Flake (FindID 474619).jpg
-yy-028	1	File:Olive oil and balsamic vinegar combined dispenser.jpg
-yy-028	2	File:BALSAMIC VINEGAR WITH PROTECTIVE GEOGRAPHICAL SIGN.חומץ בלסמי עם סימון הגנה גאוגרפי.jpg
-yy-028	3	File:Traditional Balsamic Vinegars of Modena (right) and Reggio Emilia (left).jpg
-yy-028	4	File:Bottle of oil and vinegar in an Italian restaurant in Singapore - 20130324.jpg
-yy-028	5	File:Olivolja Balsamvinäger 90-tal.jpg
-yy-028	6	File:48 aceto 25 a e vecch.jpg
-yy-028	7	File:Münster, Domplatz, Wochenmarkt -- 2019 -- 2709.jpg
-yy-028	8	File:Aceto Balsamico.jpg
-yy-031	1	File:Korean.dessert-Tteok-Jeolpyeon-dotori-ssuk-01.jpg
-yy-031	2	File:Korean acorn jellies.jpg
-yy-031	3	File:Artemisia princeps tea.jpg
-yy-031	4	File:Artemisia princeps 2.JPG
-yy-031	5	File:Artemisia princeps 5.jpg
-yy-031	6	File:Artemisia princeps 3.jpg
-yy-031	7	File:Artemisia princeps 4.jpg
-yy-031	8	File:Korean wormwood(Artemisia princeps).jpg
-yy-032	1	File:Theobroma cacao flower 01.JPG
-yy-032	2	File:Cocoa powder.jpg
-yy-032	3	File:Dutch process and natural cocoa.jpg
-yy-032	4	File:Cocoa-powder-1883108.jpg
-yy-032	5	File:Cocoa Powder and Chocolate on Marble Background.jpg
-yy-032	6	File:Cocoa Spelled Out in Cocoa Powder.jpg
-yy-032	7	File:Cans of Bournville Cocoa powder c.1910.jpg
-yy-032	8	File:1920s or 1930s Swedish Marabou 250 gr Ergo cocoa powder tin.jpg
-pk-023	1	File:Clara Peeters - Still Life with Cheeses, Almonds and Pretzels.jpg
-pk-023	2	File:Pretzel-Snack-American.jpg
-pk-023	3	File:Pretzel Ampersand.jpg
-pk-023	4	File:Pretzel Knot.jpg
-pk-023	5	File:Pretzel (14243965679).jpg
-pk-023	6	File:Pretzel bows🥨.jpg
-pk-023	7	File:Pretzel-Prague.JPG
-pk-023	8	File:Pretzel, Auntie Annes, Kingston MA.jpg
-yh-005	1	File:Market Aix-en-Provence 20100828 Calisson-Honey.jpg
-yh-005	2	File:The original Appledore cook book - containing practical receipts for plain and rich cooking (1881) (14587792807).jpg
-yh-005	3	File:Minstrels With Krause at the 1920 State Fair of North Carolina.jpg
-yh-005	4	File:Dreer's garden book 1921 (1921) (21009886152).jpg
-yh-005	5	File:Sirop de fraise artisanal.jpg
-yh-005	6	File:Some LA -leftovers for dinner when we returned to Oakland. Cold fried chicken, biscuit, strawberry jam, and maple syrup from @poppyandrosela with fresh strawberries and Greek yogurt. (16642631850).jpg
-yh-005	7	File:Waffles, banana, kiwi fruit, and strawberries, with maple syrup and powdered sugar - Auckland, New Zealand.jpg
-yh-005	8	File:Strawberry Sundae 02.jpg
-pk-002	1	File:Paper coffee cup, Novosibirsk 02.jpg
-pk-002	2	File:Paper coffee cup, Novosibirsk 01.jpg
-pk-002	3	File:Disposable , paper coffee cups, Christmas in Australia, 2021.jpg
-pk-002	4	File:Disposable paper coffee cup at Kakadu Crocodile Hotel, Jabiru, Northern Territory, 2021.jpg
-pk-002	5	File:Hot Stopper in the lid of a paper coffee cup with a cardboard sleeve.jpeg
-pk-002	6	File:Paper cup and coffee cup at restaurant Wanda's.jpg
-pk-002	7	File:Disposable paper coffee cups San Churro Chocolateria, 2020.jpg
-pk-002	8	File:Japan Airlines paper coffee cup with creamer 20171016 (cropped).jpg
-pk-005	1	File:Pistachios gelato Milkshakes - domed plastic cup.jpg
-pk-005	2	File:Cup Lid made of biodegradable plastic-top PNr°1108.jpg
-pk-005	3	File:HK 中環 Central Lunch MacDonald's drink cup plastic cover 6PS 塑膠分類標誌 Resin identification code Sept 2019 SSG 01.jpg
-pk-005	4	File:Coffee cup lid.jpg
-pk-005	5	File:Personalized cup with flower design with straw and lid and happy birthday card (19437692823).jpg
-pk-005	6	File:Plastic travel mug.jpg
-pk-005	7	File:HK Sai Kung District 將軍澳 TKO 康城路1號 Lohas Park Road Montara LOHAS Park 日出康城商場 The Lohas Shopping Mall shop 麥當勞 McDonald's Restaurant food drink PS6 plastic white cup lid March 2022 Px2.jpg
-pk-005	8	File:A cup of Slurpee sold in Taiwan.jpg
-pk-015	1	File:Bubble Tea.png
-pk-015	2	File:Bubble Tea Becher.jpg
-pk-015	3	File:2009-12-30 cups of bubble tea at a Chunshuitang in Taipei.jpg
-pk-015	4	File:QXFQ bubble tea 20230513 023013.jpg
-pk-015	5	File:Matcha green tea.jpg
-pk-015	6	File:A bubble tea with tapioca pearls, July 2018.jpg
-pk-015	7	File:CoCo Fresh Tea & Juice 2026-07-12Co shop branch 02.jpg
-pk-015	8	File:CoCo Fresh Tea & Juice 2026-07-12Co shop branch 03.jpg
-pk-007	1	File:Double Cup Carrier-Vanta-3-bg.webp
-pk-007	2	File:Reine-Bamiléké-Cameroun.jpg
-pk-007	3	File:Items for traditional marriage.jpg
-pk-007	4	File:Alapere photographer rally LAGOS Nigeria 09.jpg
-pk-007	5	File:US Navy 041207-N-2984R-084 NASCAR Nextel Cup driver John Andretti pays a visit to the Air Traffic Control crew in the Carrier Air Traffic Control Center (CATCC) aboard the Nimitz-class aircraft carrier USS Harry S. Truman (CVN.jpg
-pk-007	6	File:2012 Thorpe Cup 057.jpg
-pk-007	7	File:2012 Thorpe Cup 055.jpg
-pk-007	8	File:2012 Thorpe Cup 081.jpg
-pk-010	1	File:BK Meal.JPG
-pk-010	2	File:Large Bacon Deluxe Value Meal, Hungry Jack's Cannington Carousel, 2025 (01).jpg
-pk-010	3	File:Zinger Burger Box Hot & Crispy, KFC Garden City Food Court WA, 2025 (01).jpg
-pk-010	4	File:Zinger Burger Box Hot & Crispy, KFC Garden City Food Court WA, 2025 (03).jpg
-pk-010	5	File:2 for 1 Betty's Deluxe burgers, Betty's Burgers Carousel, 2026 (01).jpg
-pk-010	6	File:Zinger Burger Box Hot & Crispy, KFC Garden City Food Court WA, 2025 (02).jpg
-pk-010	7	File:2 for 1 Betty's Deluxe burgers, Betty's Burgers Carousel, 2026 (02).jpg
-pk-010	8	File:Zinger Bánh Mì Combo, KFC Garden City Food Court WA, 2025 (02).jpg
-pk-011	1	File:Balap Karung.jpg
-pk-011	2	File:Schoolgirls in Bamozai.JPG
-pk-011	3	File:Garbage bag Basel Bebbisagg.JPG
-pk-011	4	File:Your motherland will never forget - restoration.jpg
-pk-011	5	File:Man at Dundas subway station, Toronto, 2008-05-06.jpg
-pk-011	6	File:Bag Illustration.png
-pk-011	7	File:Traditional Sack at Central Asian Museum Leh 21.jpg
-pk-011	8	File:Bag-dynamic-gradient.png
-pk-013	1	File:India - Varanasi paper bag maker - 0078.jpg
-pk-013	2	File:Brown Bag (with staple).jpg
-pk-013	3	File:Brown paper bag texture.jpg
-pk-013	4	File:White paper bag on white and black background.jpg
-pk-013	5	File:Empty paper bag from a Five Guys meal.jpg
-pk-013	6	File:Brown bag.jpg
-pk-013	7	File:Brown Paper Bag Texture Free Creative COmmons (6816220224).jpg
-pk-013	8	File:Brown paper bag with happy smiley over head.jpg
-pk-022	1	File:Public Garbage Bin in Nacka.jpg
-pk-022	2	File:Dowsett Dumping - 3038028582.jpg
-pk-022	3	File:'I' is for Imitation - Chesnut Road.jpg
-pk-022	4	File:The political cartoon for the year 1775 (BM 1868,0808.10072).jpg
-pk-022	5	File:Many concrete pieces of aged and weathered on the big semi-transparent trash bag inside.jpg
-pk-022	6	File:(on train) plastic bag for trash by Taiwan Railway Administration.jpg
-pk-022	7	File:TRA glass cup and trash bag at TR Banqiao Station 20250712.jpg
-pk-022	8	File:Garbage bags outside in neighborhood at twilight.jpg
-pk-032	1	File:Dupont-baby-bag-advert (8080777436).jpg
-pk-032	2	File:Cellofan.jpg
-pk-032	3	File:Fiesta de las Culturas Indígenas 096.jpg
-pk-032	4	File:당면 glassnoodels.jpg
-pk-032	5	File:The Market woman.jpg
-pk-032	6	File:Women's Activities and Conferences (1958-1960) - DPLA - 02c235e9a22db9b1bd48629a83a3b27d.jpg
-pk-032	7	File:"The Test Tube Girl" - DPLA - 68c2fc423819db8cc8b48649ab5d33cf.jpg
-pk-032	8	File:Wallet in a clear plastic bag for security checks, Singapore - 20150728.jpg
-pk-018	1	File:Curryking-4612.jpg
-pk-018	2	File:Currywurst forks.jpg
-pk-018	3	File:Picker made from Cellulose Acetate Biograde.JPG
-pk-018	4	File:Currywurst mit pommes in Berlin.jpg
-pk-018	5	File:Frietvorkje.jpg
-pk-018	6	File:FishAndChipsBerlin.JPG
-pk-018	7	File:German curry sausage with chips.JPG
-pk-018	8	File:BiodegradablePlasticUtensils1.jpg
-pk-019	1	File:Plastic Knife Mould.jpg
-pk-019	2	File:Victorinox German Army Knife 1985.JPG
-pk-019	3	File:Swiss army knife open 20050612 (cropped).jpg
-pk-019	4	File:23 0049718 Convair Negative Image - Convair employee cutting plastic with knife (53867607599).jpg
-pk-019	5	File:Swiss army knife open 20050612.jpg
-pk-019	6	File:FORK. KNIFE. SPOON..jpg
-pk-019	7	File:Single Use Plastic Cutlery.jpg
-pk-019	8	File:Victorinox German Army Knife 1985 noBG.png
-pk-027	1	File:A typical meal tray at a Russian cafeteria.jpg
-pk-027	2	File:42. Donald DeLue to Supt. Schober, April 4, 1972 Page 1 (10399072-4eff-4db0-b6c3-061637f9a627).jpg
-pk-027	3	File:Christian herald and signs of our times (1891) (14777112802).jpg
-pk-027	4	File:Canadian forest industries July-December 1912 (1912) (20521581432).jpg
-pk-027	5	File:A forcible entrance into Leadenhall- Street; by Master Billy declaratory upon a dun'd- ass. (BM 1868,0808.5713).jpg
-pk-027	6	File:11. The Tennessee Monument Commission Presents the Tennessee-Gettysburg Monument Program, before July 3, 1982 Page 2.jpg (3aa15d83-b353-467d-a188-35cdb98161a6).jpg
-pk-027	7	File:Florists' review (microform) (16683751285).jpg
-pk-027	8	File:The New York Lottery Policy Game in the New York Herald of New York City, New York on November 23, 1869.png
-pk-030	1	File:Robert Pohle, Cake Board, 1935-1942, NGA 24734.jpg
-pk-030	2	File:Crosby Snack Shed and Cake Board - geograph.org.uk - 7796507.jpg
-pk-030	3	File:Wikimedia Italia board with Wikipedia 25 birthday cake 01.jpg
-pk-030	4	File:Dignitaries and Board Members with cake (43271227784).jpg
-pk-030	5	File:Louise cake slices.jpg
-pk-030	6	File:Wikimedia UK charity cake 2.jpg
-pk-030	7	File:Wikimedia UK charity cake 1.jpg
-pk-030	8	File:Christening Cake (9696366409).jpg
-pk-028	1	File:Chiffon cake 02.jpg
-pk-028	2	File:Making of a chiffon cake.jpg
-pk-028	3	File:Chiffon cake kanko.jpg
-pk-028	4	File:Making Chiffon cake No 3.jpg
-pk-028	5	File:Colourful chiffon cake 2.jpg
-pk-028	6	File:Homemade chiffon cake from my mother friends.jpg
-pk-028	7	File:Making Chiffon cake 4.jpg
-pk-028	8	File:Chiffon cake 01.jpg
-yh-001	1	File:Sliced-cubed Mango 01.jpg
-yh-001	2	File:Liat Portal for Foodie Disorder - Banana Mango Nut Bowl.jpg
-yh-001	3	File:Liat Portal for Foodie Disorder - Fresh mango halves scored and plated.jpg
-yh-001	4	File:Liat Portal for Foodie Disorder - Mango plate with strawberries vegetables nuts and pesto.jpg
-yh-001	5	File:A Yellow Swiss roll with Mango cube.jpg
-yh-001	6	File:Liat Portal for Foodie Disorder - Mango.jpg
-yh-001	7	File:Pickled Mango.png
-yh-001	8	File:Paneer-Potato in Mango Sauce.jpg
-yh-009	1	File:Cupcakes, chocolate and strawberry flavour.jpg
-yh-009	2	File:Strawberry Chocolate Cake.webp
-yh-009	3	File:Chocolate strawberry cake.jpg
-yh-009	4	File:Chocolate cake with strawberries.jpg
-yh-009	5	File:Chocolate banana cake garnished with strawberry ice cream.jpg
-yh-009	6	File:Chocolate Covered Strawberry Wedding Cake - panoramio.jpg
-yh-009	7	File:Chocolate cake with cream and strawberries.jpg
-yh-009	8	File:Vegan chocolate cake with sliced strawberries.jpg
-yh-010	1	File:Sweet potato ice cream and castela cake (42314902224).jpg
-yh-010	2	File:Bywater Bakery New Orleans Jan 2019 Sweet Potato King Cake.jpg
-yh-010	3	File:Roasted garae-tteok and sweet potatoes.png
-yh-010	4	File:Roasted sweet potatoes and garae-tteok.png
-yh-010	5	File:Karaimo rare cake.JPG
-yh-010	6	File:Lasagne, peas with mushrooms, glazed sweet potatoes, marble cake - commonwealth zk51x730m.jpg
-yh-010	7	File:Patty cake (5670175839).jpg
-yh-010	8	File:12.15 總統院際國政茶敘 - 54985094884.jpg
-yh-013	1	File:Rum and Raisin Ice cream cake. Made fresh in-store (27335721587).jpg
-yh-013	2	File:IMG-20240601-WA0044Peach and fresh cream cake.jpg
-yh-013	3	File:Ice cream cakes for any occasion. Made fresh in-store (28997443328).jpg
-yh-013	4	File:IMG-20240601-WA0026 Fresh cream and fruit cake.jpg
-yh-013	5	File:IMG-20240601-WA0025 Fresh cream and fruit butter cake.jpg
-yh-013	6	File:Who doesn't like ice cream. And when it's made out of fresh Cold Rock Ice cream (41204693370).jpg
-yh-013	7	File:Wedding Cake 2 tier w Swiss butter cream and 90 fresh white cream roses (14597749783).jpg
-yh-013	8	File:Wedding Cake 2 tier w Swiss butter cream and 90 fresh white cream roses (14574314081).jpg
-yh-015	1	File:Pineapple juice mixed with pear-lemon-chia seeds-2860722.jpg
-yh-015	2	File:'Trulem' Lemon Juice Cordial label (6954616263).jpg
-yh-015	3	File:"An Aesthetic Lemon Juice making".jpg
-yh-015	4	File:Person prepares a drink using a jar and a squeezer with water bottles nearby.jpg
-yh-015	5	File:Pouring water into a jar to prepare a drink during a gathering.jpg
-yh-015	6	File:Eupene's Monsa lemon squash label (6819374018).jpg
-yh-015	7	File:The Process Of Making Omubisi Gwa'menvu (Banana Juice) 20.jpg
-yh-015	8	File:Eargon hummus 1.jpg
-yh-017	1	File:Abraham van Beyeren - Still Life with a silver Wine-jar and a reflected Portrait of the Artist ASH ASHM WA1940 2 10.jpg
-yh-017	2	File:L is for lemon curd.jpg
-yh-017	3	File:Lemon and orange slices in a big jar full of sweet beverage.jpg
-yh-017	4	File:塩レモン３.jpg
-yh-017	5	File:塩レモン２.jpg
-yh-017	6	File:Open refrigerator with food at night.jpg
-yh-017	7	File:20160812-AMS-LSC-0277 (28931073426).jpg
-yh-017	8	File:20160812-AMS-LSC-0201 (28344326864).jpg
-yh-018	1	File:Citrus paradisi (Grapefruit, pink) white bg.jpg
-yh-018	2	File:Citrus paradisi (Grapefruit, pink).jpg
-yh-018	3	File:Citrus x paradisi (Macfad.) Pompelino Grapefruit 002.jpg
-yh-018	4	File:Pink Grapefruit 2011-1.jpg
-yh-018	5	File:Pink Grapefruit (3047091102).jpg
-yh-018	6	File:Pink Grapefruit (3047084674).jpg
-yh-018	7	File:Pink Grapefruit.jpg
-yh-018	8	File:Self-made gin pink grapefruit long drink.jpg
-yh-020	1	File:Fruits jam variants.jpg
-yh-020	2	File:Blueberry jam waterfall.jpg
-yh-020	3	File:Fruit preserve jars.jpg
-yh-020	4	File:Making Blueberry Jam 1.jpg
-yh-020	5	File:Blueberry Jam (862679726).jpg
-yh-020	6	File:Tasty Fruit Preserves Sugar Bowl 1940 program.jpg
-yh-020	7	File:Making Blueberry Jam 4.jpg
-yh-020	8	File:Making Blueberry Jam 6.jpg
-yy-008	1	File:Glass of strawberry juice 20180815.jpg
-yy-008	2	File:Cherry juice 2 tall 1 short glass 259A7251.jpg
-yy-008	3	File:Cherry juice 259A7261.jpg
-yy-008	4	File:2024-12-16 15 09 43 A glass of strawberry lemonade at the Applebee's along U.S. Route 1 (Brunswick Pike) in Lawrence Township, Mercer County, New Jersey.jpg
-yy-008	5	File:5 Strawberry DNA Extraction.jpg
-yy-008	6	File:4 Strawberry DNA Extraction.jpg
-yy-008	7	File:6 Strawberry DNA Extraction.jpg
-yy-008	8	File:1 Strawberry DNA Extraction.jpg
-yy-024	1	File:Vodka and Blue Curacao (with Brilliant Blue FCF).jpg
-yy-024	2	File:Bar-Sirup.jpg
-yy-024	3	File:Blue Curaçao Bottle.jpg
-yy-024	4	File:Chroma Lab - Blue Curaçao 02.jpg
-yy-024	5	File:Chroma Lab - Blue Curaçao 01.jpg
-yy-024	6	File:Mr. Boston Blue Curacao.jpg
-yy-024	7	File:Bols Blue Curaçao.jpg
-yy-024	8	File:16-09-17-WikiLovesCocktails-Flaschen-Img0041.jpg
+yy-027	1	File:Almond slices.jpg
+yy-027	2	File:Almond tart 6.jpg
+yy-027	3	File:Malt-based sweet barfi with almond slices, in West Bengal, India, photographed on December 4, 2023.jpg
+yy-027	4	File:Supermoist banana and almond cake, slice.jpg
+yy-027	5	File:Almond croissant - Auckland, New Zealand.jpg
+yy-027	6	File:Mocha almond fudge avocado cake (4673005762).jpg
+yy-027	7	File:Supermoist banana and almond cake.jpg
+yy-027	8	File:Sliced almonds in a supermarket.jpg
+pk-010	1	File:Eight drinking straws (4273846588).jpg
+pk-010	2	File:Refraction drinking-straw.jpg
+pk-010	3	File:A paper straw for bubble tea and the popular straw.jpg
+pk-010	4	File:Two crazy straws.png
+pk-010	5	File:Packages of colorful plastic straws.jpg
+pk-010	6	File:Straw.jpg
+pk-010	7	File:Painting showing Ancient Egyptian drinking straw circa 1300 B.C.E., Neues Museum, Berlin.jpg
+pk-010	8	File:Metal straw.jpg
+pk-011	1	File:India - Varanasi paper bag maker - 0078.jpg
+pk-011	2	File:Albert Heijn paper shopping bag (2019) 03.jpg
+pk-011	3	File:Albert Heijn paper shopping bag (2019) 05.jpg
+pk-011	4	File:Albert Heijn paper shopping bag (2019) 06.jpg
+pk-011	5	File:Albert Heijn paper shopping bag (2019) 08.jpg
+pk-011	6	File:Albert Heijn paper shopping bag (2019) 01.jpg
+pk-011	7	File:Albert Heijn paper shopping bag (2019) 07.jpg
+pk-011	8	File:Zara paper shopping bag, Groningen (2019) 02.jpg
+pk-022	1	File:Black garbage bag.jpg
+pk-022	2	File:A typical black bin bag from the UK 20060811.jpg
+pk-022	3	File:Blue garbage bag.jpg
+pk-022	4	File:Puerto Vallarta trash in the road.jpg
+pk-022	5	File:Bouche de poubelle à l'arrêt de bus Les Granges.jpg
+pk-022	6	File:Pedal bin closed.jpg
+pk-022	7	File:Spare tire on rear of Toyota Land Cruiser J60 with trash bag.jpg
+pk-022	8	File:Garbage bag Basel Bebbisagg.JPG
+pk-027	1	File:Receipt roll of clothing issued to non-commissioned officers, musicians, and privates, of detachment cattle corral, April 1865.jpg
+pk-027	2	File:Receipt roll of clothing issued to non-commissioned officers, musicians, and privates, of detachment cattle corral, April 1865 - DPLA - 5f35588947917f7ab40091279f3740d9 (page 2).jpg
+pk-027	3	File:Receipt roll of clothing issued to non-commissioned officers, musicians, and privates, of detachment cattle corral, April 1865 - DPLA - 5f35588947917f7ab40091279f3740d9 (page 1).jpg
+pk-027	4	File:Papyrus containing the granting of religious services in the temple of Hathor in Demotic and a receipt in Greek - Museo Egizio (Turin) S 6080 p07.jpg
+pk-027	5	File:Papyrus containing the granting of religious services in the temple of Hathor in Demotic and a receipt in Greek - Museo Egizio (Turin) S 6080 p03.jpg
+pk-027	6	File:Papyrus containing the granting of religious services in the temple of Hathor in Demotic and a receipt in Greek - Museo Egizio (Turin) S 6080 p02.jpg
+pk-027	7	File:Papyrus containing the granting of religious services in the temple of Hathor in Demotic and a receipt in Greek - Museo Egizio (Turin) S 6080 p08.jpg
+pk-027	8	File:Papyrus containing the granting of religious services in the temple of Hathor in Demotic and a receipt in Greek - Museo Egizio (Turin) S 6080 p04.jpg
+pk-030	1	File:Frances (Appleton) Longfellow to Thomas Gold Appleton, 5 July 1839 (edfe7613-b302-4793-85e1-fec6d01e5e89).jpg
+pk-030	2	File:Frances (Appleton) Longfellow to Thomas Gold Appleton, 5 July 1839 (5f202b0d-332b-4825-8eca-e1af3b2df2b9).jpg
+pk-030	3	File:Frances (Appleton) Longfellow to Thomas Gold Appleton, 5 July 1839 (fe2fe587-6583-4cb8-a85c-96127d6d4ebf).jpg
+pk-030	4	File:Frances (Appleton) Longfellow to Thomas Gold Appleton, 5 July 1839 (0c6fc462-2bdc-40f3-8f16-0c4b1d9a43dc).jpg
+pk-030	5	File:Directory of the inhabitants, institutions, manufacturing establishments, business, societies, etc., etc., in the towns of Waltham and Watertown (1871) (14760931034).jpg
+pk-030	6	File:Life and light for woman (1873) (14594810888).jpg
+pk-030	7	File:New Bedford, Massachusetts; its history, industries, institutions and attractions (1889) (14591164917).jpg
+pk-030	8	File:James Carville Unplugged (4156526243).jpg
+yh-010	1	File:Roasted garae-tteok and sweet potatoes.png
+yh-010	2	File:Roasted sweet potatoes and garae-tteok.png
+yh-010	3	File:Korean food in Korea 43.jpg
+yh-010	4	File:KOCIS Borigoge Village in Yangpyeong-si, Gyeonggi-do (4811001721).jpg
+yh-010	5	File:Sweet Potato.jpg
+yh-010	6	File:Ipomoea batatas (Sweet Potato) Flower.jpg
+yh-010	7	File:Sweet potatoes 2.jpg
+yh-010	8	File:Sweet Potato Snack.jpg
+yh-013	1	File:Piece of chocolate cake on a white plate decorated with chocolate sauce.jpg
+yh-013	2	File:Apple cake with vanilla ice cream 2.jpg
+yh-013	3	File:Slice of cake at the office.jpg
+yh-013	4	File:Ice Cream swiss roll.jpg
+yh-013	5	File:Red velvet cake slice.jpg
+yh-013	6	File:Dobos-Eszterhazy-Zserbo.jpg
+yh-013	7	File:Finished cake (3372596788).jpg
+yh-013	8	File:Orangentorte.jpg
