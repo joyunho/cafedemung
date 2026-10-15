@@ -37,6 +37,9 @@ jobs:
       - name: Candidate sheets for review
         if: hashFiles('img/review/candidates.json') != ''
         run: python tools/fetch_images.py --candidates img/review/candidates.json
+      - name: Remove old candidate sheets
+        if: hashFiles('img/review/candidates.json') == ''
+        run: rm -f img/review/cand-*.jpg img/review/cand.txt
       - name: Commit images
         run: |
           git config user.name "github-actions[bot]"
