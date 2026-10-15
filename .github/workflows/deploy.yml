@@ -1,7 +1,12 @@
 # main에 올리면 앱 파일만 모아 gh-pages 브랜치에 게시한다. GitHub Pages는 gh-pages 브랜치를 그대로 서비스한다.
+# 제품 사진 수집(Fetch product images)이 main에서 끝나도 다시 게시한다.
 name: Deploy app
 on:
   push:
+    branches: [main]
+  workflow_run:
+    workflows: ["Fetch product images"]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 permissions:
@@ -12,12 +17,18 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Collect site files
         run: |
-          mkdir -p _site
+          mkdir -p _site/img
           cp -r index.html config.js sw.js manifest.webmanifest icons .nojekyll _site/
+          if [ -d img/items ]; then
+            cp -r img/items img/manifest.json img/CREDITS.md _site/img/
+          fi
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
