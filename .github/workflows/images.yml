@@ -1,0 +1,50 @@
+# 제품 사진 수집: img/sources.json 의 출처에서 사진을 받아 썸네일로 줄이고 저장소에 커밋한다.
+name: Fetch product images
+on:
+  push:
+    branches: [main, claude/inventory-app]
+    paths:
+      - img/sources.json
+      - tools/fetch_images.py
+      - .github/workflows/images.yml
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "이미 받은 사진도 모두 다시 받기"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: images-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Pillow
+        run: pip install --quiet "pillow>=11,<13"
+      - name: Fetch and resize images
+        run: python tools/fetch_images.py --review ${{ inputs.force && '--force' || '' }}
+      - name: Commit images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898732+github-actions[bot]@users.noreply.github.com"
+          git add img
+          if git diff --cached --quiet; then
+            echo "바뀐 사진 없음"
+            exit 0
+          fi
+          git commit -m "제품 사진 갱신 (자동)"
+          for i in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
