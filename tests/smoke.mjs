@@ -94,6 +94,8 @@ try {
   await B.waitForFunction(() => document.querySelector('#summary').textContent.includes('윤호'), null, { timeout: 20000 });
   check(true, 'B가 윤호 폰의 스냅샷을 받음');
   check(!(await A.isVisible('#pairHint')), '연결되면 안내 배너가 사라짐');
+  await B.waitForSelector('#syncHint', { state: 'hidden', timeout: 20000 });
+  check(true, 'B가 A의 숫자를 받은 뒤 고치기 가능');
 
   console.log('3) A에서 +2 → B에 반영');
   const incA = A.locator('.item[data-id="yy-001"] button.inc[data-f="u"]');
@@ -217,6 +219,9 @@ try {
     { id: 'pk-028', name: '쉬폰 비닐 미니', section: '포장·소모품', group: '쉬폰 포장', note: '', min: null, order: 1210, unopened: 30, opened: 1, t: { u: 1000, o: 0, m: 0, d: 0 }, b: { u: '윤호', o: '', m: '' } },
     { id: 'yh-026', name: '쉬폰 비닐 미니', section: '윤호 정리', group: '쉬폰·포장', note: '', min: null, order: 2250, unopened: 12, opened: null, t: { u: 2000, o: 0, m: 0, d: 0 }, b: { u: '윤호', o: '', m: '' } },
     { id: 'yh-001', name: '망고', section: '윤호 정리', group: '냉동과일·청', note: '', min: null, order: 2010, unopened: 3, opened: 1, t: { u: 0, o: 0, m: 500, d: 0 }, b: { u: '', o: '', m: '윤호' } },
+    { id: 'nUSER1', name: '직접 추가한 시럽', section: '윤영 정리', group: '시럽', note: '', min: null, order: 480, unopened: 1, opened: null, t: { u: 300, o: 0, m: 300, d: 0 }, b: { u: '윤호', o: '', m: '윤호' } },
+    { id: 'nUSER2', name: '쉬폰 리본', section: '윤호 정리', group: '쉬폰·포장', note: '', min: null, order: 2300, unopened: 5, opened: null, t: { u: 300, o: 0, m: 300, d: 0 }, b: { u: '윤호', o: '', m: '윤호' } },
+    { id: 'yy-005', name: '유기농딸기', section: '윤영 정리', group: '유기농', note: '', min: null, order: 50, unopened: null, opened: null, t: { u: 0, o: 0, m: 0, d: 900 }, b: { u: '', o: '', m: '' } },
   ];
   const oldStore = { v: 1, items: oldItems, lastId: '', lastIdAt: 0, peers: {}, lastSnapAt: 0, lastSchedSnapAt: 0, dirtySinceSnap: false, daily: { day: '', n: 0 }, dirty: [] };
   const oldCfg = { name: '옛폰', code: code2, deviceId: 'dOLDPHONE', view: 'list', tab: '윤호 정리', hints: { pair: true, install: true } };
@@ -225,6 +230,7 @@ try {
   const stE = await storeOf(E); const itE = id => stE.items.find(i => i.id === id);
   check(itE('pk-028').unopened === 42 && itE('pk-028').t.u === 2001 && gone(itE('yh-026')), '고친 숫자끼리 합침 (30+12=42): ' + itE('pk-028').unopened);
   check(itE('yh-001').section === '과일·케이크' && itE('yh-001').t.m === 501, '옛 폰의 망고도 과일·케이크로');
+  check(itE('nUSER1').section === '음료 재료' && itE('nUSER1').group === '시럽' && itE('nUSER2').section === '포장·소모품' && itE('nUSER2').group === '쉬폰 포장', '직접 추가한 항목도 분류 보고 옮김 (시럽 → 음료 재료, 쉬폰·포장 → 포장·소모품)');
   check((await E.$$eval('#tabs button', bs => bs.map(b => b.dataset.sec))).join('/') === '음료/음료 재료/과일·케이크/포장·소모품' && itE('yy-001').section === '음료', '옛 폰 구역 탭 4개 (두 단계 정리 모두 적용)');
   await E.reload(); await E.waitForSelector('.item', { timeout: 20000 });
   check((await storeOf(E)).items.find(i => i.id === 'pk-028').unopened === 42, '다시 열어도 두 번 더하지 않음');
@@ -233,21 +239,35 @@ try {
   await F.waitForFunction(() => { const s = JSON.parse(localStorage.getItem('cdm.store') || '{"items":[]}'); const it = s.items.find(i => i.id === 'pk-028'); return !!(it && it.unopened === 42); }, null, { timeout: 25000 });
   const stF = await storeOf(F);
   check(!stF.items.some(i => i.section === '윤호 정리' && !gone(i)), "새 폰에도 '윤호 정리' 없음, 숫자 42로 맞춰짐");
+  await F.waitForFunction(() => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-005'); return !!(it && it.t.d === 900); }, null, { timeout: 25000 });
   await F.click('#gearBtn'); await F.waitForSelector('#settings:not([hidden])');
   await F.click('#resetBtn'); await F.click('#resetYes');
   await F.waitForFunction(() => { const s = JSON.parse(localStorage.getItem('cdm.store')); const it = s.items.find(i => i.id === 'pk-028'); return !!(it && it.unopened === 38); }, null, { timeout: 5000 }).catch(() => {});
   const stF2 = await storeOf(F); const itF2 = id => stF2.items.find(i => i.id === id);
   check(itF2('pk-028').unopened === 38 && gone(itF2('yh-026')) && !stF2.items.some(i => i.section === '윤호 정리' && !gone(i)), '시트 값으로 초기화해도 합친 상태 유지 (38)');
+  check(!gone(itF2('yy-005')) && itF2('yy-005').section === '음료' && itF2('yy-005').group === '유기농', '초기화로 되살린 항목은 새 배치 자리로 (유기농딸기 → 음료)');
+  const bk = { app: 'cafedemung', v: 1, items: [{ id: 'yy-006', name: '유기농바나나', section: '윤영 정리', group: '유기농', note: '', min: null, order: 60, unopened: 5, opened: null, t: { u: Date.now(), o: 0, m: Date.now(), d: 0 }, b: { u: '옛폰', o: '', m: '옛폰' } }] };
+  await F.setInputFiles('#restoreFile', { name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(bk)) });
+  await F.waitForFunction(() => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-006'); return !!(it && it.unopened === 5); }, null, { timeout: 5000 });
+  const it6 = (await storeOf(F)).items.find(i => i.id === 'yy-006');
+  check(it6.section === '음료' && it6.group === '유기농', '예전 배치로 들어온 항목(백업·예전 버전 폰)도 새 자리로 옮김');
 
   console.log('12c) 코드 없이 누구나 (SHARED_CODE)');
   const SH = 'SHAR-EDCO-DE23';
   const S1 = await phone('S1', { shared: SH });
   await S1.waitForSelector('.item', { timeout: 20000 });
   check(await S1.isHidden('#setup') && await S1.isVisible('#nameHint'), '처음 설정 없이 바로 재고 화면, 이름 넣기는 선택');
+  check(await S1.isVisible('#syncHint'), '아직 받은 숫자가 없으면 받아오는 중 안내');
+  await S1.locator('.item[data-id="yy-003"] button.inc[data-f="u"]').click();
+  check((await inputVal(S1, '#u-yy-003')) === '16', '받아오기 전에는 시트 숫자를 못 고침 (실제 숫자 덮어쓰기 방지)');
+  await S1.click('#sh-start');
+  check(await S1.isHidden('#syncHint'), '"처음 숫자로 시작"을 누르면 고칠 수 있음');
   check((await S1.evaluate(() => JSON.parse(localStorage.getItem('cdm.settings')).code)) === SH, '공용 코드로 연결');
   const S2 = await phone('S2', { shared: SH, hash: '#j=ZZZZ-ZZZZ-ZZZZ' });
   await S2.waitForSelector('.item', { timeout: 20000 });
   check((await S2.evaluate(() => location.hash)) === '' && (await S2.evaluate(() => JSON.parse(localStorage.getItem('cdm.settings')).code)) === SH, '예전 연결 링크로 열어도 공용 코드');
+  await S2.waitForSelector('#syncHint', { state: 'hidden', timeout: 20000 });
+  check(true, '새 폰은 다른 폰의 숫자를 받으면 바로 고칠 수 있음');
   await S1.locator('.item[data-id="yy-003"] button.inc[data-f="u"]').click();
   await S2.waitForFunction(() => document.querySelector('#u-yy-003').value === '17', null, { timeout: 20000 });
   check(true, '이름도 코드도 없이 숫자가 다른 폰에 전달');

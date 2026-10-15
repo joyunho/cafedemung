@@ -256,6 +256,10 @@ main{min-width:0}
       <button class="btn" id="pairShareBtn" type="button">연결 링크 보내기</button>
       <button class="btn" id="pairClose" type="button">닫기</button>
     </div>
+    <div class="banner" id="syncHint" hidden>
+      <span class="grow">가게 숫자를 받아오는 중이에요. 다른 폰이 앱을 열면 자동으로 받아와요. 지금 보이는 건 시트의 처음 숫자라서, 받아오기 전에는 고칠 수 없어요.</span>
+      <button class="btn" id="sh-start" type="button">처음 숫자로 시작</button>
+    </div>
     <div class="banner info" id="nameHint" hidden>
       <span class="grow">이름을 넣으면 누가 고쳤는지 보여요. 안 넣어도 돼요.</span>
       <input id="nh-name" maxlength="20" placeholder="예: 윤호" autocomplete="off" aria-label="내 이름">
@@ -561,8 +565,13 @@ main{min-width:0}
   // 폰마다 단계별로 한 번씩 실행한다(설정의 layout = 마친 단계). 바꾸는 시각은 "그 항목의 마지막 시각 + 1"로 정해서,
   // 같은 데이터를 가진 폰은 언제 실행하든 똑같은 결과를 내고, 정리 뒤에 실제로 고친 값은 항상 이긴다.
   // 각 단계는 아직 원래 구역(from)에 있는 항목만 옮기므로 사용자가 직접 옮긴 항목은 그대로 둔다.
+  // 목록에 없는 항목(직접 추가한 것 등)은 분류 이름을 보고 옮긴다
+  const V1_GROUPS = { '냉동과일·청': '냉동과일', '베이스': '과일청·베이스' };
+  const V2_GROUPS = { '음료·우유': ['음료', '우유·주스'], '우유·주스': ['음료', '우유·주스'], '탄산·스파클링': ['음료', '탄산·스파클링'], '분다버그': ['음료', '탄산·스파클링'],
+    '유기농': ['음료', '유기농'], '뽀로로': ['음료', '뽀로로'], '기라델리': ['음료 재료', '소스'], '아이스티·기타': ['음료 재료', '아이스티'], '스무디': ['음료 재료', '스무디·베이스'] };
   const LAYOUT_STEPS = [
     { v: 1, from: '윤호 정리',
+      fallback: it => grpOf(it) === '쉬폰·포장' ? ['포장·소모품', '쉬폰 포장'] : ['과일·케이크', V1_GROUPS[grpOf(it)] || grpOf(it)],
       move: [ // [id, 구역, 분류, 순서]
         ['yh-001','과일·케이크','냉동과일',510], ['yh-002','과일·케이크','냉동과일',520], ['yh-003','과일·케이크','냉동과일',530], ['yh-004','과일·케이크','냉동과일',540],
         ['yh-005','과일·케이크','과일청·베이스',610], ['yh-016','과일·케이크','과일청·베이스',620], ['yh-017','과일·케이크','과일청·베이스',630], ['yh-018','과일·케이크','과일청·베이스',640],
@@ -575,6 +584,7 @@ main{min-width:0}
         ['yh-026','pk-028'], ['yh-027','pk-029'], ['yh-022','pk-030'], ['yh-023','pk-031'], ['yh-025','pk-032'], ['yh-024','pk-033'], ['yh-028','pk-026'],
       ] },
     { v: 2, from: '윤영 정리',
+      fallback: it => V2_GROUPS[grpOf(it)] || ['음료 재료', grpOf(it)],
       move: [
         ['yy-001','음료','탄산·스파클링',10], ['yy-003','음료','탄산·스파클링',20], ['yy-046','음료','탄산·스파클링',30], ['yy-047','음료','탄산·스파클링',40],
         ['yy-002','음료','우유·주스',60], ['yy-004','음료','우유·주스',70],
@@ -593,30 +603,38 @@ main{min-width:0}
       merge: [] },
   ];
   const LAYOUT_V = LAYOUT_STEPS[LAYOUT_STEPS.length - 1].v;
+  for (const step of LAYOUT_STEPS) step.moveMap = new Map(step.move.map(([id, ...rest]) => [id, rest]));
   const sumCount = (a, b) => { a = num(a); b = num(b); return a === null && b === null ? null : (a || 0) + (b || 0); };
-  // done 단계 다음부터 적용하고, 바뀐 항목 id를 보낼 순서대로 돌려준다: 없앤 것 → 숫자 더한 것 → 옮긴 것.
+  // 없어진 구역('윤호 정리', '윤영 정리')에 있는 항목은 언제 들어오든 새 자리로 옮긴다(받은 데이터·백업 복원 포함).
+  // 같은 규칙·같은 시각(t.m + 1)이라 폰끼리 결과가 같고, 예전 버전 폰에서 다시 들어와도 결국 모두 새 자리로 모인다.
+  function applyMoves(items) {
+    const moved = [];
+    for (const it of items.values()) {
+      if (isDeleted(it)) continue;
+      const step = LAYOUT_STEPS.find(st => st.from === it.section); if (!step) continue;
+      const [section, group, order] = step.moveMap.get(it.id) || [...step.fallback(it), it.order];
+      it.section = section; it.group = group; it.order = num(order) ?? it.order; it.t.m = (it.t.m || 0) + 1;
+      moved.push(it.id);
+    }
+    return moved;
+  }
+  // done 단계 다음의 합치기를 하고 옮길 것을 옮긴 뒤, 바뀐 항목 id를 보낼 순서대로 돌려준다: 없앤 것 → 숫자 더한 것 → 옮긴 것.
   // (없앤 것이 먼저 가야 다른 폰이 더한 숫자만 받고 없앨 항목은 남아 두 번 세는 일이 없다)
+  // 합치기는 단계마다 폰에서 한 번만 한다. 시각은 칸별로 "두 항목 중 늦은 시각 + 1"이라 정리 뒤 실제로 고친 숫자가 항상 이긴다.
   function applyLayout(items, done = 0) {
-    const gone = [], summed = [], moved = [];
+    const gone = [], summed = [];
     for (const step of LAYOUT_STEPS) {
       if (step.v <= done) continue;
       for (const [fromId, toId] of step.merge) {
         const a = items.get(fromId), b = items.get(toId);
         if (!a || !b || isDeleted(a) || isDeleted(b)) continue;
-        const ts = Math.max(lastTouched(a), lastTouched(b), a.t.d || 0) + 1;
-        if (num(a.unopened) !== null) { b.unopened = sumCount(b.unopened, a.unopened); b.t.u = ts; }
-        if (num(a.opened) !== null) { b.opened = sumCount(b.opened, a.opened); b.t.o = ts; }
-        a.t.d = ts;
+        if (num(a.unopened) !== null) { b.unopened = sumCount(b.unopened, a.unopened); b.t.u = Math.max(a.t.u || 0, b.t.u || 0) + 1; }
+        if (num(a.opened) !== null) { b.opened = sumCount(b.opened, a.opened); b.t.o = Math.max(a.t.o || 0, b.t.o || 0) + 1; }
+        a.t.d = Math.max(lastTouched(a), a.t.d || 0) + 1;
         gone.push(fromId); summed.push(toId);
       }
-      for (const [id, section, group, order] of step.move) {
-        const it = items.get(id);
-        if (!it || isDeleted(it) || it.section !== step.from) continue;   // 이미 직접 옮긴 건 그대로 둔다
-        it.section = section; it.group = group; it.order = order; it.t.m = (it.t.m || 0) + 1;
-        moved.push(id);
-      }
     }
-    return [...new Set([...gone, ...summed, ...moved])];
+    return [...new Set([...gone, ...summed, ...applyMoves(items)])];
   }
   function migrateLayout() {
     const done = S.cfg.layout || 0;
@@ -626,6 +644,12 @@ main{min-width:0}
     if (changed.length && !S.fresh) { for (const id of changed) { S.dirty.delete(id); S.dirty.add(id); } S.dirtySinceSnap = true; }
     if (changed.length) saveStore(true);
     S.cfg.layout = LAYOUT_V; saveCfg();
+  }
+  // 받은 데이터에 없어진 구역의 항목이 섞여 오면 새 자리로 옮기고 다시 알린다
+  function settleLayout() {
+    const moved = applyMoves(S.items);
+    if (moved.length) { for (const id of moved) S.dirty.add(id); S.dirtySinceSnap = true; scheduleDelta(); }
+    return moved.length;
   }
 
   // ---------- 사진 ----------
@@ -808,7 +832,7 @@ main{min-width:0}
   }
   let snapBusy = false;
   async function publishSnapshot(scheduled) {
-    if (snapBusy || !S.key || !S.online) return false;
+    if (snapBusy || !S.key || !S.online || !S.cfg.synced) return false;   // 아직 실제 숫자를 못 받은 폰은 시트 숫자를 퍼뜨리지 않는다
     snapBusy = true;
     try {
       const snapTs = now();
@@ -865,7 +889,7 @@ main{min-width:0}
     if (msg.from === S.cfg.deviceId) { saveStore(); return; }
     S.peers[msg.from] = { name: String(msg.name || ''), seen: Math.max((S.peers[msg.from] || {}).seen || 0, num(msg.ts) || S.lastIdAt) };
     if (msg.k === 'delta') {
-      const n = mergeMany(msg.items); saveStore(); if (n) { render(); } else renderSummary();
+      const n = mergeMany(msg.items) + settleLayout(); markSynced(); saveStore(); if (n) { render(); } else renderSummary();
     } else if (msg.k === 'snap') {
       const key = msg.from + ':' + msg.snapTs;
       const slot = S.parts.get(key) || { of: msg.of, parts: [], at: now() };
@@ -873,12 +897,12 @@ main{min-width:0}
       for (const [k, v] of S.parts) if (now() - v.at > 3600 * 1000) S.parts.delete(k);
       if (slot.parts.filter(Boolean).length === slot.of) {
         S.parts.delete(key);
-        try { const full = JSON.parse(await unpackB64(slot.parts.join(''))); const n = mergeMany(full.items); saveStore(); if (n) render(); else renderSummary(); }
+        try { const full = JSON.parse(await unpackB64(slot.parts.join(''))); const n = mergeMany(full.items) + settleLayout(); markSynced(); saveStore(); if (n) render(); else renderSummary(); }
         catch (e) { /* 깨진 스냅샷 */ }
       }
     } else if (msg.k === 'need') {
       saveStore(); renderSummary();
-      if (now() - S.lastSnapAt > 60000) publishSnapshot(false);
+      if (S.cfg.synced && now() - S.lastSnapAt > 60000) publishSnapshot(false);
     } else saveStore();
   }
   async function connect() {
@@ -887,9 +911,10 @@ main{min-width:0}
     catch (e) { setSync('error', '이 브라우저에서는 암호화를 쓸 수 없어요 (https 필요)'); return; }
     setSync('connecting');
     await pollCatchUp();
+    if (!S.cfg.synced) { S.cfg.hints.needSentAt = now(); saveCfg(); requestSnapshot(); }   // 새 폰: 다른 폰에 전체 숫자를 바로 요청
     openStream();
     if (S.dirty.size) await flushDelta();
-    if (S.pushAll) { S.pushAll = false; publishSnapshot(false); }   // 코드를 바꿨으면 이 폰의 데이터를 바로 새 채널에 올린다
+    if (S.pushAll) { S.pushAll = false; publishSnapshot(true); }   // 코드를 바꿨으면 이 폰의 데이터를 바로 새 채널에 올린다
     syncTick();
   }
   let tickTimer = 0;
@@ -899,8 +924,9 @@ main{min-width:0}
     const peerIds = Object.keys(S.peers);
     const recentPeer = peerIds.some(id => now() - (S.peers[id].seen || 0) < 3600 * 1000);
     if (S.dirtySinceSnap && now() - S.lastSchedSnapAt > 15 * 60 * 1000 && !S.dirty.size) publishSnapshot(true);
-    if (!recentPeer && now() - (S.cfg.hints.needSentAt || 0) > 6 * 3600 * 1000) { S.cfg.hints.needSentAt = now(); saveCfg(); requestSnapshot(); }
-    tickTimer = setTimeout(syncTick, 10 * 60 * 1000);
+    const needEvery = S.cfg.synced ? 6 * 3600 * 1000 : 60 * 1000;   // 아직 못 받았으면 1분마다 다시 요청
+    if ((!recentPeer || !S.cfg.synced) && now() - (S.cfg.hints.needSentAt || 0) > needEvery) { S.cfg.hints.needSentAt = now(); saveCfg(); requestSnapshot(); }
+    tickTimer = setTimeout(syncTick, S.cfg.synced ? 10 * 60 * 1000 : 60 * 1000);
   }
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { clearTimeout(deltaTimer); flushDelta(); closeStream(); clearTimeout(tickTimer); }
@@ -973,6 +999,7 @@ main{min-width:0}
     const pl = peerLine(); if (pl) parts.push(`연결된 폰 ${pl}`);
     el.innerHTML = parts.join('<span aria-hidden="true">·</span>');
     $('#pairHint').hidden = !!SHARED || Object.keys(S.peers).length > 0 || !!S.cfg.hints.pair;
+    $('#syncHint').hidden = !!S.cfg.synced;
     const nh = $('#nameHint'); const showName = !S.cfg.name && !S.cfg.hints.name;
     if (nh.hidden === showName) nh.hidden = !showName;
   }
@@ -1135,7 +1162,7 @@ main{min-width:0}
     fr.onload = () => {
       try {
         const data = JSON.parse(String(fr.result)); if (!data || !Array.isArray(data.items)) throw new Error('bad');
-        const n = mergeMany(data.items); for (const r of data.items) if (r && r.id) S.dirty.add(String(r.id));
+        const n = mergeMany(data.items); settleLayout(); for (const r of data.items) if (r && r.id) S.dirty.add(String(r.id)); markSynced();
         S.dirtySinceSnap = true; saveStore(); scheduleDelta(); render(); toast(`백업에서 ${n}개 항목을 반영했어요`);
       } catch (e) { toast('백업 파일을 읽지 못했어요'); }
     };
@@ -1161,7 +1188,7 @@ main{min-width:0}
     if (codeRaw) { code = normCode(codeRaw); if (!code || code.length !== 14) { err.hidden = false; err.textContent = '가게 코드는 영문·숫자 12자예요 (예: K7PD-3QWX-9ZAB).'; return; } }
     else code = newCode();
     err.hidden = true;
-    S.cfg.name = name; S.cfg.code = code; if (!S.cfg.deviceId) S.cfg.deviceId = newId('d'); saveCfg(); clearHash();
+    S.cfg.name = name; S.cfg.code = code; S.cfg.synced = !!S.cfg.synced || !codeRaw; if (!S.cfg.deviceId) S.cfg.deviceId = newId('d'); saveCfg(); clearHash();
     await startApp(true);
   });
 
@@ -1227,6 +1254,14 @@ main{min-width:0}
   $('#pairClose').addEventListener('click', () => { S.cfg.hints.pair = true; saveCfg(); $('#pairHint').hidden = true; });
   $('#nh-save').addEventListener('click', () => { const n = $('#nh-name').value.trim(); if (!n) { $('#nh-name').focus(); return; } S.cfg.name = n; saveCfg(); $('#nameHint').hidden = true; render(); toast('이름을 저장했어요'); });
   $('#nh-name').addEventListener('keydown', ev => { if (ev.key === 'Enter') $('#nh-save').click(); });
+  // 아직 다른 폰의 숫자를 한 번도 받지 못한 새 폰은 시트 숫자를 실제 숫자 위에 덮어쓰지 않도록 고치기를 막는다
+  function markSynced() { if (S.cfg.synced) return; S.cfg.synced = true; saveCfg(); $('#syncHint').hidden = true; toast('가게 숫자를 받아왔어요'); }
+  function canEdit() {
+    if (S.cfg.synced) return true;
+    const b = $('#syncHint'); b.hidden = false; b.scrollIntoView({ block: 'center' });
+    toast('아직 가게 숫자를 받아오는 중이에요'); return false;
+  }
+  $('#sh-start').addEventListener('click', () => { S.cfg.synced = true; saveCfg(); $('#syncHint').hidden = true; toast('처음 숫자로 시작해요'); });
   $('#nh-close').addEventListener('click', () => { S.cfg.hints.name = true; saveCfg(); $('#nameHint').hidden = true; });
   $('#copyLinkBtn').addEventListener('click', () => copyText(joinLink(), '연결 링크를 복사했어요'));
   $('#refreshBtn').addEventListener('click', async () => { toast('받아오는 중…', 1500); S.cfg.hints.needSentAt = 0; await pollCatchUp(); await requestSnapshot(); if (!S.es) openStream(); });
@@ -1237,7 +1272,14 @@ main{min-width:0}
   $('#resetNo').addEventListener('click', () => { $('#resetConfirm').hidden = true; });
   $('#resetYes').addEventListener('click', () => {
     const seed = seedItems(); applyLayout(seed); const ts = now();
-    for (const [id, s] of seed) { if (isDeleted(s)) continue; /* 배치 정리로 다른 항목에 합쳐진 것 */ const it = S.items.get(id) || s; it.unopened = s.unopened; it.opened = s.opened; it.t.u = ts; it.t.o = ts; it.b.u = S.cfg.name; it.b.o = S.cfg.name; if (isDeleted(it)) { it.t.m = ts; it.b.m = S.cfg.name; } S.items.set(id, it); S.dirty.add(id); }
+    for (const [id, s] of seed) {
+      if (isDeleted(s)) continue;   // 배치 정리로 다른 항목에 합쳐진 것
+      const it = S.items.get(id) || s; const wasDel = isDeleted(it);
+      it.unopened = s.unopened; it.opened = s.opened; it.t.u = ts; it.t.o = ts; it.b.u = S.cfg.name; it.b.o = S.cfg.name;
+      if (wasDel) { it.section = s.section; it.group = s.group; it.order = s.order; it.t.m = ts; it.b.m = S.cfg.name; }   // 지웠던 항목은 새 배치 자리로 되살린다
+      S.items.set(id, it); S.dirty.add(id);
+    }
+    settleLayout(); S.cfg.synced = true; saveCfg();
     S.dirtySinceSnap = true; saveStore(); scheduleDelta(); closeSheets(); render(); toast('시트 값으로 되돌렸어요');
   });
 
@@ -1271,7 +1313,7 @@ main{min-width:0}
   $('#ed-cancel').addEventListener('click', closeSheets);
   ed.del.addEventListener('click', () => { ed.confirm.hidden = false; });
   $('#ed-del-no').addEventListener('click', () => { ed.confirm.hidden = true; });
-  $('#ed-del-yes').addEventListener('click', () => { const id = S.editing && S.editing.id; closeSheets(); if (id) { deleteItem(id); toast('삭제했어요'); } });
+  $('#ed-del-yes').addEventListener('click', () => { const id = S.editing && S.editing.id; if (id && !canEdit()) return; closeSheets(); if (id) { deleteItem(id); toast('삭제했어요'); } });
   sheets.editor.addEventListener('submit', ev => {
     ev.preventDefault();
     const name = ed.name.value.trim(); if (!name) { ed.name.focus(); return; }
@@ -1280,7 +1322,9 @@ main{min-width:0}
     const imgRaw = ed.img.value.trim(); const img = validImgUrl(imgRaw);
     if (imgRaw && !img) { ed.img.focus(); toast('사진 주소는 https:// 로 시작해야 해요'); return; }
     const patch = { name, section: ed.sec.value.trim() || '기타', group: ed.group.value.trim() || '기타', note: ed.note.value.trim(), min, img };
-    const id = S.editing && S.editing.id; closeSheets();
+    const id = S.editing && S.editing.id;
+    if (id && !canEdit()) return;
+    closeSheets();
     if (id) { editMeta(id, patch); } else { addItem({ ...patch, unopened: null, opened: null }); toast('추가했어요'); if (!S.q && !S.low) { S.cfg.tab = patch.section; saveCfg(); render(); } }
   });
 
@@ -1292,6 +1336,7 @@ main{min-width:0}
     if (btn.classList.contains('name')) { openEditor(id); return; }
     if (btn.classList.contains('thumb')) { openViewer(id); return; }
     const f = btn.dataset.f; if (!f) return; const key = f === 'u' ? 'unopened' : 'opened';
+    if (!canEdit()) return;
     const it = S.items.get(id); if (!it) return; const cur = num(it[key]);
     const next = btn.classList.contains('inc') ? (cur === null ? 1 : cur + 1) : (cur === null ? 0 : Math.max(0, cur - 1));
     editCounts(id, { [key]: next });
@@ -1299,6 +1344,7 @@ main{min-width:0}
   list.addEventListener('change', ev => {
     const inp = ev.target; if (!(inp instanceof HTMLInputElement) || !inp.dataset.f) return;
     const li = inp.closest('.item'); if (!li) return; const id = li.dataset.id, key = inp.dataset.f === 'u' ? 'unopened' : 'opened';
+    if (!canEdit()) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; return; }
     const raw = inp.value.trim().replace(/,/g, '');
     if (raw === '') { editCounts(id, { [key]: null }); return; }
     const n = Number(raw);
@@ -1337,17 +1383,23 @@ main{min-width:0}
   migrateLayout();
   loadImages();
   if (!S.cfg.deviceId) { S.cfg.deviceId = newId('d'); saveCfg(); }
+  if (S.cfg.synced === undefined) { S.cfg.synced = !!(S.cfg.code && S.cfg.name); saveCfg(); }   // 이미 쓰던 폰은 실제 숫자를 갖고 있다
   const join = pendingJoinCode();
   if (SHARED) {
-    // 모두 같은 코드: 처음 설정 없이 바로 시작. 예전 코드를 쓰던 폰은 데이터를 들고 공용 채널로 옮긴다.
+    // 모두 같은 코드: 처음 설정 없이 바로 시작.
     if (join) clearHash();
-    if (S.cfg.code !== SHARED) setCode(SHARED, !!S.cfg.code && !S.fresh);
-    startApp(false);
+    if (S.cfg.code && S.cfg.code !== SHARED && S.cfg.synced) {
+      // 다른 코드를 쓰던 폰: 그 채널에서 아직 못 받은 변경까지 받은 뒤, 데이터를 들고 공용 채널로 옮긴다
+      startApp(false).then(() => switchCode(SHARED));
+    } else {
+      if (S.cfg.code !== SHARED) setCode(SHARED, false);
+      startApp(false);
+    }
   } else if (join && join.length === 14 && S.cfg.code && S.cfg.name) {
     clearHash();
     if (join !== S.cfg.code) { startApp(false).then(() => switchCode(join)).then(() => toast('링크의 가게 코드로 연결했어요')); }
     else startApp(false);
-  } else if (!S.cfg.code || !S.cfg.name) showSetup(join && join.length === 14 ? join : '');
+  } else if (!S.cfg.code || !S.cfg.name) showSetup(join && join.length === 14 ? join : (S.cfg.code || ''));
   else startApp(false);
 })();
 </script>
