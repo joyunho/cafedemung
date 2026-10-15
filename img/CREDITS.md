@@ -32,7 +32,7 @@
 | 블루시럽 (블루 큐라소) | [File:Vodka and Blue Curacao (with Brilliant Blue FCF).jpg](https://commons.wikimedia.org/wiki/File:Vodka_and_Blue_Curacao_(with_Brilliant_Blue_FCF).jpg) | Soldier of Wasteland | CC BY-SA 4.0 |
 | 딸기잼 | [File:Exploding Strawberry Jar.JPG](https://commons.wikimedia.org/wiki/File:Exploding_Strawberry_Jar.JPG) | Hughespr | Public domain |
 | 미니웨하스 | [File:Loacker Quadratini, napolitaner.jpg](https://commons.wikimedia.org/wiki/File:Loacker_Quadratini,_napolitaner.jpg) | Samuel Wiki | CC0 |
-| 아몬드 (슬라이스) | [File:Pumpkin Seeds, Almond Flakes and Pine Nuts - Breakfast - Holiday Inn - Whitechapel.jpg](https://commons.wikimedia.org/wiki/File:Pumpkin_Seeds,_Almond_Flakes_and_Pine_Nuts_-_Breakfast_-_Holiday_Inn_-_Whitechapel.jpg) | Haydn Blackey | CC BY-SA 2.0 |
+| 아몬드 (슬라이스) | [File:Almond slices.jpg](https://commons.wikimedia.org/wiki/File:Almond_slices.jpg) | Fumikas Sagisavas | CC0 |
 | 발사믹 | [File:Traditional Balsamic Vinegars of Modena (right) and Reggio Emilia (left).jpg](https://commons.wikimedia.org/wiki/File:Traditional_Balsamic_Vinegars_of_Modena_(right)_and_Reggio_Emilia_(left).jpg) | 1hnmr | CC BY-SA 3.0 |
 | 오곡파우더 (미숫가루) | [File:Misu 1.jpg](https://commons.wikimedia.org/wiki/File:Misu_1.jpg) | Hyeon-Jeong Suk | CC BY 2.0 |
 | 녹차파우더 (말차) | [File:Matcha tea latte with rosetta latte art.jpg](https://commons.wikimedia.org/wiki/File:Matcha_tea_latte_with_rosetta_latte_art.jpg) | Irvan Ary Maulana | CC BY-SA 4.0 |
@@ -62,8 +62,8 @@
 | 캐리어 | [File:Double Cup Carrier-Vanta-3-bg.webp](https://commons.wikimedia.org/wiki/File:Double_Cup_Carrier-Vanta-3-bg.webp) | Wikilanemak | CC BY 4.0 |
 | 스무디빨대 | [File:A paper straw for bubble tea and the popular straw.jpg](https://commons.wikimedia.org/wiki/File:A_paper_straw_for_bubble_tea_and_the_popular_straw.jpg) | WrS.tm.pl | Public domain |
 | 일반빨대 | [File:Eight drinking straws (4273846588).jpg](https://commons.wikimedia.org/wiki/File:Eight_drinking_straws_(4273846588).jpg) | Horia Varlan from Bucharest, Romania | CC BY 2.0 |
-| 포장빨대 | [File:BK Meal.JPG](https://commons.wikimedia.org/wiki/File:BK_Meal.JPG) | Terence Ong | CC BY 2.5 |
-| 손잡이종이백 | 와이드종이백와 같은 사진 | | |
+| 포장빨대 | [File:Packages of colorful plastic straws.jpg](https://commons.wikimedia.org/wiki/File:Packages_of_colorful_plastic_straws.jpg) | Ser Amantio di Nicolao | CC BY-SA 4.0 |
+| 손잡이종이백 | [File:Albert Heijn paper shopping bag (2019) 01.jpg](https://commons.wikimedia.org/wiki/File:Albert_Heijn_paper_shopping_bag_(2019)_01.jpg) | Donald Trung Quoc Don (Chữ Hán: 徵國單) - Wikimedia Commons . ( Want to use this image? ) | CC BY-SA 4.0 |
 | 와이드종이백 | [File:Albert Heijn paper shopping bag (2019) 03.jpg](https://commons.wikimedia.org/wiki/File:Albert_Heijn_paper_shopping_bag_(2019)_03.jpg) | Donald Trung Quoc Don (Chữ Hán: 徵國單) - Wikimedia Commons . ( Want to use this image? ) | CC BY-SA 4.0 |
 | 크라프트지 별대 | [File:Brown Bag (with staple).jpg](https://commons.wikimedia.org/wiki/File:Brown_Bag_(with_staple).jpg) | Jeffrey Beall | CC BY-SA 2.0 |
 | 크라프트지 특대 | [File:Brown bag.jpg](https://commons.wikimedia.org/wiki/File:Brown_bag.jpg) | Jeffrey Beall | CC BY-SA 2.0 |
@@ -74,12 +74,12 @@
 | 나이프 | [File:Single Use Plastic Cutlery.jpg](https://commons.wikimedia.org/wiki/File:Single_Use_Plastic_Cutlery.jpg) | Meanwell Packaging | CC BY 2.0 |
 | 배달봉투 | [File:Plastic shopping bag of Sakae.JPG](https://commons.wikimedia.org/wiki/File:Plastic_shopping_bag_of_Sakae.JPG) | Tokumeigakarinoaoshima | CC0 |
 | 검정봉투 | [File:Black plastic bag on white counter.jpg](https://commons.wikimedia.org/wiki/File:Black_plastic_bag_on_white_counter.jpg) | 999real | CC0 |
-| 분리수거봉투 | 없음 | | |
+| 분리수거봉투 | [File:Blue garbage bag.jpg](https://commons.wikimedia.org/wiki/File:Blue_garbage_bag.jpg) | Wiki Farazi | Public domain |
 | 프렛즐 | [File:Pretzel bows🥨.jpg](https://commons.wikimedia.org/wiki/File:Pretzel_bows%F0%9F%A5%A8.jpg) | Fumikas Sagisavas | CC0 |
 | 쿠앤크 (오레오) | [File:Oreo-Two-Cookies.jpg](https://commons.wikimedia.org/wiki/File:Oreo-Two-Cookies.jpg) | Evan-Amos | Public domain |
 | 옥수수 (콘 과자) | [File:Puffcorn Example Frito Lay.jpg](https://commons.wikimedia.org/wiki/File:Puffcorn_Example_Frito_Lay.jpg) | Ll1324 | CC0 |
 | 냅킨 | [File:Table utensils wrapped in a paper napkin 2.jpg](https://commons.wikimedia.org/wiki/File:Table_utensils_wrapped_in_a_paper_napkin_2.jpg) | Ser Amantio di Nicolao | CC BY-SA 4.0 |
-| 빌지 (영수증 용지) | [File:Paper Roll Holders.jpg](https://commons.wikimedia.org/wiki/File:Paper_Roll_Holders.jpg) | tony_duell | CC BY 2.0 |
+| 빌지 (주문·영수증 용지) | [File:2007.08.15.Kassazettel.WienerWasser.JPG](https://commons.wikimedia.org/wiki/File:2007.08.15.Kassazettel.WienerWasser.JPG) | Anton-kurt at German Wikipedia ( Original text: Anton-kurt 22:44, 4. Nov. 2007 (CET) ) | Public domain |
 | 쉬폰 비닐 미니 | [File:Homemade chiffon cake from my mother friends.jpg](https://commons.wikimedia.org/wiki/File:Homemade_chiffon_cake_from_my_mother_friends.jpg) | Peachyeung316 | CC BY-SA 4.0 |
 | 쉬폰 비닐 1호 | 쉬폰 비닐 미니와 같은 사진 | | |
 | 쉬폰 미니 받침 | [File:Chiffon cake 01.jpg](https://commons.wikimedia.org/wiki/File:Chiffon_cake_01.jpg) | Wikimedia Commons | CC BY-SA 3.0 |
@@ -95,10 +95,10 @@
 | 딸기 케이크 | [File:Shortcake slice 2.jpg](https://commons.wikimedia.org/wiki/File:Shortcake_slice_2.jpg) | Shisma | CC BY 4.0 |
 | 초코 케이크 | [File:Piece of chocolate cake on a white plate decorated with chocolate sauce.jpg](https://commons.wikimedia.org/wiki/File:Piece_of_chocolate_cake_on_a_white_plate_decorated_with_chocolate_sauce.jpg) | Daria Yakovleva Minor edits made by Subsidiary account | CC0 |
 | 초코딸기 케이크 | [File:Strawberry Chocolate Cake.webp](https://commons.wikimedia.org/wiki/File:Strawberry_Chocolate_Cake.webp) | Stevele998 | CC BY-SA 4.0 |
-| 고구마 케이크 | [File:Karaimo rare cake.JPG](https://commons.wikimedia.org/wiki/File:Karaimo_rare_cake.JPG) | Nissy-KITAQ | CC BY-SA 3.0 |
+| 고구마 케이크 | [The best sweet potato cake in town!](https://www.flickr.com/photos/97304820@N00/8942934234) | Dushan and Miae (Flickr) | CC BY-SA 2.0 |
 | 포레스트 케이크 | [File:Black Forest gateau.jpg](https://commons.wikimedia.org/wiki/File:Black_Forest_gateau.jpg) | Mikelo | CC BY-SA 2.0 |
 | 치즈 케이크 | [File:Cheesecake with slice cut out.jpg](https://commons.wikimedia.org/wiki/File:Cheesecake_with_slice_cut_out.jpg) | Martin van Dam | CC BY 2.0 |
-| 우유 케이크 | [File:Rum and Raisin Ice cream cake. Made fresh in-store (27335721587).jpg](https://commons.wikimedia.org/wiki/File:Rum_and_Raisin_Ice_cream_cake._Made_fresh_in-store_(27335721587).jpg) | Cold Rock ice creamery aspley from Aspley, Australia | CC BY 2.0 |
+| 우유 케이크 | [white chocolate cake](https://www.flickr.com/photos/71284893@N00/3158678035) | boo_licious (Flickr) | CC BY 2.0 |
 | 오레오 케이크 | [File:Oreo cake for St. Patrick's Day at Safeway.jpg](https://commons.wikimedia.org/wiki/File:Oreo_cake_for_St._Patrick%27s_Day_at_Safeway.jpg) | Ser Amantio di Nicolao | CC BY-SA 4.0 |
 | 레몬주스 | [File:Pineapple juice mixed with pear-lemon-chia seeds-2860722.jpg](https://commons.wikimedia.org/wiki/File:Pineapple_juice_mixed_with_pear-lemon-chia_seeds-2860722.jpg) | public domain | CC0 |
 | 복숭아 베이스 | [File:PeachesInSyrup.jpg](https://commons.wikimedia.org/wiki/File:PeachesInSyrup.jpg) | Ken Hammond | Public domain |

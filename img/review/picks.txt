@@ -24,7 +24,7 @@ yy-023	설탕시럽 (모닌 퓨어 케인)	cached	Monin, Monin Sugar Cane Monin 
 yy-024	블루시럽 (블루 큐라소)	cached	File:Vodka and Blue Curacao (with Brilliant Blue FCF).jpg	https://commons.wikimedia.org/wiki/File:Vodka_and_Blue_Curacao_(with_Brilliant_Blue_FCF).jpg
 yy-025	딸기잼	cached	File:Exploding Strawberry Jar.JPG	https://commons.wikimedia.org/wiki/File:Exploding_Strawberry_Jar.JPG
 yy-026	미니웨하스	cached	File:Loacker Quadratini, napolitaner.jpg	https://commons.wikimedia.org/wiki/File:Loacker_Quadratini,_napolitaner.jpg
-yy-027	아몬드 (슬라이스)	cached	File:Pumpkin Seeds, Almond Flakes and Pine Nuts - Breakfast - Holiday Inn - Whitechapel.jpg	https://commons.wikimedia.org/wiki/File:Pumpkin_Seeds,_Almond_Flakes_and_Pine_Nuts_-_Breakfast_-_Holiday_Inn_-_Whitechapel.jpg
+yy-027	아몬드 (슬라이스)	main	File:Almond slices.jpg	https://commons.wikimedia.org/wiki/File:Almond_slices.jpg
 yy-028	발사믹	cached	File:Traditional Balsamic Vinegars of Modena (right) and Reggio Emilia (left).jpg	https://commons.wikimedia.org/wiki/File:Traditional_Balsamic_Vinegars_of_Modena_(right)_and_Reggio_Emilia_(left).jpg
 yy-029	오곡파우더 (미숫가루)	cached	File:Misu 1.jpg	https://commons.wikimedia.org/wiki/File:Misu_1.jpg
 yy-030	녹차파우더 (말차)	cached	File:Matcha tea latte with rosetta latte art.jpg	https://commons.wikimedia.org/wiki/File:Matcha_tea_latte_with_rosetta_latte_art.jpg
@@ -54,7 +54,8 @@ pk-006	핫뚜껑	cached	File:Coffee cup lid.jpg	https://commons.wikimedia.org/wi
 pk-007	캐리어	cached	File:Double Cup Carrier-Vanta-3-bg.webp	https://commons.wikimedia.org/wiki/File:Double_Cup_Carrier-Vanta-3-bg.webp
 pk-008	스무디빨대	cached	File:A paper straw for bubble tea and the popular straw.jpg	https://commons.wikimedia.org/wiki/File:A_paper_straw_for_bubble_tea_and_the_popular_straw.jpg
 pk-009	일반빨대	cached	File:Eight drinking straws (4273846588).jpg	https://commons.wikimedia.org/wiki/File:Eight_drinking_straws_(4273846588).jpg
-pk-010	포장빨대	cached	File:BK Meal.JPG	https://commons.wikimedia.org/wiki/File:BK_Meal.JPG
+pk-010	포장빨대	main	File:Packages of colorful plastic straws.jpg	https://commons.wikimedia.org/wiki/File:Packages_of_colorful_plastic_straws.jpg
+pk-011	손잡이종이백	main	File:Albert Heijn paper shopping bag (2019) 01.jpg	https://commons.wikimedia.org/wiki/File:Albert_Heijn_paper_shopping_bag_(2019)_01.jpg
 pk-012	와이드종이백	cached	File:Albert Heijn paper shopping bag (2019) 03.jpg	https://commons.wikimedia.org/wiki/File:Albert_Heijn_paper_shopping_bag_(2019)_03.jpg
 pk-013	크라프트지 별대	cached	File:Brown Bag (with staple).jpg	https://commons.wikimedia.org/wiki/File:Brown_Bag_(with_staple).jpg
 pk-014	크라프트지 특대	cached	File:Brown bag.jpg	https://commons.wikimedia.org/wiki/File:Brown_bag.jpg
@@ -64,12 +65,12 @@ pk-018	포크	cached	File:Picker made from Cellulose Acetate Biograde.JPG	https:
 pk-019	나이프	cached	File:Single Use Plastic Cutlery.jpg	https://commons.wikimedia.org/wiki/File:Single_Use_Plastic_Cutlery.jpg
 pk-020	배달봉투	cached	File:Plastic shopping bag of Sakae.JPG	https://commons.wikimedia.org/wiki/File:Plastic_shopping_bag_of_Sakae.JPG
 pk-021	검정봉투	cached	File:Black plastic bag on white counter.jpg	https://commons.wikimedia.org/wiki/File:Black_plastic_bag_on_white_counter.jpg
-pk-022	분리수거봉투	FAIL	LookupError: commons "transparent garbage bag": 쓸 수 있는 결과 0개	
+pk-022	분리수거봉투	main	File:Blue garbage bag.jpg	https://commons.wikimedia.org/wiki/File:Blue_garbage_bag.jpg
 pk-023	프렛즐	cached	File:Pretzel bows🥨.jpg	https://commons.wikimedia.org/wiki/File:Pretzel_bows%F0%9F%A5%A8.jpg
 pk-024	쿠앤크 (오레오)	cached	File:Oreo-Two-Cookies.jpg	https://commons.wikimedia.org/wiki/File:Oreo-Two-Cookies.jpg
 pk-025	옥수수 (콘 과자)	cached	File:Puffcorn Example Frito Lay.jpg	https://commons.wikimedia.org/wiki/File:Puffcorn_Example_Frito_Lay.jpg
 pk-026	냅킨	cached	File:Table utensils wrapped in a paper napkin 2.jpg	https://commons.wikimedia.org/wiki/File:Table_utensils_wrapped_in_a_paper_napkin_2.jpg
-pk-027	빌지 (영수증 용지)	cached	File:Paper Roll Holders.jpg	https://commons.wikimedia.org/wiki/File:Paper_Roll_Holders.jpg
+pk-027	빌지 (주문·영수증 용지)	main	File:2007.08.15.Kassazettel.WienerWasser.JPG	https://commons.wikimedia.org/wiki/File:2007.08.15.Kassazettel.WienerWasser.JPG
 pk-028	쉬폰 비닐 미니	cached	File:Homemade chiffon cake from my mother friends.jpg	https://commons.wikimedia.org/wiki/File:Homemade_chiffon_cake_from_my_mother_friends.jpg
 pk-030	쉬폰 미니 받침	cached	File:Chiffon cake 01.jpg	https://commons.wikimedia.org/wiki/File:Chiffon_cake_01.jpg
 pk-032	15*18 OPP 봉투	cached	File:Cellofan.jpg	https://commons.wikimedia.org/wiki/File:Cellofan.jpg
@@ -82,10 +83,10 @@ yh-006	아포가또 아이스크림	cached	File:Affogato.JPG	https://commons.wik
 yh-007	딸기 케이크	cached	File:Shortcake slice 2.jpg	https://commons.wikimedia.org/wiki/File:Shortcake_slice_2.jpg
 yh-008	초코 케이크	cached	File:Piece of chocolate cake on a white plate decorated with chocolate sauce.jpg	https://commons.wikimedia.org/wiki/File:Piece_of_chocolate_cake_on_a_white_plate_decorated_with_chocolate_sauce.jpg
 yh-009	초코딸기 케이크	cached	File:Strawberry Chocolate Cake.webp	https://commons.wikimedia.org/wiki/File:Strawberry_Chocolate_Cake.webp
-yh-010	고구마 케이크	cached	File:Karaimo rare cake.JPG	https://commons.wikimedia.org/wiki/File:Karaimo_rare_cake.JPG
+yh-010	고구마 케이크	main	The best sweet potato cake in town!	https://www.flickr.com/photos/97304820@N00/8942934234
 yh-011	포레스트 케이크	cached	File:Black Forest gateau.jpg	https://commons.wikimedia.org/wiki/File:Black_Forest_gateau.jpg
 yh-012	치즈 케이크	cached	File:Cheesecake with slice cut out.jpg	https://commons.wikimedia.org/wiki/File:Cheesecake_with_slice_cut_out.jpg
-yh-013	우유 케이크	cached	File:Rum and Raisin Ice cream cake. Made fresh in-store (27335721587).jpg	https://commons.wikimedia.org/wiki/File:Rum_and_Raisin_Ice_cream_cake._Made_fresh_in-store_(27335721587).jpg
+yh-013	우유 케이크	main	white chocolate cake	https://www.flickr.com/photos/71284893@N00/3158678035
 yh-014	오레오 케이크	cached	File:Oreo cake for St. Patrick's Day at Safeway.jpg	https://commons.wikimedia.org/wiki/File:Oreo_cake_for_St._Patrick%27s_Day_at_Safeway.jpg
 yh-015	레몬주스	cached	File:Pineapple juice mixed with pear-lemon-chia seeds-2860722.jpg	https://commons.wikimedia.org/wiki/File:Pineapple_juice_mixed_with_pear-lemon-chia_seeds-2860722.jpg
 yh-016	복숭아 베이스	cached	File:PeachesInSyrup.jpg	https://commons.wikimedia.org/wiki/File:PeachesInSyrup.jpg
@@ -94,7 +95,6 @@ yh-018	자몽 베이스	cached	File:Citrus paradisi (Grapefruit, pink) white bg.
 yh-019	청포도 베이스	cached	File:Solaris grapes in Chateaux Luna vineyard 24.jpg	https://commons.wikimedia.org/wiki/File:Solaris_grapes_in_Chateaux_Luna_vineyard_24.jpg
 yh-020	블루베리 베이스	cached	File:Blueberry Jam (862679726).jpg	https://commons.wikimedia.org/wiki/File:Blueberry_Jam_(862679726).jpg
 yh-021	참외 베이스	cached	File:Korean melon-Chamoe-01.jpg	https://commons.wikimedia.org/wiki/File:Korean_melon-Chamoe-01.jpg
-pk-011	손잡이종이백	same	pk-012	
 pk-017	컵홀더 (아이스)	same	pk-016	
 pk-029	쉬폰 비닐 1호	same	pk-028	
 pk-031	쉬폰 1호 받침	same	pk-030	
