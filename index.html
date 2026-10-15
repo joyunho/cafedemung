@@ -85,6 +85,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .tabs button{flex:1 0 auto;height:42px;padding:0 14px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);font-weight:500;white-space:nowrap;border-radius:6px 6px 0 0}
 .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
 .tabs button .n{font-size:12px;font-weight:400;margin-left:4px;font-variant-numeric:tabular-nums}
+@media (max-width:480px){.tabs button{padding:0 8px;font-size:14px}.tabs button .n{font-size:11px;margin-left:3px}}
+@media (max-width:380px){.tabs button{padding:0 5px}}
 
 /* ---- 입력 목록 ---- */
 main{min-width:0}
