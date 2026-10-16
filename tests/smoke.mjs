@@ -44,7 +44,7 @@ async function setupPhone(page, nick, code) {
 }
 const inputVal = (page, sel) => page.$eval(sel, el => el.value);
 async function openEd(page, id) {
-  await page.click(`.item[data-id="${id}"] .name`); await page.waitForSelector('#editor:not([hidden])');
+  await page.click(id ? `.item[data-id="${id}"] .name` : '#addBtn'); await page.waitForSelector('#editor:not([hidden])');
   await page.waitForFunction(() => document.activeElement && document.activeElement.id === 'ed-name', null, { timeout: 3000 }).catch(() => {});
 }
 
@@ -241,12 +241,12 @@ try {
   check(await B.$eval('.item[data-id="yh-007"]', el => el.classList.contains('flash')), '이동한 항목 강조');
 
   console.log('7) 항목 추가/삭제 전파');
-  await A.click('#addBtn'); await A.waitForSelector('#editor:not([hidden])');
+  await openEd(A, null);   // 새 항목
   await A.fill('#ed-name', '테스트 시럽'); await A.fill('#ed-group', '시럽'); await A.click('#ed-save');
   await B.waitForFunction(() => JSON.parse(localStorage.getItem('cdm.store')).items.some(i => i.name === '테스트 시럽'), null, { timeout: 20000 });
   check(true, '추가한 항목이 B에 저장됨');
   const newId = (await storeOf(A)).items.find(i => i.name === '테스트 시럽').id;
-  await A.click(`.item[data-id="${newId}"] .name`); await A.waitForSelector('#editor:not([hidden])');
+  await openEd(A, newId);
   await A.click('#ed-delete'); await A.click('#ed-del-yes');
   await B.waitForFunction(id => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === id); return !!(it && it.t.d > 0); }, newId, { timeout: 20000 });
   check(true, '삭제가 B에 전파');
@@ -323,6 +323,28 @@ try {
   await sleep(300);
   check(alerts().length === n2 + 1, '앱을 닫으면 기다리지 않고 바로 알림');
 
+  console.log('7d) 끊긴 채로 앱을 닫아도 못 보낸 알림은 다음에 열 때 한 번 보냄');
+  const G = await phone('G', { hash: '#j=' + code });
+  await setupPhone(G, '알바2');
+  await G.waitForSelector('#syncHint', { state: 'hidden', timeout: 20000 });
+  offlinePhase = true;
+  const n3 = alerts().length;
+  await G.context().setOffline(true); await sleep(300);
+  await G.fill('#u-yy-007', '0'); await G.press('#u-yy-007', 'Enter'); await sleep(1500);
+  await G.evaluate(() => window.dispatchEvent(new Event('pagehide'))); await sleep(500);
+  const savedG = await G.evaluate(() => [localStorage.getItem('cdm.store'), localStorage.getItem('cdm.settings')]);
+  check(alerts().length === n3 && JSON.parse(savedG[0]).alerts.some(x => x.id === 'yy-007'), '끊긴 채로 닫아도 못 보낸 알림이 폰에 남음');
+  await G.context().close();
+  const G2 = await phone('G2', { init: savedG });
+  for (let i = 0; i < 80 && alerts().length === n3; i++) await sleep(250);
+  await sleep(1500);
+  const sentG = alerts().slice(n3);
+  check(sentG.length === 1 && (new URLSearchParams(sentG[0].query).get('title') || '').includes('유기농코코아 없음'), '다음에 열면 한 번 보냄: ' + sentG.length + '통');
+  await G2.reload(); await G2.waitForSelector('.item', { timeout: 20000 }); await sleep(2500);
+  check(alerts().length === n3 + 1, '보낸 뒤 다시 열어도 또 보내지 않음');
+  await G2.context().close();
+  offlinePhase = false;
+
   console.log('8) 오프라인 수정 후 복구');
   offlinePhase = true;
   await B.context().setOffline(true);
@@ -372,12 +394,13 @@ try {
   const want = await C.evaluate(() => {
     const d1 = new Date(); d1.setDate(d1.getDate() - 1); d1.setHours(13, 5, 0, 0);
     const d2 = new Date(); d2.setDate(d2.getDate() - 10); d2.setHours(9, 30, 0, 0);
-    // 앱이 닫힐 때 저장한 다음에 고쳐 넣는다(앱의 pagehide 저장이 먼저 등록되어 먼저 실행됨)
-    window.addEventListener('pagehide', () => {
+    const seed = () => {
       const st = JSON.parse(localStorage.getItem('cdm.store'));
       for (const [id, d] of [['yy-009', d1], ['yy-008', d2]]) { const it = st.items.find(i => i.id === id); it.unopened = 4; it.t.u = d.getTime(); it.b.u = '사장님'; }
       localStorage.setItem('cdm.store', JSON.stringify(st));
-    });
+    };
+    // 앱은 pagehide와 화면 숨김(visibilitychange) 때 저장한다 → 둘 다 앱 다음에 고쳐 넣는다
+    window.addEventListener('pagehide', seed); document.addEventListener('visibilitychange', seed);
     const md = d2.getFullYear() === new Date().getFullYear() ? `${d2.getMonth() + 1}/${d2.getDate()}` : `${d2.getFullYear()}/${d2.getMonth() + 1}/${d2.getDate()}`;
     return { y: '어제 13:05 · 사장님', old: `${md}(${'일월화수목금토'[d2.getDay()]}) 09:30 · 사장님` };
   });

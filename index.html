@@ -592,7 +592,7 @@ main{min-width:0}
     cfg: Object.assign({ name: '', code: '', deviceId: '', view: 'list', tab: '', hints: {} }, load('settings', {}) || {}),
     items: new Map(),
     lastId: '', lastIdAt: 0, peers: {}, lastSnapAt: 0, lastSchedSnapAt: 0, dirtySinceSnap: false, daily: { day: '', n: 0 },
-    q: '', low: false, lastStructure: '', editing: null,
+    q: '', low: false, lastStructure: '', editing: null, alertsSent: [],
     key: null, topic: '', es: null, online: navigator.onLine, status: 'connecting', dirty: new Set(), seen: new Set(), parts: new Map(),
   };
 
@@ -806,7 +806,7 @@ main{min-width:0}
   function saveStore(immediate) {
     clearTimeout(saveTimer);
     const doSave = () => {
-      store('store', { v: 1, items: Array.from(S.items.values()), lastId: S.lastId, lastIdAt: S.lastIdAt, peers: S.peers, lastSnapAt: S.lastSnapAt, lastSchedSnapAt: S.lastSchedSnapAt, dirtySinceSnap: S.dirtySinceSnap, daily: S.daily, dirty: Array.from(S.dirty), alerts: pendingAlerts() });
+      store('store', { v: 1, items: Array.from(S.items.values()), lastId: S.lastId, lastIdAt: S.lastIdAt, peers: S.peers, lastSnapAt: S.lastSnapAt, lastSchedSnapAt: S.lastSchedSnapAt, dirtySinceSnap: S.dirtySinceSnap, daily: S.daily, dirty: Array.from(S.dirty), alerts: pendingAlerts(), alertsSent: S.alertsSent });
     };
     if (immediate) doSave(); else saveTimer = setTimeout(doSave, 300);
   }
@@ -871,7 +871,7 @@ main{min-width:0}
       S.lastSnapAt = num(st.lastSnapAt) || 0; S.lastSchedSnapAt = num(st.lastSchedSnapAt) || 0;
       S.dirtySinceSnap = st.dirtySinceSnap === true; S.daily = st.daily || { day: '', n: 0 };
       for (const id of (st.dirty || [])) if (S.items.has(id)) S.dirty.add(id);
-      S.alertSeed = st.alerts;
+      S.alertSeed = st.alerts; S.alertsSent = Array.isArray(st.alertsSent) ? st.alertsSent.filter(x => x && typeof x.id === 'string' && num(x.ts)) : [];
     }
   }
 
@@ -1039,35 +1039,40 @@ main{min-width:0}
   // 저장소에도 같이 저장해서, 끊긴 채로 앱을 닫아도 다음에 열 때 보낸다(하루 지난 건 버림).
   const alertWait = new Map();
   const alertSent = new Map();   // id → { key, at } 이 폰에서 같은 상태로 10분 안에 또 보내지 않음
+  // 보내는 중인 것도 저장소에 남겨 둔다(그 사이 앱이 닫혀도 다음에 다시 보냄). 보낸 것은 sent에 적어 다시 열었을 때 두 번 보내지 않게.
   const pendingAlerts = () => Array.from(alertWait, ([id, w]) => ({ id, b: w.before.key, a: (w.after || w.before).key, ts: w.ts }));
+  const wasSent = (id, ts) => S.alertsSent.some(x => x.id === id && x.ts === ts);
+  function markSent(id, ts) { S.alertsSent = S.alertsSent.filter(x => now() - x.ts < 24 * 3600 * 1000).concat({ id, ts }).slice(-100); }
   function restoreAlerts(list) {
     for (const r of Array.isArray(list) ? list : []) {
-      if (!r || !S.items.has(String(r.id)) || !num(r.ts) || alertWait.has(String(r.id))) continue;
+      if (!r || !S.items.has(String(r.id)) || !num(r.ts) || alertWait.has(String(r.id)) || wasSent(String(r.id), r.ts)) continue;
       alertWait.set(String(r.id), { before: { key: String(r.b || '') }, after: { key: String(r.a || '') }, ts: r.ts, timer: 0 });
     }
   }
   function queueAlert(it, before, ts) {
     if (S.cfg.alertsOff) return;
-    const w = alertWait.get(it.id) || { before };
+    const old = alertWait.get(it.id);
+    const w = old && !old.inflight ? old : { before };   // 보내는 중인 알림은 그대로 두고 새로 기다린다
     clearTimeout(w.timer); w.ts = ts; w.after = statusOf(it);
     w.timer = setTimeout(() => fireAlert(it.id), ALERT_DELAY_MS);
     alertWait.set(it.id, w); saveStore();
   }
   async function fireAlert(id, keepalive = false) {
-    const w = alertWait.get(id); if (!w) return;
-    clearTimeout(w.timer); alertWait.delete(id);
-    const done = () => { saveStore(); };
-    if (S.cfg.alertsOff || !S.alertTopic || now() - w.ts > 24 * 3600 * 1000) return done();
+    const w = alertWait.get(id); if (!w || w.inflight) return;
+    clearTimeout(w.timer); w.timer = 0;
+    const done = () => { if (alertWait.get(id) === w) alertWait.delete(id); saveStore(); };
+    if (S.cfg.alertsOff || !S.alertTopic || now() - w.ts > 24 * 3600 * 1000 || wasSent(id, w.ts)) return done();
     const cur = S.items.get(id); if (!cur || isDeleted(cur)) return done();
     const st = statusOf(cur); if (sev(st) <= sev(w.before)) return done();
     // 그 사이 다른 폰이 숫자를 바꿨고 그 폰 때문에 더 나빠졌으면 그 폰이 알린다(두 번 가지 않게). 아니면 이 폰이 알린다.
     if (Math.max(cur.t.u, cur.t.o) !== w.ts && sev(st) > sev(w.after || w.before)) return done();
     const last = alertSent.get(id); if (last && last.key === st.key && now() - last.at < 10 * 60 * 1000) return done();
+    w.inflight = true;
     const ok = await sendAlert(`${cur.name} ${st.label}`, [`${secOf(cur)} · ${grpOf(cur)}`, `안뜯은거 ${fmtV(num(cur.unopened))} / 뜯은거 ${fmtV(num(cur.opened))}`,
       `${S.cfg.name || '누군가'} · ${new Date(w.ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`].join('\n'), st.key === 'none' ? 4 : 3, keepalive);
-    if (ok) alertSent.set(id, { key: st.key, at: now() });
-    else if (!alertWait.has(id)) alertWait.set(id, { ...w, timer: 0 });   // 인터넷이 돌아오거나 앱을 다시 열 때 다시 보낸다
-    done();
+    w.inflight = false;
+    if (ok) { alertSent.set(id, { key: st.key, at: now() }); markSent(id, w.ts); if (alertWait.get(id) === w) alertWait.delete(id); saveStore(true); }
+    else saveStore();   // 남겨 둔다: 인터넷이 돌아오거나 앱을 다시 열 때 다시 보낸다
   }
   // all: 기다리는 것까지 지금 보냄(화면을 끄거나 앱을 닫을 때). 아니면 보내지 못했던 것만 다시.
   function flushAlerts(all = false) { for (const [id, w] of Array.from(alertWait)) if (all || !w.timer) fireAlert(id, all); }
@@ -1160,7 +1165,7 @@ main{min-width:0}
     tickTimer = setTimeout(syncTick, S.cfg.synced ? 10 * 60 * 1000 : 60 * 1000);
   }
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { clearTimeout(deltaTimer); flushDelta(); flushAlerts(true); closeStream(); clearTimeout(tickTimer); }
+    if (document.hidden) { clearTimeout(deltaTimer); flushDelta(); flushAlerts(true); saveStore(true); closeStream(); clearTimeout(tickTimer); }
     else { tickTimes(); if (S.key) pollCatchUp().then(() => { openStream(); syncTick(); renderSummary(); flushAlerts(); }); }
   });
   window.addEventListener('pagehide', () => { clearTimeout(deltaTimer); flushDelta(); flushAlerts(true); saveStore(true); });
