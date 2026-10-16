@@ -43,6 +43,10 @@ async function setupPhone(page, nick, code) {
   await page.waitForSelector('.item', { timeout: 20000 });
 }
 const inputVal = (page, sel) => page.$eval(sel, el => el.value);
+async function openEd(page, id) {
+  await page.click(`.item[data-id="${id}"] .name`); await page.waitForSelector('#editor:not([hidden])');
+  await page.waitForFunction(() => document.activeElement && document.activeElement.id === 'ed-name', null, { timeout: 3000 }).catch(() => {});
+}
 
 try {
   console.log('1) 폰 A 처음 설정');
@@ -135,12 +139,12 @@ try {
   await sleep(700); await A.click('#toast .act');
   check((await inputVal(A, '#o-yy-012')) === '', '위에 뜬 토스트로도 되돌리기');
   await A.evaluate(() => window.scrollTo(0, 0));
-  await B.click('.item[data-id="yy-001"] .name'); await B.waitForSelector('#editor:not([hidden])');
+  await openEd(B, 'yy-001');
   const histB = await B.textContent('#ed-hist-list');
   check(histB.includes('안뜯은거 120 → 122') && histB.includes('윤호'), '편집 화면에 최근 기록: ' + histB.trim().slice(0, 60));
   await B.click('#ed-cancel');
   await A.fill('#u-yy-010', '5'); await A.press('#u-yy-010', 'Enter');
-  await A.click('.item[data-id="yy-010"] .name'); await A.waitForSelector('#editor:not([hidden])');
+  await openEd(A, 'yy-010');
   await A.click('#ed-hist-list button.undo');
   check((await inputVal(A, '#u-yy-010')) === '' && (await A.textContent('#ed-hist-list')).trim() === '', '기록에서 되돌리기 (5 → 비움), 제자리가 된 줄은 숨김');
   await A.click('#ed-cancel');
@@ -149,7 +153,7 @@ try {
   await B.waitForFunction(() => document.querySelector('#u-yy-005').value === '1', null, { timeout: 20000 });
   await B.fill('#u-yy-005', '77'); await B.press('#u-yy-005', 'Enter');
   await A.waitForFunction(() => document.querySelector('#u-yy-005').value === '77', null, { timeout: 20000 });
-  await A.click('.item[data-id="yy-005"] .name'); await A.waitForSelector('#editor:not([hidden])');
+  await openEd(A, 'yy-005');
   const undos = await A.$$eval('#ed-hist-list button.undo', bs => bs.map(b => b.textContent));
   check(undos.length === 1 && undos[0].includes('(1)'), '기록의 되돌리기는 칸마다 가장 최근 줄에만: ' + JSON.stringify(undos));
   await B.fill('#u-yy-005', '50'); await B.press('#u-yy-005', 'Enter');
@@ -161,6 +165,19 @@ try {
   check((await A.textContent('#toast')).includes('50 → 51'), '다른 폰이 바꾼 뒤에는 새 줄로 (50 → 51): ' + (await A.textContent('#toast')));
   await sleep(700); await A.click('#toast .act');
   check((await inputVal(A, '#u-yy-005')) === '50', '되돌리면 다른 폰의 50으로');
+  await A.locator('.item[data-id="yy-005"] button.inc[data-f="u"]').click();
+  await sleep(800);   // 저장(0.3초 뒤)이 끝난 뒤에 읽는다(되돌리기 전 51이 남아 있을 수 있음)
+  const it5 = (await storeOf(A)).items.find(i => i.id === 'yy-005');
+  await A.setInputFiles('#restoreFile', { name: 'b.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ app: 'cafedemung', v: 1, items: [{ ...it5, unopened: 60, t: { ...it5.t, u: it5.t.u + 50 }, h: [] }] })) });
+  await A.waitForFunction(() => document.querySelector('#u-yy-005').value === '60', null, { timeout: 5000 });
+  await openEd(A, 'yy-005');
+  check((await A.$$('#ed-hist-list button.undo')).length === 0, '기록 없이 숫자가 바뀌면(옛 버전·백업) 이 폰의 마지막 줄도 되돌리기 없음');
+  await A.click('#ed-cancel');
+  await A.locator('.item[data-id="yy-005"] button.inc[data-f="u"]').click();
+  await A.waitForSelector('#toast .act', { timeout: 3000 });
+  check((await A.textContent('#toast')).includes('60 → 61'), '그 다음 수정은 새 줄로 (60 → 61): ' + (await A.textContent('#toast')));
+  await sleep(700); await A.click('#toast .act');
+  check((await inputVal(A, '#u-yy-005')) === '60', '되돌리면 60으로');
   const metaNow = await A.locator('.item[data-id="yy-005"] .meta').textContent();
   check(metaNow.startsWith('방금 · 윤호'), '항목마다 수정 시각 · 이름: ' + metaNow);
 
@@ -191,8 +208,9 @@ try {
   check((await B.textContent('#vw-name')) === '망고', '표에서 사진 누르면 크게 보기');
   await B.click('#vw-close');
   check(await B.isVisible('#table'), '크게 보기 닫아도 표 화면 유지');
-  const mcol = await B.$eval('#table tr.row[data-id="yy-001"] td.m', td => td.textContent);
-  check(/^(방금|오늘 \d\d:\d\d)/.test(mcol) && mcol.includes('사장님'), '표의 수정 칸에 날짜·시각과 이름: ' + mcol);
+  const mcol = await B.$eval('#table tr.row[data-id="yy-001"] td.m', td => ({ d: td.querySelector('.d') && td.querySelector('.d').textContent, ts: td.querySelector('.d') && td.querySelector('.d').dataset.ts, by: td.querySelector('.by') && td.querySelector('.by').textContent }));
+  check(/^(방금|오늘 \d\d:\d\d)$/.test(mcol.d || '') && mcol.by === '사장님' && Number(mcol.ts) > 1e12, '표의 수정 칸에 날짜·시각과 이름 (저절로 새로 고침): ' + JSON.stringify(mcol));
+  check((await B.$$('#table .feed [data-ts]')).length >= 3, '최근 변경의 시각도 저절로 새로 고침');
   await B.click('#pdfBtn'); await B.waitForSelector('#pdfSheet:not([hidden])');
   await B.click('#pdfOrders');
   await B.waitForSelector('#pdfReady:not([hidden])', { timeout: 90000 }).catch(() => {});
@@ -202,6 +220,14 @@ try {
   await B.waitForFunction(() => { const p = window.CDM_LAST_PDF && window.CDM_LAST_PDF(); return !!(p && p.name.includes('재고표') && !document.querySelector('#pdfReady').hidden); }, null, { timeout: 90000 }).catch(() => {});
   const pdfA = await B.evaluate(async () => { const p = window.CDM_LAST_PDF(); const t = new TextDecoder('latin1').decode(await p.arrayBuffer()); return { name: p.name, head: t.slice(0, 5), pages: (t.match(/\/Type\s*\/Page[^s]/g) || []).length }; });
   check(pdfA.head === '%PDF-' && pdfA.pages >= 4 && pdfA.name.includes('재고표'), '재고표 PDF (전체 항목, 구역별) ' + pdfA.pages + '쪽: ' + (await B.textContent('#pdfMsg')));
+  const lay = await B.evaluate(() => Array.from(document.querySelectorAll('#pdfStage .pg')).map(pg => { const b = pg.querySelector('.pb'), kids = Array.from(b.children), last = kids[kids.length - 1];
+    return { over: kids.filter(k => k.offsetTop + k.offsetHeight > b.clientHeight).length, lastIsHead: !!last && (last.tagName === 'H2' || last.classList.contains('h') || last.classList.contains('g')), rows: kids.filter(k => k.classList.contains('r') && !k.classList.contains('h') && !k.classList.contains('g')).length }; }));
+  check(lay.length === pdfA.pages && lay.every(p => !p.over && !p.lastIsHead), 'PDF 쪽마다 잘린 줄·홀로 남은 제목 없음 ' + JSON.stringify(lay));
+  const rowsIn = lay.reduce((n, p) => n + p.rows, 0), wantRows = await B.evaluate(() => JSON.parse(localStorage.getItem('cdm.store')).items.filter(i => !(i.t.d > 0 && i.t.d >= Math.max(i.t.u, i.t.o, i.t.m))).length);
+  check(rowsIn >= wantRows, `PDF에 모든 항목 (${rowsIn}줄 ≥ 항목 ${wantRows}개)`);
+  await B.emulateMedia({ media: 'print' });
+  check(await B.isVisible('#app'), '평소 인쇄(PDF 인쇄 아님)는 화면을 숨기지 않음');
+  await B.emulateMedia({ media: 'screen' });
   await B.click('#pdf-close');
   const feed = await B.$$eval('#table .feed li', ls => ls.map(l => l.textContent));
   check(feed.length >= 3 && feed.some(t => t.includes('탄산수') && t.includes('120 → 122')), '한눈에 "최근 변경" 목록 ' + feed.length + '줄');
@@ -228,7 +254,7 @@ try {
   console.log('7b) 사진 주소 직접 넣기 → 다른 폰에 전달');
   const customImg = APP + 'icons/icon-192.png';
   await A.click('#tabs button[data-sec="음료"]');
-  await A.click('.item[data-id="yy-003"] .name'); await A.waitForSelector('#editor:not([hidden])');
+  await openEd(A, 'yy-003');
   await A.fill('#ed-img', 'javascript:alert(1)'); await A.click('#ed-save');
   check(await A.isVisible('#editor'), '잘못된 사진 주소는 저장 안 됨');
   await A.fill('#ed-img', customImg);
@@ -241,8 +267,9 @@ try {
 
   console.log('7b2) 긴 메모를 여러 번 고쳐도 메시지는 4096바이트 안');
   for (let i = 0; i < 8; i++) {
-    await A.click('.item[data-id="yy-002"] .name'); await A.waitForSelector('#editor:not([hidden])');
-    await A.fill('#ed-note', (i + ' 아주 긴 메모 테스트입니다 ').repeat(12).slice(0, 118)); await A.click('#ed-save');
+    await openEd(A, 'yy-002');
+    // 한글만(3바이트)으로 채워서, 기록을 줄이지 않으면 한 항목이 4096바이트를 넘게 한다
+    await A.fill('#ed-note', (i + ' ' + '가나다라마바사아자차카타파하'.repeat(10)).slice(0, 118)); await A.click('#ed-save');
     await A.waitForSelector('#editor', { state: 'hidden' });
   }
   await A.locator('.item[data-id="yy-002"] button.inc[data-f="u"]').click();
@@ -250,7 +277,15 @@ try {
   check(true, '긴 기록이 쌓인 항목도 숫자가 다른 폰에 전달');
   const h2 = (await storeOf(A)).items.find(i => i.id === 'yy-002').h;
   check(h2.every(e => e[2] !== 'm' || e[3].length <= 120), '기록 글자 수 120자 제한');
-  check(!h2.some(e => e[2] === 'm' && e[3].includes('사진')), '사진을 안 건드리고 저장하면 사진 기록이 안 남음');
+  await sleep(600);
+  const h6a = (await storeOf(A)).items.find(i => i.id === 'yy-006');
+  await openEd(A, 'yy-006'); await A.click('#ed-save'); await A.waitForSelector('#editor', { state: 'hidden' }); await sleep(600);
+  const h6b = (await storeOf(A)).items.find(i => i.id === 'yy-006');
+  check(h6b.t.m === h6a.t.m && (h6b.h || []).length === (h6a.h || []).length && (await A.locator('.item[data-id="yy-006"] .meta').textContent()) === '시트에서 가져옴', '아무것도 안 바꾸고 저장하면 수정으로 치지 않음');
+  await openEd(A, 'yy-006'); await A.fill('#ed-note', '짧은 메모'); await A.click('#ed-save'); await A.waitForSelector('#editor', { state: 'hidden' });
+  await sleep(600);
+  const m6 = ((await storeOf(A)).items.find(i => i.id === 'yy-006').h || []).filter(e => e[2] === 'm');
+  check(m6.length === 1 && m6[0][3] === '메모 "짧은 메모"', '사진을 안 건드리고 저장하면 사진 기록이 안 남음: ' + JSON.stringify(m6.map(e => e[3])));
   check(log.every(l => l.size <= 4096), '모든 메시지가 4096바이트 이하 (최대 ' + Math.max(...log.map(l => l.size)) + ')');
 
   console.log('7c) 사장님 폰 알림 (ntfy 앱)');
@@ -278,6 +313,10 @@ try {
   for (let i = 0; i < 40 && alerts().length === n1; i++) await sleep(250);
   check(alerts().length === n1 + 1 && (new URLSearchParams(alerts()[alerts().length - 1].query).get('title') || '').includes('애플스파클링 없음'), '다시 연결되면 못 보낸 알림을 보냄');
   await sleep(1500); offlinePhase = false;
+  const t3 = (await storeOf(A)).items.find(i => i.id === 'yy-003').t.u;
+  await A.evaluate(() => { document.querySelector('#toast').hidden = true; });
+  await A.locator('.item[data-id="yy-003"] button.dec[data-f="u"]').click(); await sleep(300);
+  check((await inputVal(A, '#u-yy-003')) === '0' && !(await A.isVisible('#toast')) && (await storeOf(A)).items.find(i => i.id === 'yy-003').t.u === t3, '0에서 − 는 아무것도 바꾸지 않고 오래된 기록의 되돌리기도 안 띄움');
   const n2 = alerts().length;
   await A.fill('#u-yy-004', '0'); await A.press('#u-yy-004', 'Enter');
   await A.evaluate(() => window.dispatchEvent(new Event('pagehide')));

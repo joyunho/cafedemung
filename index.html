@@ -183,7 +183,7 @@ main{min-width:0}
 .grid td .tag{margin-left:0;font-size:10.5px;padding:1px 6px}
 .grid td.n.s-none{color:var(--crit)}
 .grid td.n.s-last,.grid td.n.s-low{color:var(--warn)}
-@media (max-width:420px){.grid th.m,.grid td.m{width:76px}}
+@media (max-width:420px){.grid th.m,.grid td.m{width:84px}}
 
 /* ---- 시작 / 바텀 시트 ---- */
 .setup{min-height:60vh;display:flex;align-items:center;justify-content:center;padding-block:20px}
@@ -237,18 +237,19 @@ main{min-width:0}
 .pg .ph span{color:#555;font-size:11px}
 .pg .pb{flex:1;overflow:hidden;position:relative}
 .pg .sum{color:#333;margin:0 0 4px;font-size:12px}
-.pg .note{color:#777;margin:0 0 8px;font-size:10.5px}
+.pg .lg{color:#777;margin:0 0 8px;font-size:10.5px}
 .pg h2{font-size:14px;margin:12px 0 4px;color:#16181a}
 .pg h2 small{font-weight:400;color:#666;font-size:11px;margin-left:6px}
 .pg .r{display:grid;grid-template-columns:var(--cols);gap:0 8px;padding:4px 6px;border-bottom:1px solid #e3e6e1;align-items:baseline}
-.pg .r>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pg .r>span{overflow:hidden;white-space:nowrap}
+.pg .r>span.w{white-space:normal;overflow-wrap:anywhere;word-break:keep-all}
 .pg .r.h{font-weight:600;color:#555;font-size:10.5px;background:#f1f3ef;border-bottom:1px solid #cfd5cc}
 .pg .r.g{display:block;background:#f7f8f5;color:#555;font-weight:600;font-size:11px}
 .pg .n{text-align:right;font-variant-numeric:tabular-nums}
 .pg .s-none{color:#b03527;font-weight:600}.pg .s-last,.pg .s-low{color:#8e5f0b;font-weight:600}.pg .s-blank{color:#999}
-.pg .empty{color:#666;padding:8px 6px}
-.pg .pf{color:#999;font-size:10px;text-align:right;margin-top:6px}
-@media print{@page{size:A4;margin:0}body>*:not(#pdfStage){display:none!important}#pdfStage{position:static;left:auto}.pg{break-after:page}}
+.pg .pe{color:#666;padding:8px 6px}
+.pg .pf{color:#999;font-size:10px;line-height:14px;height:14px;text-align:right;margin-top:6px}
+@media print{body.pdfprint{background:#fff}@page{size:A4;margin:0}body.pdfprint>*:not(#pdfStage){display:none!important}body.pdfprint #pdfStage{position:static;left:auto}.pg{break-after:page}}
 .toast .act{pointer-events:auto;margin-left:10px;padding:4px 2px;border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;white-space:nowrap}
 .hist,.feed{list-style:none;margin:0;padding:0}
 .hist li,.feed li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
@@ -457,7 +458,7 @@ main{min-width:0}
   const NTFY = String(CFG.NTFY || 'https://ntfy.sh').replace(/\/+$/, '');
   const POLL_MS = Math.max(15000, Number(CFG.POLL_MS) || 60000);
   const ALERT_DELAY_MS = Math.max(500, Number(CFG.ALERT_DELAY_MS) || 6000);   // 연타가 끝난 뒤 알림을 보내기까지 기다리는 시간(되돌리기가 보이는 4.5초보다 길게)
-  const APP_URL = location.origin + location.pathname;
+  const APP_URL = new URL('./', location.href).href;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const now = () => Date.now();
@@ -604,15 +605,20 @@ main{min-width:0}
   const pad2 = n => String(n).padStart(2, '0');
   function fmtWhen(ms, short = false) {
     if (!ms) return '';
-    if (now() >= ms && now() - ms < 60000) return '방금';
-    const d = new Date(ms), t = new Date(), hm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    ms = Math.min(ms, now());   // 다른 폰 시계가 조금 빨라도 내일 날짜로 보이지 않게
+    if (now() - ms < 60000) return '방금';
+    const d = new Date(ms), t = new Date(now()), hm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
     const day0 = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
     const diff = Math.round((day0(t) - day0(d)) / 86400000);
     if (diff === 0) return `오늘 ${hm}`;
     if (diff === 1) return `어제 ${hm}`;
-    const md = d.getFullYear() === t.getFullYear() ? `${d.getMonth() + 1}/${d.getDate()}` : `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+    const md = `${d.getMonth() + 1}/${d.getDate()}`;
+    if (d.getFullYear() !== t.getFullYear()) return short ? `${String(d.getFullYear()).slice(2)}/${md}` : `${d.getFullYear()}/${md}(${WD[d.getDay()]}) ${hm}`;
     return short ? `${md} ${hm}` : `${md}(${WD[d.getDay()]}) ${hm}`;
   }
+  // 시간 글자(data-ts)를 지금 기준으로 다시 쓴다: '방금' → '오늘 09:05' → '어제 …'
+  const tsSpan = (ms, short = true) => `<span data-ts="${ms}"${short ? ' data-s="1"' : ''}>${esc(fmtWhen(ms, short))}</span>`;
+  function refreshTimes() { for (const el of document.querySelectorAll('[data-ts]')) { const v = fmtWhen(Number(el.dataset.ts), el.dataset.s === '1'); if (el.textContent !== v) el.textContent = v; } }
   function ago(ms) {
     if (!ms) return '';
     const s = Math.max(0, (now() - ms) / 1000);
@@ -800,7 +806,7 @@ main{min-width:0}
   function saveStore(immediate) {
     clearTimeout(saveTimer);
     const doSave = () => {
-      store('store', { v: 1, items: Array.from(S.items.values()), lastId: S.lastId, lastIdAt: S.lastIdAt, peers: S.peers, lastSnapAt: S.lastSnapAt, lastSchedSnapAt: S.lastSchedSnapAt, dirtySinceSnap: S.dirtySinceSnap, daily: S.daily, dirty: Array.from(S.dirty) });
+      store('store', { v: 1, items: Array.from(S.items.values()), lastId: S.lastId, lastIdAt: S.lastIdAt, peers: S.peers, lastSnapAt: S.lastSnapAt, lastSchedSnapAt: S.lastSchedSnapAt, dirtySinceSnap: S.dirtySinceSnap, daily: S.daily, dirty: Array.from(S.dirty), alerts: pendingAlerts() });
     };
     if (immediate) doSave(); else saveTimer = setTimeout(doSave, 300);
   }
@@ -824,8 +830,8 @@ main{min-width:0}
   }
   const myTag = () => (S.cfg.deviceId || 'd').slice(-4);
   let histSeq = 0;
-  function addHist(it, f, a, b) {
-    const ts = now(), by = S.cfg.name || '';
+  function addHist(it, f, a, b, ts = now()) {
+    const by = S.cfg.name || '';
     const h = it.h || (it.h = []);
     const last = h[h.length - 1];
     // 이어 쓰기는 직전 줄의 '후' 값이 지금 바꾸기 전 값과 같을 때만(그 사이 다른 폰이 바꿨으면 새 줄)
@@ -835,9 +841,9 @@ main{min-width:0}
   }
   const keyOf = f => f === 'u' ? 'unopened' : 'opened';
   const fLabel = f => f === 'u' ? '안뜯은거' : '뜯은거';
-  function latestOf(it, f) { const h = it.h || []; for (let i = h.length - 1; i >= 0; i--) if (h[i][2] === f) return h[i]; return null; }
-  // 되돌릴 수 있는 기록: 그 칸의 가장 최근 기록이고, 지금 값이 그 기록의 '후' 값 그대로일 때만(그 뒤에 바뀐 숫자를 지우지 않게)
-  const undoable = (it, e) => !!e && isCountF(e[2]) && latestOf(it, e[2]) === e && e[3] !== e[4] && e[4] === num(it[keyOf(e[2])]);
+  function latestOf(it, f, shownOnly = false) { const h = it.h || []; for (let i = h.length - 1; i >= 0; i--) if (h[i][2] === f && (!shownOnly || histShown(h[i]))) return h[i]; return null; }
+  // 되돌릴 수 있는 기록: 그 칸의 (제자리 줄을 뺀) 가장 최근 기록이고, 지금 값이 그 기록의 '후' 값 그대로일 때만(그 뒤에 바뀐 숫자를 지우지 않게)
+  const undoable = (it, e) => !!e && isCountF(e[2]) && latestOf(it, e[2], true) === e && e[3] !== e[4] && e[4] === num(it[keyOf(e[2])]);
   const fmtV = v => v === null || v === undefined ? '–' : String(v);
   function histText(e) {
     if (e[2] === 'u') return `안뜯은거 ${fmtV(e[3])} → ${fmtV(e[4])}`;
@@ -865,6 +871,7 @@ main{min-width:0}
       S.lastSnapAt = num(st.lastSnapAt) || 0; S.lastSchedSnapAt = num(st.lastSchedSnapAt) || 0;
       S.dirtySinceSnap = st.dirtySinceSnap === true; S.daily = st.daily || { day: '', n: 0 };
       for (const id of (st.dirty || [])) if (S.items.has(id)) S.dirty.add(id);
+      S.alertSeed = st.alerts;
     }
   }
 
@@ -887,8 +894,8 @@ main{min-width:0}
   function editCounts(id, patch) {
     const it = S.items.get(id); if (!it) return;
     const ts = now(), by = S.cfg.name, before = statusOf(it);
-    if ('unopened' in patch) { const v = num(patch.unopened); if (v !== it.unopened) addHist(it, 'u', it.unopened, v); it.unopened = v; it.t.u = ts; it.b.u = by; }
-    if ('opened' in patch) { const v = num(patch.opened); if (v !== it.opened) addHist(it, 'o', it.opened, v); it.opened = v; it.t.o = ts; it.b.o = by; }
+    if ('unopened' in patch) { const v = num(patch.unopened); if (v !== it.unopened) addHist(it, 'u', it.unopened, v, ts); it.unopened = v; it.t.u = ts; it.b.u = by; }
+    if ('opened' in patch) { const v = num(patch.opened); if (v !== it.opened) addHist(it, 'o', it.opened, v, ts); it.opened = v; it.t.o = ts; it.b.o = by; }
     markDirty(id); refreshRow(id); queueAlert(it, before, ts);
   }
   function editMeta(id, patch) {
@@ -899,7 +906,8 @@ main{min-width:0}
     if ('note' in patch && (patch.note || '') !== (it.note || '')) parts.push(patch.note ? `메모 "${patch.note}"` : '메모 지움');
     if ('min' in patch && patch.min !== it.min) parts.push(patch.min === null ? '최소 수량 지움' : `최소 수량 ${patch.min}`);
     if ('img' in patch && (patch.img || '') !== (it.img || '')) parts.push(patch.img ? '사진 바꿈' : '기본 사진으로');
-    if (parts.length) addHist(it, 'm', parts.join(', '), null);
+    if (!parts.length) return;   // 기록만 보려고 열었다가 저장해도 '방금 고침'이 되지 않게
+    addHist(it, 'm', parts.join(', '), null);
     Object.assign(it, patch); it.t.m = now(); it.b.m = S.cfg.name;
     markDirty(id); render();
   }
@@ -1027,27 +1035,39 @@ main{min-width:0}
   // 이 폰에서 바꾼 숫자 때문에 '없음·마지막·부족'이 더 나빠지면, 잠시(연타가 끝날 때까지) 기다렸다가 알림 주제로 평문 알림을 보낸다.
   const SEVERITY = { low: 1, last: 2, none: 3 };
   const sev = st => SEVERITY[st.key] || 0;
-  const alertWait = new Map();   // id → { before, ts(이 폰이 마지막으로 고친 시각), timer(0이면 보내지 못해 다시 보낼 차례) }
-  const alertSent = new Map();   // id → { key, at } 같은 상태로 10분 안에 또 보내지 않음
+  // 기다리는 알림 id → { before(바꾸기 전 상태), after(이 폰이 바꾼 뒤 상태), ts(이 폰이 마지막으로 고친 시각), timer(0이면 보내지 못해 다시 보낼 차례) }
+  // 저장소에도 같이 저장해서, 끊긴 채로 앱을 닫아도 다음에 열 때 보낸다(하루 지난 건 버림).
+  const alertWait = new Map();
+  const alertSent = new Map();   // id → { key, at } 이 폰에서 같은 상태로 10분 안에 또 보내지 않음
+  const pendingAlerts = () => Array.from(alertWait, ([id, w]) => ({ id, b: w.before.key, a: (w.after || w.before).key, ts: w.ts }));
+  function restoreAlerts(list) {
+    for (const r of Array.isArray(list) ? list : []) {
+      if (!r || !S.items.has(String(r.id)) || !num(r.ts) || alertWait.has(String(r.id))) continue;
+      alertWait.set(String(r.id), { before: { key: String(r.b || '') }, after: { key: String(r.a || '') }, ts: r.ts, timer: 0 });
+    }
+  }
   function queueAlert(it, before, ts) {
     if (S.cfg.alertsOff) return;
     const w = alertWait.get(it.id) || { before };
-    clearTimeout(w.timer); w.ts = ts;
+    clearTimeout(w.timer); w.ts = ts; w.after = statusOf(it);
     w.timer = setTimeout(() => fireAlert(it.id), ALERT_DELAY_MS);
-    alertWait.set(it.id, w);
+    alertWait.set(it.id, w); saveStore();
   }
   async function fireAlert(id, keepalive = false) {
     const w = alertWait.get(id); if (!w) return;
     clearTimeout(w.timer); alertWait.delete(id);
-    if (S.cfg.alertsOff || !S.alertTopic) return;
-    const cur = S.items.get(id); if (!cur || isDeleted(cur)) return;
-    if (Math.max(cur.t.u, cur.t.o) !== w.ts) return;   // 그 사이 다른 폰이 숫자를 바꿨으면 그 폰이 알린다
-    const st = statusOf(cur); if (sev(st) <= sev(w.before)) return;
-    const last = alertSent.get(id); if (last && last.key === st.key && now() - last.at < 10 * 60 * 1000) return;
+    const done = () => { saveStore(); };
+    if (S.cfg.alertsOff || !S.alertTopic || now() - w.ts > 24 * 3600 * 1000) return done();
+    const cur = S.items.get(id); if (!cur || isDeleted(cur)) return done();
+    const st = statusOf(cur); if (sev(st) <= sev(w.before)) return done();
+    // 그 사이 다른 폰이 숫자를 바꿨고 그 폰 때문에 더 나빠졌으면 그 폰이 알린다(두 번 가지 않게). 아니면 이 폰이 알린다.
+    if (Math.max(cur.t.u, cur.t.o) !== w.ts && sev(st) > sev(w.after || w.before)) return done();
+    const last = alertSent.get(id); if (last && last.key === st.key && now() - last.at < 10 * 60 * 1000) return done();
     const ok = await sendAlert(`${cur.name} ${st.label}`, [`${secOf(cur)} · ${grpOf(cur)}`, `안뜯은거 ${fmtV(num(cur.unopened))} / 뜯은거 ${fmtV(num(cur.opened))}`,
       `${S.cfg.name || '누군가'} · ${new Date(w.ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`].join('\n'), st.key === 'none' ? 4 : 3, keepalive);
     if (ok) alertSent.set(id, { key: st.key, at: now() });
     else if (!alertWait.has(id)) alertWait.set(id, { ...w, timer: 0 });   // 인터넷이 돌아오거나 앱을 다시 열 때 다시 보낸다
+    done();
   }
   // all: 기다리는 것까지 지금 보냄(화면을 끄거나 앱을 닫을 때). 아니면 보내지 못했던 것만 다시.
   function flushAlerts(all = false) { for (const [id, w] of Array.from(alertWait)) if (all || !w.timer) fireAlert(id, all); }
@@ -1120,6 +1140,8 @@ main{min-width:0}
     catch (e) { setSync('error', '이 브라우저에서는 암호화를 쓸 수 없어요 (https 필요)'); return; }
     setSync('connecting');
     await pollCatchUp();
+    if (S.alertSeed) { restoreAlerts(S.alertSeed); S.alertSeed = null; }
+    flushAlerts();   // 지난번에 못 보낸 알림(다른 폰 변경을 받은 뒤에 판단)
     if (!S.cfg.synced) { S.cfg.hints.needSentAt = now(); saveCfg(); requestSnapshot(); }   // 새 폰: 다른 폰에 전체 숫자를 바로 요청
     openStream();
     if (S.dirty.size) await flushDelta();
@@ -1139,12 +1161,12 @@ main{min-width:0}
   }
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { clearTimeout(deltaTimer); flushDelta(); flushAlerts(true); closeStream(); clearTimeout(tickTimer); }
-    else if (S.key) { flushAlerts(); pollCatchUp().then(() => { openStream(); syncTick(); renderSummary(); }); }
+    else { tickTimes(); if (S.key) pollCatchUp().then(() => { openStream(); syncTick(); renderSummary(); flushAlerts(); }); }
   });
   window.addEventListener('pagehide', () => { clearTimeout(deltaTimer); flushDelta(); flushAlerts(true); saveStore(true); });
-  window.addEventListener('online', () => { S.online = true; if (S.key) { pollCatchUp().then(openStream); flushDelta(); flushAlerts(); } });
+  window.addEventListener('online', () => { S.online = true; if (S.key) { pollCatchUp().then(() => { openStream(); flushAlerts(); }); flushDelta(); } });
   window.addEventListener('offline', () => { S.online = false; setSync('offline'); closeStream(); });
-  setInterval(() => { if (!document.hidden && S.key) { pollCatchUp(); if (!S.es) openStream(); flushAlerts(); } }, POLL_MS);
+  setInterval(() => { if (!document.hidden && S.key) { pollCatchUp().then(() => flushAlerts()); if (!S.es) openStream(); } }, POLL_MS);
 
   // ---------- 보기 계산 ----------
   function liveItems() { const out = []; for (const d of S.items.values()) if (!isDeleted(d)) out.push(d); out.sort((a, b) => (a.order || 0) - (b.order || 0) || String(a.name).localeCompare(String(b.name), 'ko')); return out; }
@@ -1288,7 +1310,8 @@ main{min-width:0}
     if (li && it) fillRow(li, it); else render();
     renderSummary();
   }
-  setInterval(() => { if (!document.hidden && $('#setup').hidden) { renderSummary(); if (S.cfg.view === 'list') for (const li of $$('#list .item')) { const it = S.items.get(li.dataset.id); if (it) fillRow(li, it); } } }, 60000);
+  function tickTimes() { if (document.hidden || !$('#setup').hidden) return; renderSummary(); refreshTimes(); if (S.cfg.view === 'list') for (const li of $$('#list .item')) { const it = S.items.get(li.dataset.id); if (it) fillRow(li, it); } }
+  setInterval(tickTimes, 60000);
 
   // ---------- 그리기: 한눈에 ----------
   function orderList() { return liveItems().filter(d => LOW_KEYS.has(statusOf(d).key)); }
@@ -1314,7 +1337,7 @@ main{min-width:0}
     } else html += '<div class="orders"><div class="ok">부족한 항목이 없어요.</div></div>';
     html += '</div>';
     const feed = recentChanges(15);
-    if (feed.length) html += `<div class="card"><div class="hd"><h2>최근 변경<span class="sub">최근 7일</span></h2></div><ul class="feed">${feed.map(({ it, e }) => `<li data-id="${esc(it.id)}"><span class="when">${esc(fmtWhen(e[1], true))}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt"><b>${esc(it.name)}</b> ${esc(histText(e))}</span></li>`).join('')}</ul></div>`;
+    if (feed.length) html += `<div class="card"><div class="hd"><h2>최근 변경<span class="sub">최근 7일</span></h2></div><ul class="feed">${feed.map(({ it, e }) => `<li data-id="${esc(it.id)}"><span class="when">${tsSpan(e[1])}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt"><b>${esc(it.name)}</b> ${esc(histText(e))}</span></li>`).join('')}</ul></div>`;
     const secs = sectionsList();
     const all = liveItems().filter(d => matches(d, q) && (!S.low || LOW_KEYS.has(statusOf(d).key)));
     for (const sec of secs) {
@@ -1325,7 +1348,7 @@ main{min-width:0}
         html += `<tr class="grp"><td colspan="5">${esc(g.group)}</td></tr>`;
         for (const it of g.items) {
           const st = statusOf(it); const u = num(it.unopened), o = num(it.opened); const lt = editedAt(it);
-          html += `<tr class="row${st.key ? ' s-' + st.key : ''}" data-id="${esc(it.id)}"><td class="p"><button type="button" class="mini" aria-label="${esc(it.name)} 사진 크게 보기">${picHTML(it)}</button></td><td><span class="nm">${esc(it.name)}${st.label ? ` <span class="tag s-${st.key}">${st.label}</span>` : ''}</span></td><td class="n${u === null ? ' blank' : ''}${st.key ? ' s-' + st.key : ''}">${u === null ? '–' : u}</td><td class="n${o === null ? ' blank' : ''}">${o === null ? '–' : o}</td><td class="m" title="${esc(lt ? fmtWhen(lt) + (lastBy(it) ? ' · ' + lastBy(it) : '') : '시트에서 가져옴')}">${lt ? `<span class="d">${esc(fmtWhen(lt, true))}</span>${lastBy(it) ? `<span class="by">${esc(lastBy(it))}</span>` : ''}` : '시트'}</td></tr>`;
+          html += `<tr class="row${st.key ? ' s-' + st.key : ''}" data-id="${esc(it.id)}"><td class="p"><button type="button" class="mini" aria-label="${esc(it.name)} 사진 크게 보기">${picHTML(it)}</button></td><td><span class="nm">${esc(it.name)}${st.label ? ` <span class="tag s-${st.key}">${st.label}</span>` : ''}</span></td><td class="n${u === null ? ' blank' : ''}${st.key ? ' s-' + st.key : ''}">${u === null ? '–' : u}</td><td class="n${o === null ? ' blank' : ''}">${o === null ? '–' : o}</td><td class="m" title="${esc(lt ? new Date(lt).toLocaleString('ko-KR') + (lastBy(it) ? ' · ' + lastBy(it) : '') : '시트에서 가져옴')}">${lt ? `<span class="d" data-ts="${lt}" data-s="1">${esc(fmtWhen(lt, true))}</span>${lastBy(it) ? `<span class="by">${esc(lastBy(it))}</span>` : ''}` : '시트'}</td></tr>`;
         }
       }
       html += '</tbody></table></section>';
@@ -1428,7 +1451,7 @@ main{min-width:0}
   // ---------- 설정 시트 ----------
   const sheets = { editor: $('#editor'), settings: $('#settings'), viewer: $('#viewer'), pdf: $('#pdfSheet'), scrim: $('#scrim') };
   function openSheet(el) { for (const k of ['editor', 'settings', 'viewer', 'pdf']) sheets[k].hidden = sheets[k] !== el; sheets.scrim.hidden = false; }
-  function closeSheets() { sheets.editor.hidden = true; sheets.settings.hidden = true; sheets.viewer.hidden = true; sheets.pdf.hidden = true; sheets.scrim.hidden = true; S.editing = null; S.viewing = null; $('#ed-confirm').hidden = true; $('#resetConfirm').hidden = true; $('#pdfStage').innerHTML = ''; }
+  function closeSheets() { sheets.editor.hidden = true; sheets.settings.hidden = true; sheets.viewer.hidden = true; sheets.pdf.hidden = true; sheets.scrim.hidden = true; S.editing = null; S.viewing = null; $('#ed-confirm').hidden = true; $('#resetConfirm').hidden = true; $('#pdfStage').innerHTML = ''; S.pdfGen = (S.pdfGen || 0) + 1; $('#pdfOrders').disabled = $('#pdfAll').disabled = false; }
 
   // ---------- PDF로 저장 (재고표·주문 목록) ----------
   // 화면 밖에 A4 쪽을 직접 나눠 그린 뒤(html2canvas) 쪽마다 이미지로 PDF에 넣는다(jsPDF). 한글 글꼴을 따로 넣지 않아도 화면 글꼴 그대로 나온다.
@@ -1450,40 +1473,52 @@ main{min-width:0}
     const used = () => { const c = body.lastElementChild; return c ? c.offsetTop + c.offsetHeight : 0; };
     const newPage = () => {
       const pg = document.createElement('div'); pg.className = 'pg';
-      pg.innerHTML = `<div class="ph"><b>${esc(title)}</b><span>${esc(stamp)}</span></div><div class="pb"></div><div class="pf"></div>`;
+      // 꼬리말(쪽 번호) 자리를 미리 채워 둬야 나중에 번호를 써도 본문 높이가 줄지 않는다
+      pg.innerHTML = `<div class="ph"><b>${esc(title)}</b><span>${esc(stamp)}</span></div><div class="pb"></div><div class="pf">0 / 0</div>`;
       stage.appendChild(pg); pages.push(pg); body = pg.querySelector('.pb');
     };
     const html = h => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
-    let repeat = null;   // 쪽이 넘어가면 다시 붙일 머리줄
-    const add = (h, { keep = 0 } = {}) => {
-      const el = html(h); body.appendChild(el);
-      if (used() + keep > body.clientHeight && body.children.length > 1) {
-        body.removeChild(el); newPage();
-        if (repeat) body.appendChild(html(repeat));
-        body.appendChild(el);
+    // 제목(구역 제목 · 열 제목 · 분류 줄)은 바로 쓰지 않고 다음 줄과 함께 놓는다 → 쪽 끝에 제목만 남지 않음.
+    // 쪽이 넘어가면 열 제목과 분류 줄(이어서)을 다시 붙인다.
+    let head = null, grp = null, pend = { h2: null, head: false, grp: false };
+    const section = h => { pend = { h2: h, head: false, grp: false }; head = null; grp = null; };
+    const tableHead = h => { head = h; pend.head = true; };
+    const groupRow = name => { grp = name; pend.grp = true; };
+    const row = (h, plain = false) => {
+      const build = fresh => {
+        const out = [];
+        if (pend.h2) out.push(pend.h2);
+        if (!plain && head && (pend.head || fresh)) out.push(head);
+        if (!plain && grp && (pend.grp || fresh)) out.push(`<div class="r g">${esc(grp)}${fresh && !pend.grp ? ' (이어서)' : ''}</div>`);
+        out.push(h);
+        return out.map(html);
+      };
+      let els = build(false); els.forEach(e => body.appendChild(e));
+      if (used() > body.clientHeight && body.children.length > els.length) {
+        els.forEach(e => body.removeChild(e)); newPage();
+        els = build(true); els.forEach(e => body.appendChild(e));
       }
+      pend = { h2: null, head: false, grp: false };
     };
     newPage();
     const live = liveItems(); let none = 0, last = 0, low = 0, blank = 0;
     for (const it of live) { const k = statusOf(it).key; if (k === 'none') none++; else if (k === 'last') last++; else if (k === 'low') low++; else if (k === 'blank') blank++; }
-    add(`<p class="sum">항목 ${live.length} · 없음 ${none} · 마지막 ${last} · 부족 ${low} · 미기입 ${blank}</p>`);
-    add(`<p class="note">없음 = 안뜯은거 0, 뜯은 것도 없음 · 마지막 = 뜯은 것만 남음 · 부족 = 최소 수량보다 적음 · – = 안 적음</p>`);
+    row(`<p class="sum">항목 ${live.length} · 없음 ${none} · 마지막 ${last} · 부족 ${low} · 미기입 ${blank}</p>`, true);
+    row(`<p class="lg">없음 = 안뜯은거 0, 뜯은 것도 없음 · 마지막 = 뜯은 것만 남음 · 부족 = 최소 수량보다 적음 · – = 안 적음</p>`, true);
     const val = v => fmtV(num(v));
-    // 종이는 나중에 읽으므로 '방금·오늘' 대신 날짜로
-    const whenBy = it => { const lt = editedAt(it); if (!lt) return '시트'; const d = new Date(lt), y = d.getFullYear() !== new Date().getFullYear() ? d.getFullYear() + '/' : '';
+    // 종이는 나중에 읽으므로 '방금·오늘' 대신 날짜로 (다른 해는 두 자리 연도)
+    const whenBy = it => { const lt = editedAt(it); if (!lt) return '시트'; const d = new Date(Math.min(lt, now())), y = d.getFullYear() !== new Date().getFullYear() ? String(d.getFullYear()).slice(2) + '/' : '';
       return `${y}${d.getMonth() + 1}/${d.getDate()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}${lastBy(it) ? ' ' + lastBy(it) : ''}`; };
     // 주문 목록
     const ol = orderList();
     const OC = '--cols:1.5fr 2fr .75fr .55fr .55fr .55fr 1.6fr';
-    repeat = null;
-    add(`<h2>주문할 것<small>없음·마지막·부족 ${ol.length}개</small></h2>`, { keep: 50 });
-    if (!ol.length) add(`<div class="empty">부족한 항목이 없어요.</div>`);
+    section(`<h2>주문할 것<small>없음·마지막·부족 ${ol.length}개</small></h2>`);
+    if (!ol.length) row(`<div class="pe">부족한 항목이 없어요.</div>`, true);
     else {
-      repeat = `<div class="r h" style="${OC}"><span>구역 · 분류</span><span>항목</span><span>상태</span><span class="n">안뜯</span><span class="n">뜯</span><span class="n">최소</span><span>메모</span></div>`;
-      add(repeat, { keep: 22 });
+      tableHead(`<div class="r h" style="${OC}"><span>구역 · 분류</span><span>항목</span><span>상태</span><span class="n">안뜯</span><span class="n">뜯</span><span class="n">최소</span><span>메모</span></div>`);
       for (const g of groupsOf(ol, true)) for (const it of g.items) {
         const st = statusOf(it);
-        add(`<div class="r" style="${OC}">${pdfCell(`${g.section} · ${g.group}`)}${pdfCell(it.name)}${pdfCell(st.label, 's-' + st.key)}${pdfCell(val(it.unopened), 'n')}${pdfCell(val(it.opened), 'n')}${pdfCell(val(it.min), 'n')}${pdfCell(it.note || '')}</div>`);
+        row(`<div class="r" style="${OC}">${pdfCell(`${g.section} · ${g.group}`, 'w')}${pdfCell(it.name, 'w')}${pdfCell(st.label, 's-' + st.key)}${pdfCell(val(it.unopened), 'n')}${pdfCell(val(it.opened), 'n')}${pdfCell(val(it.min), 'n')}${pdfCell(it.note || '', 'w')}</div>`);
       }
     }
     // 전체 재고표
@@ -1491,15 +1526,13 @@ main{min-width:0}
       const IC = '--cols:2.1fr .55fr .55fr .55fr .75fr 1.5fr 1.35fr';
       for (const sec of sectionsList()) {
         const items = live.filter(it => secOf(it) === sec); if (!items.length) continue;
-        repeat = null;
-        add(`<h2>${esc(sec)}<small>${items.length}개</small></h2>`, { keep: 70 });
-        repeat = `<div class="r h" style="${IC}"><span>항목</span><span class="n">안뜯</span><span class="n">뜯</span><span class="n">최소</span><span>상태</span><span>메모</span><span>마지막 수정</span></div>`;
-        add(repeat, { keep: 44 });
+        section(`<h2>${esc(sec)}<small>${items.length}개</small></h2>`);
+        tableHead(`<div class="r h" style="${IC}"><span>항목</span><span class="n">안뜯</span><span class="n">뜯</span><span class="n">최소</span><span>상태</span><span>메모</span><span>마지막 수정</span></div>`);
         for (const g of groupsOf(items, false)) {
-          add(`<div class="r g">${esc(g.group)}</div>`, { keep: 22 });
+          groupRow(g.group);
           for (const it of g.items) {
             const st = statusOf(it);
-            add(`<div class="r" style="${IC}">${pdfCell(it.name)}${pdfCell(val(it.unopened), 'n')}${pdfCell(val(it.opened), 'n')}${pdfCell(val(it.min), 'n')}${pdfCell(st.label, 's-' + st.key)}${pdfCell(it.note || '')}${pdfCell(whenBy(it))}</div>`);
+            row(`<div class="r" style="${IC}">${pdfCell(it.name, 'w')}${pdfCell(val(it.unopened), 'n')}${pdfCell(val(it.opened), 'n')}${pdfCell(val(it.min), 'n')}${pdfCell(st.label, 's-' + st.key)}${pdfCell(it.note || '', 'w')}${pdfCell(whenBy(it), 'w')}</div>`);
           }
         }
       }
@@ -1507,24 +1540,30 @@ main{min-width:0}
     pages.forEach((pg, i) => { pg.querySelector('.pf').textContent = `${i + 1} / ${pages.length}`; });
     return pages;
   }
-  let pdfBusy = false;
+  // 만들기마다 번호를 붙인다. 시트를 닫으면(closeSheets) 번호가 바뀌어, 하던 것은 조용히 멈춘다.
+  let pdfBusy = 0;
+  const pdfButtons = on => { $('#pdfOrders').disabled = $('#pdfAll').disabled = !on; };
   async function makePdf(kind) {
-    if (pdfBusy) return;   // 만드는 중에 또 누르면 무시(같은 그리기 자리를 같이 쓰므로)
-    pdfBusy = true; $('#pdfOrders').disabled = $('#pdfAll').disabled = true;
-    try { await makePdfNow(kind); } finally { pdfBusy = false; $('#pdfOrders').disabled = $('#pdfAll').disabled = false; }
+    if (pdfBusy && pdfBusy === S.pdfGen) return;   // 만드는 중에 또 누르면 무시(같은 그리기 자리를 같이 쓰므로)
+    const gen = S.pdfGen = (S.pdfGen || 0) + 1; pdfBusy = gen; pdfButtons(false);
+    try { await makePdfNow(kind, gen); } finally { if (pdfBusy === gen) { pdfBusy = 0; pdfButtons(true); } }
   }
-  async function makePdfNow(kind) {
+  async function makePdfNow(kind, gen) {
+    const live = () => S.pdfGen === gen;
     const msg = $('#pdfMsg'); $('#pdfReady').hidden = true; $('#pdfPrintRow').hidden = true; S.pdf = null;
     msg.textContent = 'PDF 만드는 중…';
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    if (!live()) return;
     const pages = buildPdfPages(kind);
     const d = new Date(), name = `${kind === 'orders' ? '카페드명-주문목록' : '카페드명-재고표'}-${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}.pdf`;
     try {
       await loadPdfLibs();
+      if (!live()) return;
       const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4', compress: true });
       for (let i = 0; i < pages.length; i++) {
         msg.textContent = `PDF 만드는 중… (${i + 1}/${pages.length}쪽)`;
         const canvas = await window.html2canvas(pages[i], { scale: 2, backgroundColor: '#ffffff', logging: false });
+        if (!live()) return;
         if (i) doc.addPage();
         doc.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', 0, 0, 595.28, 841.89);
       }
@@ -1534,6 +1573,7 @@ main{min-width:0}
       $('#pdfShare').hidden = !(navigator.canShare && navigator.canShare({ files: [S.pdf] }));
       $('#pdfReady').hidden = false;
     } catch (e) {
+      if (!live()) return;
       msg.textContent = 'PDF 파일을 만들지 못했어요(처음 한 번은 인터넷이 필요해요). 대신 아래 "인쇄"에서 PDF로 저장할 수 있어요.';
       $('#pdfPrintRow').hidden = false;
     }
@@ -1542,7 +1582,9 @@ main{min-width:0}
   $('#pdfAll').addEventListener('click', () => makePdf('all'));
   $('#pdf-close').addEventListener('click', closeSheets);
   $('#pdfBtn2').addEventListener('click', () => openPdf());
-  $('#pdfPrint').addEventListener('click', () => window.print());
+  // 인쇄: 이때만 화면을 숨기고 PDF 쪽만 찍는다(평소 인쇄는 그대로)
+  $('#pdfPrint').addEventListener('click', () => { document.body.classList.add('pdfprint'); window.print(); });
+  window.addEventListener('afterprint', () => document.body.classList.remove('pdfprint'));
   $('#pdfShare').addEventListener('click', async () => { if (!S.pdf) return; try { await navigator.share({ files: [S.pdf], title: S.pdf.name }); } catch (e) { if (!e || e.name !== 'AbortError') toast('공유하지 못했어요. "파일로 저장"을 써 주세요'); } });
   $('#pdfSave').addEventListener('click', () => {
     if (!S.pdf) return;
@@ -1654,7 +1696,7 @@ main{min-width:0}
     const id = S.editing && S.editing.id; const it = id ? S.items.get(id) : null;
     const rows = it ? (it.h || []).filter(histShown).slice().reverse() : [];
     $('#ed-hist').hidden = !rows.length;
-    $('#ed-hist-list').innerHTML = rows.map(e => `<li><span class="when">${esc(fmtWhen(e[1], true))}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt">${esc(histText(e))}</span>${undoable(it, e) ? `<button type="button" class="undo" data-h="${esc(e[0])}">되돌리기 (${esc(fmtV(e[3]))})</button>` : ''}</li>`).join('');
+    $('#ed-hist-list').innerHTML = rows.map(e => `<li><span class="when">${tsSpan(e[1])}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt">${esc(histText(e))}</span>${undoable(it, e) ? `<button type="button" class="undo" data-h="${esc(e[0])}">되돌리기 (${esc(fmtV(e[3]))})</button>` : ''}</li>`).join('');
   }
   $('#ed-hist-list').addEventListener('click', ev => {
     const b = ev.target.closest('button.undo'); if (!b) return;
@@ -1699,6 +1741,7 @@ main{min-width:0}
     if (!canEdit()) return;
     const it = S.items.get(id); if (!it) return; const cur = num(it[key]);
     const next = btn.classList.contains('inc') ? (cur === null ? 1 : cur + 1) : (cur === null ? 0 : Math.max(0, cur - 1));
+    if (next === cur) return;   // 0에서 − 처럼 바뀌는 게 없으면 그대로
     editCounts(id, { [key]: next }); countToast(id, f);
   });
   list.addEventListener('change', ev => {
@@ -1706,14 +1749,18 @@ main{min-width:0}
     const li = inp.closest('.item'); if (!li) return; const id = li.dataset.id, key = inp.dataset.f === 'u' ? 'unopened' : 'opened';
     if (!canEdit()) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; return; }
     const raw = inp.value.trim().replace(/,/g, '');
-    if (raw === '') { editCounts(id, { [key]: null }); countToast(id, inp.dataset.f); return; }
+    const it0 = S.items.get(id); const cur = it0 ? num(it0[key]) : null;
+    if (raw === '') { if (cur !== null) { editCounts(id, { [key]: null }); countToast(id, inp.dataset.f); } return; }
     const n = Number(raw);
-    if (!Number.isFinite(n) || n < 0) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; toast('숫자만 적어주세요'); return; }
-    editCounts(id, { [key]: Math.round(n * 10) / 10 }); countToast(id, inp.dataset.f);
+    if (!Number.isFinite(n) || n < 0) { inp.value = fmtNum(cur); toast('숫자만 적어주세요'); return; }
+    const v = Math.round(n * 10) / 10;
+    if (v === cur) { inp.value = fmtNum(cur); return; }
+    editCounts(id, { [key]: v }); countToast(id, inp.dataset.f);
   });
   // 숫자를 바꾸면 "전 → 후 · 되돌리기"를 잠깐 보여준다. 되돌리기는 1분 안에 연달아 바꾼 것을 한꺼번에 되돌린다.
   function countToast(id, f) {
-    const it = S.items.get(id); const e = it && latestOf(it, f); if (!e || !e[0].startsWith(myTag())) return;
+    // 방금 이 수정이 쓰거나 이어 쓴 줄일 때만(시각이 그 칸의 마지막 수정 시각과 같음). 오래된 줄을 되돌리라고 내밀지 않는다.
+    const it = S.items.get(id); const e = it && latestOf(it, f); if (!e || !e[0].startsWith(myTag()) || e[1] !== it.t[f]) return;
     const row = list.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
     if (!histShown(e)) { toast(`${it.name} ${fLabel(f)} ${fmtV(e[4])} (원래대로)`, 1500, null, row); return; }
     const hid = e[0];
