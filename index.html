@@ -1039,11 +1039,11 @@ main{min-width:0}
   //   timer(0이면 보낼 차례), tried(보냈는지 확실치 않은 시도 {m 표시, k 상태, tt 시각}), busy(보내는 중), again(보내는 중에 또 바뀜) }
   // 알림마다 표시(a=항목.시각)를 누르는 주소에 붙인다. 결과를 모르는 시도(앱이 닫히며 보낸 것, 응답을 못 받은 것)가 있으면
   // 다음에 보내기 전에 알림 주제에서 그 표시를 찾아본다: 있으면 보낸 것으로 치고 그 상태를 새 기준으로 삼는다.
-  // ntfy는 12시간만 보관하므로 11시간 넘은 시도는 확인할 수 없어 보낸 것으로 본다. 대신 인터넷이 없는 줄 알고 보낸 시도는
-  // '확실히 못 감'으로 적어 두고 그냥 다시 보낸다(잃지 않게). 저장소에도 같이 저장(하루 지난 건 버림).
+  // ntfy는 12시간만 보관하므로 그보다 오래된 시도는 확인할 수 없다 → 다시 보낸다(드물게 두 번 갈 수는 있어도 잃지는 않게).
+  // 인터넷이 없는 줄 알고 한 시도는 '확실히 못 감'이라 적지 않고 그냥 다시 보낸다. 저장소에도 같이 저장(하루 지난 건 버림).
   const alertWait = new Map();
   const alertSent = new Map();   // id → { key, at } 이 폰에서 같은 상태로 10분 안에 또 보내지 않음
-  const DAY_MS = 24 * 3600 * 1000, CACHE_MS = 11 * 3600 * 1000;
+  const DAY_MS = 24 * 3600 * 1000, CACHE_MS = 11.5 * 3600 * 1000;
   const alertMark = (id, ts) => `${id}.${Math.round(ts).toString(36)}`;
   const wasSent = mark => S.alertsSent.some(x => x.m === mark);
   function markSent(mark, ts) { S.alertsSent = S.alertsSent.filter(x => now() - x.ts < DAY_MS).concat({ m: mark, ts }).slice(-100); }
@@ -1083,10 +1083,10 @@ main{min-width:0}
     // 결과를 모르는 지난 시도가 있으면 먼저 정리한다(닫히는 중에는 기다릴 수 없어 건너뜀)
     if (w.tried && !unloading) {
       const tr = w.tried;
-      let seen = wasSent(tr.m) || now() - tr.tt > CACHE_MS ? true : null;
+      let seen = wasSent(tr.m) ? true : now() - tr.tt > CACHE_MS ? false : null;   // 너무 오래돼 확인할 수 없으면 안 간 것으로
       if (seen === null) { w.busy = true; seen = await alertOnTopic(tr.m); w.busy = false; }
       if (seen === null) { saveStore(); return; }   // 확인 못 함(인터넷 없음): 다음에 다시
-      if (seen) { markSent(tr.m, tr.tt); alertSent.set(id, { key: tr.k, at: now() }); w.before = worseSt(w.before, { key: tr.k }); }
+      if (seen) { markSent(tr.m, tr.tt); alertSent.set(id, { key: tr.k, at: tr.tt }); w.before = worseSt(w.before, { key: tr.k }); }   // 10분 규칙은 실제로 보낸 때부터
       w.tried = null; w.again = false;
     }
     const cur = S.items.get(id); if (!cur || isDeleted(cur)) return drop();
@@ -1096,8 +1096,8 @@ main{min-width:0}
     const last = alertSent.get(id); if (last && last.key === st.key && now() - last.at < 10 * 60 * 1000) return drop();
     const sentTs = w.ts, mark = alertMark(id, sentTs);
     if (wasSent(mark)) return drop();
-    // 보내기 전에 '보내려 함'을 먼저 남긴다. 닫히는 중인데 인터넷이 없으면 안 갈 게 확실하니 적지 않는다(다음에 그냥 다시 보냄).
-    w.busy = true; w.again = false; w.tried = unloading && navigator.onLine === false ? null : { m: mark, k: st.key, tt: now() }; saveStore(true);
+    // 보내기 전에 '보내려 함'을 먼저 남긴다. 인터넷이 없는 줄 알면 안 갈 게 확실하니 적지 않는다(다음에 그냥 다시 보냄).
+    w.busy = true; w.again = false; w.tried = navigator.onLine === false ? null : { m: mark, k: st.key, tt: now() }; saveStore(true);
     const ok = await sendAlert(`${cur.name} ${st.label}`, [`${secOf(cur)} · ${grpOf(cur)}`, `안뜯은거 ${fmtV(num(cur.unopened))} / 뜯은거 ${fmtV(num(cur.opened))}`,
       `${S.cfg.name || '누군가'} · ${new Date(sentTs).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`].join('\n'), st.key === 'none' ? 4 : 3, mark);
     w.busy = false;
