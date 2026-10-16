@@ -42,6 +42,7 @@ export function startServers({ appPort = 8080, ntfyPort = 8081, delayScale = 1 }
         // ntfy.sh는 4096바이트가 넘으면 본문을 첨부 파일로 바꿔 버린다(받는 폰은 읽지 못함). 여기서는 아예 거절해서 드러나게 한다.
         if (size > 4096) { res.writeHead(413, { 'Content-Type': 'application/json' }); return res.end('{"error":"message too large"}'); }
         const msg = { id: newId(), time: nowSec(), expires: 0, event: 'message', topic: name, message: body };
+        for (const k of ['title', 'click', 'priority']) { const v = url.searchParams.get(k); if (v) msg[k] = k === 'priority' ? Number(v) : v; }   // ntfy처럼 주소 값을 메시지에 담는다
         const ms = parseDelay(delay);
         if (ms > 0) setTimeout(() => deliver(t, { ...msg }), ms * delayScale); else deliver(t, msg);
         res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(msg));

@@ -871,7 +871,7 @@ main{min-width:0}
       S.lastSnapAt = num(st.lastSnapAt) || 0; S.lastSchedSnapAt = num(st.lastSchedSnapAt) || 0;
       S.dirtySinceSnap = st.dirtySinceSnap === true; S.daily = st.daily || { day: '', n: 0 };
       for (const id of (st.dirty || [])) if (S.items.has(id)) S.dirty.add(id);
-      S.alertSeed = st.alerts; S.alertsSent = Array.isArray(st.alertsSent) ? st.alertsSent.filter(x => x && typeof x.id === 'string' && num(x.ts)) : [];
+      S.alertSeed = Array.isArray(st.alerts) ? st.alerts : null; S.alertsSent = Array.isArray(st.alertsSent) ? st.alertsSent.filter(x => x && typeof x.m === 'string' && num(x.ts)) : [];
     }
   }
 
@@ -1035,50 +1035,75 @@ main{min-width:0}
   // 이 폰에서 바꾼 숫자 때문에 '없음·마지막·부족'이 더 나빠지면, 잠시(연타가 끝날 때까지) 기다렸다가 알림 주제로 평문 알림을 보낸다.
   const SEVERITY = { low: 1, last: 2, none: 3 };
   const sev = st => SEVERITY[st.key] || 0;
-  // 기다리는 알림 id → { before(바꾸기 전 상태), after(이 폰이 바꾼 뒤 상태), ts(이 폰이 마지막으로 고친 시각), timer(0이면 보내지 못해 다시 보낼 차례) }
-  // 저장소에도 같이 저장해서, 끊긴 채로 앱을 닫아도 다음에 열 때 보낸다(하루 지난 건 버림).
+  // 기다리는 알림: 항목마다 하나 { before(이번 수정 묶음 전 상태), after(이 폰이 바꾼 뒤 상태), ts(이 폰이 마지막으로 고친 시각),
+  //   timer(0이면 보낼 차례), tried(보냈는지 확실치 않은 알림 표시), busy(보내는 중), again(보내는 중에 또 바뀜) }
+  // 알림마다 표시(a=항목.시각)를 누르는 주소에 붙인다. 보냈는지 확실치 않은 것(앱이 닫히며 보낸 것, 응답을 못 받은 것)은
+  // 다시 보내기 전에 알림 주제에서 그 표시를 찾아보고 이미 있으면 보내지 않는다 → 잃지도 않고 두 번 보내지도 않는다.
+  // 저장소에도 같이 저장한다(하루 지난 건 버림). 아직 되살리지 않은 지난번 것도 같이 저장해서, 켜자마자 닫혀도 남는다.
   const alertWait = new Map();
   const alertSent = new Map();   // id → { key, at } 이 폰에서 같은 상태로 10분 안에 또 보내지 않음
-  // 보내는 중인 것도 저장소에 남겨 둔다(그 사이 앱이 닫혀도 다음에 다시 보냄). 보낸 것은 sent에 적어 다시 열었을 때 두 번 보내지 않게.
-  const pendingAlerts = () => Array.from(alertWait, ([id, w]) => ({ id, b: w.before.key, a: (w.after || w.before).key, ts: w.ts }));
-  const wasSent = (id, ts) => S.alertsSent.some(x => x.id === id && x.ts === ts);
-  function markSent(id, ts) { S.alertsSent = S.alertsSent.filter(x => now() - x.ts < 24 * 3600 * 1000).concat({ id, ts }).slice(-100); }
+  const DAY_MS = 24 * 3600 * 1000;
+  const alertMark = (id, ts) => `${id}.${Math.round(ts).toString(36)}`;
+  const wasSent = mark => S.alertsSent.some(x => x.m === mark);
+  function markSent(mark, ts) { S.alertsSent = S.alertsSent.filter(x => now() - x.ts < DAY_MS).concat({ m: mark, ts }).slice(-100); }
+  const pendingAlerts = () => Array.from(alertWait, ([id, w]) => ({ id, b: w.before.key, a: (w.after || w.before).key, ts: w.ts, t: w.tried || '' }))
+    .concat((S.alertSeed || []).filter(r => r && !alertWait.has(String(r.id))));
+  const lowerSt = (x, y) => (sev(x) <= sev(y) ? x : y);
   function restoreAlerts(list) {
     for (const r of Array.isArray(list) ? list : []) {
-      if (!r || !S.items.has(String(r.id)) || !num(r.ts) || alertWait.has(String(r.id)) || wasSent(String(r.id), r.ts)) continue;
-      alertWait.set(String(r.id), { before: { key: String(r.b || '') }, after: { key: String(r.a || '') }, ts: r.ts, timer: 0 });
+      const id = String((r && r.id) || ''); if (!S.items.has(id) || !num(r.ts) || now() - r.ts > DAY_MS) continue;
+      const before = { key: String(r.b || '') }, cur = alertWait.get(id);
+      if (cur) { cur.before = lowerSt(cur.before, before); continue; }   // 그 사이 같은 항목을 또 고쳤으면 더 낮은 기준으로 합친다
+      alertWait.set(id, { before, after: { key: String(r.a || '') }, ts: r.ts, timer: 0, tried: String(r.t || '') });
     }
   }
   function queueAlert(it, before, ts) {
     if (S.cfg.alertsOff) return;
-    const old = alertWait.get(it.id);
-    const w = old && !old.inflight ? old : { before };   // 보내는 중인 알림은 그대로 두고 새로 기다린다
+    const w = alertWait.get(it.id) || { before };
     clearTimeout(w.timer); w.ts = ts; w.after = statusOf(it);
-    w.timer = setTimeout(() => fireAlert(it.id), ALERT_DELAY_MS);
+    if (w.busy) { w.again = true; w.timer = 0; }   // 보내는 중이면 끝난 뒤에 다시 판단
+    else w.timer = setTimeout(() => fireAlert(it.id), ALERT_DELAY_MS);
     alertWait.set(it.id, w); saveStore();
   }
-  async function fireAlert(id, keepalive = false) {
-    const w = alertWait.get(id); if (!w || w.inflight) return;
-    clearTimeout(w.timer); w.timer = 0;
-    const done = () => { if (alertWait.get(id) === w) alertWait.delete(id); saveStore(); };
-    if (S.cfg.alertsOff || !S.alertTopic || now() - w.ts > 24 * 3600 * 1000 || wasSent(id, w.ts)) return done();
-    const cur = S.items.get(id); if (!cur || isDeleted(cur)) return done();
-    const st = statusOf(cur); if (sev(st) <= sev(w.before)) return done();
-    // 그 사이 다른 폰이 숫자를 바꿨고 그 폰 때문에 더 나빠졌으면 그 폰이 알린다(두 번 가지 않게). 아니면 이 폰이 알린다.
-    if (Math.max(cur.t.u, cur.t.o) !== w.ts && sev(st) > sev(w.after || w.before)) return done();
-    const last = alertSent.get(id); if (last && last.key === st.key && now() - last.at < 10 * 60 * 1000) return done();
-    w.inflight = true;
-    const ok = await sendAlert(`${cur.name} ${st.label}`, [`${secOf(cur)} · ${grpOf(cur)}`, `안뜯은거 ${fmtV(num(cur.unopened))} / 뜯은거 ${fmtV(num(cur.opened))}`,
-      `${S.cfg.name || '누군가'} · ${new Date(w.ts).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`].join('\n'), st.key === 'none' ? 4 : 3, keepalive);
-    w.inflight = false;
-    if (ok) { alertSent.set(id, { key: st.key, at: now() }); markSent(id, w.ts); if (alertWait.get(id) === w) alertWait.delete(id); saveStore(true); }
-    else saveStore();   // 남겨 둔다: 인터넷이 돌아오거나 앱을 다시 열 때 다시 보낸다
+  // 알림 주제에 이 표시가 이미 있나: true / false / null(확인 못 함)
+  async function alertOnTopic(mark, ts) {
+    try {
+      const r = await fetch(`${NTFY}/${S.alertTopic}/json?poll=1&since=${Math.floor(ts / 1000) - 120}`, { cache: 'no-store' });
+      return r.ok ? (await r.text()).includes('a=' + mark) : null;
+    } catch (e) { return null; }
   }
-  // all: 기다리는 것까지 지금 보냄(화면을 끄거나 앱을 닫을 때). 아니면 보내지 못했던 것만 다시.
-  function flushAlerts(all = false) { for (const [id, w] of Array.from(alertWait)) if (all || !w.timer) fireAlert(id, all); }
-  async function sendAlert(title, body, priority = 3, keepalive = false) {
+  async function fireAlert(id, unloading = false) {
+    const w = alertWait.get(id); if (!w || w.busy) return;
+    clearTimeout(w.timer); w.timer = 0;
+    if (!S.alertTopic) return;   // 아직 연결 전: 연결되면 다시
+    const drop = () => { if (alertWait.get(id) === w) alertWait.delete(id); saveStore(); };
+    if (S.cfg.alertsOff || now() - w.ts > DAY_MS) return drop();
+    const cur = S.items.get(id); if (!cur || isDeleted(cur)) return drop();
+    const st = statusOf(cur); if (sev(st) <= sev(w.before)) return drop();
+    // 그 사이 다른 폰이 숫자를 바꿨고 그 폰 때문에 더 나빠졌으면 그 폰이 알린다(두 번 가지 않게). 아니면 이 폰이 알린다.
+    if (Math.max(cur.t.u, cur.t.o) !== w.ts && sev(st) > sev(w.after || w.before)) return drop();
+    const last = alertSent.get(id); if (last && last.key === st.key && now() - last.at < 10 * 60 * 1000) return drop();
+    const sentTs = w.ts, mark = alertMark(id, sentTs);
+    if (wasSent(mark)) return drop();
+    const uncertain = w.tried === mark;
+    w.busy = true; w.again = false; w.tried = mark; saveStore(true);   // 보내기 전에 '보내려 함'을 먼저 남긴다
+    // 전에 보내려다 결과를 모르면 먼저 확인한다(앱이 닫히는 중에는 기다릴 수 없어 그냥 보냄)
+    const seen = uncertain && !unloading ? await alertOnTopic(mark, sentTs) : false;
+    const ok = seen === null ? false : seen ? true : await sendAlert(`${cur.name} ${st.label}`, [`${secOf(cur)} · ${grpOf(cur)}`, `안뜯은거 ${fmtV(num(cur.unopened))} / 뜯은거 ${fmtV(num(cur.opened))}`,
+      `${S.cfg.name || '누군가'} · ${new Date(sentTs).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`].join('\n'), st.key === 'none' ? 4 : 3, mark, unloading);
+    w.busy = false;
+    if (ok) { alertSent.set(id, { key: st.key, at: now() }); markSent(mark, sentTs); w.tried = ''; }
+    if (w.again || w.ts !== sentTs) {   // 보내는 중에 또 바뀜: 보냈으면 그 상태를 기준으로, 못 보냈으면 처음 기준 그대로 다시 판단
+      if (ok) w.before = st;
+      w.again = false; w.timer = setTimeout(() => fireAlert(id), ALERT_DELAY_MS);
+    } else if (ok && alertWait.get(id) === w) alertWait.delete(id);
+    saveStore(true);   // 못 보냈으면 남겨 둔다(timer 0): 인터넷이 돌아오거나 다시 열 때 확인 후 보낸다
+  }
+  // unloading: 기다리는 것까지 지금 보냄(화면을 끄거나 앱을 닫을 때). 아니면 보낼 차례인 것만.
+  function flushAlerts(unloading = false) { for (const [id, w] of Array.from(alertWait)) if (unloading || !w.timer) fireAlert(id, unloading); }
+  async function sendAlert(title, body, priority = 3, mark = '', keepalive = false) {
     if (!S.alertTopic) return false;
-    const q = new URLSearchParams({ title: '재고 알림: ' + title, priority: String(priority), tags: priority >= 4 ? 'rotating_light' : 'warning', click: APP_URL });
+    const q = new URLSearchParams({ title: '재고 알림: ' + title, priority: String(priority), tags: priority >= 4 ? 'rotating_light' : 'warning', click: APP_URL + (mark ? '#a=' + mark : '') });
     try { const r = await fetch(`${NTFY}/${S.alertTopic}?${q}`, { method: 'POST', body, keepalive }); if (r.ok) bumpDaily(); return r.ok; } catch (e) { return false; }
   }
   async function requestSnapshot() { try { await publish({ k: 'need' }); } catch (e) { /* 다음에 */ } }
@@ -1813,6 +1838,7 @@ main{min-width:0}
   if (!S.cfg.deviceId) { S.cfg.deviceId = newId('d'); saveCfg(); }
   if (S.cfg.synced === undefined) { S.cfg.synced = !!(S.cfg.code && S.cfg.name); saveCfg(); }   // 이미 쓰던 폰은 실제 숫자를 갖고 있다
   const join = pendingJoinCode();
+  if (/^#a=/.test(location.hash || '')) clearHash();   // 알림을 눌러 열린 주소의 표시는 지운다
   if (SHARED) {
     // 모두 같은 코드: 처음 설정 없이 바로 시작.
     if (join) clearHash();

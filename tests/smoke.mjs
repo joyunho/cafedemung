@@ -342,6 +342,13 @@ try {
   check(sentG.length === 1 && (new URLSearchParams(sentG[0].query).get('title') || '').includes('유기농코코아 없음'), '다음에 열면 한 번 보냄: ' + sentG.length + '통');
   await G2.reload(); await G2.waitForSelector('.item', { timeout: 20000 }); await sleep(2500);
   check(alerts().length === n3 + 1, '보낸 뒤 다시 열어도 또 보내지 않음');
+  // 고친 직후(알림 대기 중)에 새로 고침: 닫히면서 보낸 알림을 다시 연 뒤 알림 주제에서 확인하고 또 보내지 않는다
+  const n4 = alerts().length;
+  await G2.fill('#u-yy-006', '0'); await G2.press('#u-yy-006', 'Enter');
+  await G2.reload(); await G2.waitForSelector('.item', { timeout: 20000 });
+  for (let i = 0; i < 40 && alerts().length === n4; i++) await sleep(250);
+  await sleep(3000);
+  check(alerts().length === n4 + 1 && (alerts()[n4].query || '').includes('a%3Dyy-006.'), '고친 직후 새로 고쳐도 알림은 한 번만: ' + (alerts().length - n4) + '통');
   await G2.context().close();
   offlinePhase = false;
 
