@@ -1,6 +1,7 @@
 // 앱 전체 흐름 검사: 처음 설정 → 링크로 연결 → 숫자 동기화 → 한눈에 보기 → 추가/삭제 → 오프라인 → 예약 스냅샷 → 늦게 합류한 폰.
 // 실행: node tests/smoke.mjs   (REAL_NTFY=1 이면 실제 ntfy.sh로도 한 번 더 검사)
 import { chromium } from 'playwright';
+import { execFileSync } from 'node:child_process';
 import { startServers } from './mock-ntfy.mjs';
 
 const APP_PORT = 8080, NTFY_PORT = 8081;
@@ -10,6 +11,7 @@ const errors = [];
 let failures = 0, offlinePhase = false;
 const check = (cond, msg) => { if (cond) console.log('  ok   ' + msg); else { failures++; console.log('  FAIL ' + msg); } };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const cdnCache = new Map();
 const storeOf = page => page.evaluate(() => JSON.parse(localStorage.getItem('cdm.store') || '{"items":[]}'));
 
 const { log, close } = await startServers({ appPort: APP_PORT, ntfyPort: NTFY_PORT, delayScale: 5e-5 });
@@ -20,6 +22,12 @@ async function phone(name, { ntfy = MOCK, hash = '', scheme = 'light', init = nu
   // init: [저장소, 설정] JSON. 처음 열 때만 넣어서 '예전에 쓰던 폰'을 흉내낸다.
   if (init) await ctx.addInitScript(([st, cfg]) => { if (!localStorage.getItem('cdm.store')) { localStorage.setItem('cdm.store', st); localStorage.setItem('cdm.settings', cfg); } }, init);
   await ctx.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
+  await ctx.route('https://cdnjs.cloudflare.com/**', route => {
+    const url = route.request().url();
+    try { if (!cdnCache.has(url)) cdnCache.set(url, execFileSync('curl', ['-sfL', '--max-time', '60', url], { maxBuffer: 1 << 25 })); }
+    catch (e) { return route.abort(); }
+    return route.fulfill({ status: 200, contentType: 'application/javascript', headers: { 'access-control-allow-origin': '*' }, body: cdnCache.get(url) });
+  });
   await ctx.route('**/config.js', route => route.fulfill({ contentType: 'text/javascript', body: `window.CDM_CONFIG={NTFY:${JSON.stringify(ntfy)},POLL_MS:15000,ALERT_DELAY_MS:600,SHARED_CODE:${JSON.stringify(shared)}};` }));
   const page = await ctx.newPage();
   page.on('pageerror', e => errors.push(`[${name}] ${e.message}`));
@@ -115,8 +123,18 @@ try {
   await A.locator('.item[data-id="yy-004"] button.inc[data-f="u"]').click();
   await A.waitForSelector('#toast .act', { timeout: 3000 });
   check((await A.textContent('#toast')).includes('30 → 31'), '숫자를 바꾸면 "전 → 후 · 되돌리기": ' + (await A.textContent('#toast')));
-  await A.click('#toast .act');
+  await A.evaluate(() => document.querySelector('#toast .act').click());
+  check((await inputVal(A, '#u-yy-004')) === '31' && await A.isVisible('#toast'), '토스트가 뜨자마자 닿은 탭은 되돌리기로 치지 않음');
+  await sleep(700); await A.click('#toast .act');
   check((await inputVal(A, '#u-yy-004')) === '30', '되돌리기 누르면 30으로');
+  await A.evaluate(() => { const el = document.querySelector('.item[data-id="yy-012"]'); window.scrollBy(0, el.getBoundingClientRect().bottom - window.innerHeight + 8); });
+  await A.locator('.item[data-id="yy-012"] button.inc[data-f="o"]').click();
+  await A.waitForSelector('#toast .act', { timeout: 3000 });
+  const ov = await A.evaluate(() => { const tEl = document.querySelector('#toast'), t = tEl.getBoundingClientRect(), r = document.querySelector('.item[data-id="yy-012"]').getBoundingClientRect(); return { top: tEl.classList.contains('top'), overlap: !(t.bottom <= r.top || t.top >= r.bottom), pe: getComputedStyle(tEl).pointerEvents, act: getComputedStyle(tEl.querySelector('.act')).pointerEvents }; });
+  check(ov.top && !ov.overlap && ov.pe === 'none' && ov.act === 'auto', '화면 아래쪽 줄을 누르면 토스트가 위에 떠서 누른 줄을 가리지 않음 ' + JSON.stringify(ov));
+  await sleep(700); await A.click('#toast .act');
+  check((await inputVal(A, '#o-yy-012')) === '', '위에 뜬 토스트로도 되돌리기');
+  await A.evaluate(() => window.scrollTo(0, 0));
   await B.click('.item[data-id="yy-001"] .name'); await B.waitForSelector('#editor:not([hidden])');
   const histB = await B.textContent('#ed-hist-list');
   check(histB.includes('안뜯은거 120 → 122') && histB.includes('윤호'), '편집 화면에 최근 기록: ' + histB.trim().slice(0, 60));
@@ -126,6 +144,25 @@ try {
   await A.click('#ed-hist-list button.undo');
   check((await inputVal(A, '#u-yy-010')) === '' && (await A.textContent('#ed-hist-list')).trim() === '', '기록에서 되돌리기 (5 → 비움), 제자리가 된 줄은 숨김');
   await A.click('#ed-cancel');
+  // 다른 폰이 그 뒤에 바꾼 숫자는 되돌리기로 지우지 않는다
+  await A.locator('.item[data-id="yy-005"] button.inc[data-f="u"]').click();
+  await B.waitForFunction(() => document.querySelector('#u-yy-005').value === '1', null, { timeout: 20000 });
+  await B.fill('#u-yy-005', '77'); await B.press('#u-yy-005', 'Enter');
+  await A.waitForFunction(() => document.querySelector('#u-yy-005').value === '77', null, { timeout: 20000 });
+  await A.click('.item[data-id="yy-005"] .name'); await A.waitForSelector('#editor:not([hidden])');
+  const undos = await A.$$eval('#ed-hist-list button.undo', bs => bs.map(b => b.textContent));
+  check(undos.length === 1 && undos[0].includes('(1)'), '기록의 되돌리기는 칸마다 가장 최근 줄에만: ' + JSON.stringify(undos));
+  await B.fill('#u-yy-005', '50'); await B.press('#u-yy-005', 'Enter');
+  await A.waitForFunction(() => document.querySelector('#ed-hist-list').textContent.includes('1 → 50'), null, { timeout: 20000 }).catch(() => {});
+  check((await A.textContent('#ed-hist-list')).includes('1 → 50'), '편집 화면이 열린 동안 다른 폰 기록도 바로 보임 (사장님 1 → 50)');
+  await A.click('#ed-cancel');
+  await A.locator('.item[data-id="yy-005"] button.inc[data-f="u"]').click();
+  await A.waitForSelector('#toast .act', { timeout: 3000 });
+  check((await A.textContent('#toast')).includes('50 → 51'), '다른 폰이 바꾼 뒤에는 새 줄로 (50 → 51): ' + (await A.textContent('#toast')));
+  await sleep(700); await A.click('#toast .act');
+  check((await inputVal(A, '#u-yy-005')) === '50', '되돌리면 다른 폰의 50으로');
+  const metaNow = await A.locator('.item[data-id="yy-005"] .meta').textContent();
+  check(metaNow.startsWith('방금 · 윤호'), '항목마다 수정 시각 · 이름: ' + metaNow);
 
   console.log('4) B에서 직접 입력 → A에 반영');
   await B.fill('#o-yy-001', '3'); await B.press('#o-yy-001', 'Enter');
@@ -154,6 +191,18 @@ try {
   check((await B.textContent('#vw-name')) === '망고', '표에서 사진 누르면 크게 보기');
   await B.click('#vw-close');
   check(await B.isVisible('#table'), '크게 보기 닫아도 표 화면 유지');
+  const mcol = await B.$eval('#table tr.row[data-id="yy-001"] td.m', td => td.textContent);
+  check(/^(방금|오늘 \d\d:\d\d)/.test(mcol) && mcol.includes('사장님'), '표의 수정 칸에 날짜·시각과 이름: ' + mcol);
+  await B.click('#pdfBtn'); await B.waitForSelector('#pdfSheet:not([hidden])');
+  await B.click('#pdfOrders');
+  await B.waitForSelector('#pdfReady:not([hidden])', { timeout: 90000 }).catch(() => {});
+  const pdfO = await B.evaluate(() => { const p = window.CDM_LAST_PDF && window.CDM_LAST_PDF(); return p ? { name: p.name, size: p.size } : null; });
+  check(!!pdfO && /^카페드명-주문목록-\d{4}-\d\d-\d\d\.pdf$/.test(pdfO.name) && pdfO.size > 5000, '주문 목록 PDF 만들기: ' + JSON.stringify(pdfO) + ' / ' + (await B.textContent('#pdfMsg')));
+  await B.click('#pdfAll');
+  await B.waitForFunction(() => { const p = window.CDM_LAST_PDF && window.CDM_LAST_PDF(); return !!(p && p.name.includes('재고표') && !document.querySelector('#pdfReady').hidden); }, null, { timeout: 90000 }).catch(() => {});
+  const pdfA = await B.evaluate(async () => { const p = window.CDM_LAST_PDF(); const t = new TextDecoder('latin1').decode(await p.arrayBuffer()); return { name: p.name, head: t.slice(0, 5), pages: (t.match(/\/Type\s*\/Page[^s]/g) || []).length }; });
+  check(pdfA.head === '%PDF-' && pdfA.pages >= 4 && pdfA.name.includes('재고표'), '재고표 PDF (전체 항목, 구역별) ' + pdfA.pages + '쪽: ' + (await B.textContent('#pdfMsg')));
+  await B.click('#pdf-close');
   const feed = await B.$$eval('#table .feed li', ls => ls.map(l => l.textContent));
   check(feed.length >= 3 && feed.some(t => t.includes('탄산수') && t.includes('120 → 122')), '한눈에 "최근 변경" 목록 ' + feed.length + '줄');
   await B.click('#copyOrdersBtn');
@@ -190,6 +239,20 @@ try {
   await B.waitForFunction(src => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-003'); return !!(it && it.img === src); }, customImg, { timeout: 20000 });
   check(true, 'B에 바뀐 사진 주소 도착');
 
+  console.log('7b2) 긴 메모를 여러 번 고쳐도 메시지는 4096바이트 안');
+  for (let i = 0; i < 8; i++) {
+    await A.click('.item[data-id="yy-002"] .name'); await A.waitForSelector('#editor:not([hidden])');
+    await A.fill('#ed-note', (i + ' 아주 긴 메모 테스트입니다 ').repeat(12).slice(0, 118)); await A.click('#ed-save');
+    await A.waitForSelector('#editor', { state: 'hidden' });
+  }
+  await A.locator('.item[data-id="yy-002"] button.inc[data-f="u"]').click();
+  await B.waitForFunction(() => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-002'); return !!(it && it.unopened === 8 && it.note.startsWith('7 ')); }, null, { timeout: 20000 });
+  check(true, '긴 기록이 쌓인 항목도 숫자가 다른 폰에 전달');
+  const h2 = (await storeOf(A)).items.find(i => i.id === 'yy-002').h;
+  check(h2.every(e => e[2] !== 'm' || e[3].length <= 120), '기록 글자 수 120자 제한');
+  check(!h2.some(e => e[2] === 'm' && e[3].includes('사진')), '사진을 안 건드리고 저장하면 사진 기록이 안 남음');
+  check(log.every(l => l.size <= 4096), '모든 메시지가 4096바이트 이하 (최대 ' + Math.max(...log.map(l => l.size)) + ')');
+
   console.log('7c) 사장님 폰 알림 (ntfy 앱)');
   const alerts = () => log.filter(l => l.topic.startsWith('cdm-alert-'));
   const n0 = alerts().length;
@@ -206,6 +269,20 @@ try {
   await A.fill('#u-yy-012', '0'); await A.press('#u-yy-012', 'Enter'); await sleep(1500);
   check(alerts().length === n0 + 2, '알림 보내기를 끄면 이 폰은 안 보냄');
   await A.click('#gearBtn'); await A.waitForSelector('#settings:not([hidden])'); await A.check('#alertSend'); await A.click('#st-cancel');
+  offlinePhase = true;
+  const n1 = alerts().length;
+  await A.context().setOffline(true); await sleep(300);
+  await A.fill('#u-yy-003', '0'); await A.press('#u-yy-003', 'Enter'); await sleep(1500);
+  check(alerts().length === n1, '인터넷이 끊긴 동안은 알림을 못 보냄');
+  await A.context().setOffline(false);
+  for (let i = 0; i < 40 && alerts().length === n1; i++) await sleep(250);
+  check(alerts().length === n1 + 1 && (new URLSearchParams(alerts()[alerts().length - 1].query).get('title') || '').includes('애플스파클링 없음'), '다시 연결되면 못 보낸 알림을 보냄');
+  await sleep(1500); offlinePhase = false;
+  const n2 = alerts().length;
+  await A.fill('#u-yy-004', '0'); await A.press('#u-yy-004', 'Enter');
+  await A.evaluate(() => window.dispatchEvent(new Event('pagehide')));
+  await sleep(300);
+  check(alerts().length === n2 + 1, '앱을 닫으면 기다리지 않고 바로 알림');
 
   console.log('8) 오프라인 수정 후 복구');
   offlinePhase = true;
@@ -236,9 +313,9 @@ try {
   await setupPhone(C, '알바');
   await C.waitForFunction(() => { const el = document.querySelector('#u-yy-001'); return el && el.value === '122'; }, null, { timeout: 25000 });
   check(true, 'C가 과거 수정(탄산수 122)을 받음');
-  await C.waitForFunction(() => { const s = JSON.parse(localStorage.getItem('cdm.store') || '{"items":[]}'); const it = s.items.find(i => i.id === 'yy-002'); return !!(it && it.unopened === 7); }, null, { timeout: 10000 });
+  await C.waitForFunction(() => { const s = JSON.parse(localStorage.getItem('cdm.store') || '{"items":[]}'); const it = s.items.find(i => i.id === 'yy-002'); return !!(it && it.unopened === 8); }, null, { timeout: 10000 });
   const cStore = await storeOf(C);
-  check(cStore.items.find(i => i.id === 'yy-002').unopened === 7, 'C에 yy-002=7 (저장소에도 반영)');
+  check(cStore.items.find(i => i.id === 'yy-002').unopened === 8, 'C에 yy-002=8 (저장소에도 반영)');
   check(cStore.items.find(i => i.name === '테스트 시럽').t.d > 0, 'C에도 삭제 반영');
 
   console.log('11) 설정 시트 · 표 복사');
@@ -253,6 +330,21 @@ try {
   console.log('12) 다시 열어도 데이터 유지 + 다크 모드');
   await C.reload(); await C.waitForSelector('.item', { timeout: 20000 });
   check((await inputVal(C, '#u-yy-001')) === '122', '새로고침 후에도 122 유지');
+  const want = await C.evaluate(() => {
+    const d1 = new Date(); d1.setDate(d1.getDate() - 1); d1.setHours(13, 5, 0, 0);
+    const d2 = new Date(); d2.setDate(d2.getDate() - 10); d2.setHours(9, 30, 0, 0);
+    // 앱이 닫힐 때 저장한 다음에 고쳐 넣는다(앱의 pagehide 저장이 먼저 등록되어 먼저 실행됨)
+    window.addEventListener('pagehide', () => {
+      const st = JSON.parse(localStorage.getItem('cdm.store'));
+      for (const [id, d] of [['yy-009', d1], ['yy-008', d2]]) { const it = st.items.find(i => i.id === id); it.unopened = 4; it.t.u = d.getTime(); it.b.u = '사장님'; }
+      localStorage.setItem('cdm.store', JSON.stringify(st));
+    });
+    const md = d2.getFullYear() === new Date().getFullYear() ? `${d2.getMonth() + 1}/${d2.getDate()}` : `${d2.getFullYear()}/${d2.getMonth() + 1}/${d2.getDate()}`;
+    return { y: '어제 13:05 · 사장님', old: `${md}(${'일월화수목금토'[d2.getDay()]}) 09:30 · 사장님` };
+  });
+  await C.reload(); await C.waitForSelector('.item', { timeout: 20000 });
+  const m9 = await C.locator('.item[data-id="yy-009"] .meta').textContent(), m8 = await C.locator('.item[data-id="yy-008"] .meta').textContent();
+  check(m9 === want.y && m8 === want.old, `수정 날짜 표시: "${m9}", "${m8}"`);
   const D = await phone('D', { scheme: 'dark' });
   check(await D.isVisible('#setup'), '다크 모드에서 설정 화면 표시');
 
@@ -283,12 +375,16 @@ try {
   const stF = await storeOf(F);
   check(!stF.items.some(i => i.section === '윤호 정리' && !gone(i)), "새 폰에도 '윤호 정리' 없음, 숫자 42로 맞춰짐");
   await F.waitForFunction(() => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-005'); return !!(it && it.t.d === 900); }, null, { timeout: 25000 });
+  await F.fill('#u-yy-001', '5'); await F.press('#u-yy-001', 'Enter'); await F.fill('#o-yy-001', '2'); await F.press('#o-yy-001', 'Enter');
   await F.click('#gearBtn'); await F.waitForSelector('#settings:not([hidden])');
   await F.click('#resetBtn'); await F.click('#resetYes');
   await F.waitForFunction(() => { const s = JSON.parse(localStorage.getItem('cdm.store')); const it = s.items.find(i => i.id === 'pk-028'); return !!(it && it.unopened === 38); }, null, { timeout: 5000 }).catch(() => {});
   const stF2 = await storeOf(F); const itF2 = id => stF2.items.find(i => i.id === id);
   check(itF2('pk-028').unopened === 38 && gone(itF2('yh-026')) && !stF2.items.some(i => i.section === '윤호 정리' && !gone(i)), '시트 값으로 초기화해도 합친 상태 유지 (38)');
   check(!gone(itF2('yy-005')) && itF2('yy-005').section === '음료' && itF2('yy-005').group === '유기농', '초기화로 되살린 항목은 새 배치 자리로 (유기농딸기 → 음료)');
+  await F.reload(); await F.waitForSelector('.item', { timeout: 20000 });
+  const h1 = (await storeOf(F)).items.find(i => i.id === 'yy-001').h;
+  check(h1.some(e => e[2] === 'u' && e[3] === 5 && e[4] === 120) && h1.some(e => e[2] === 'o' && e[3] === 2 && e[4] === null), '초기화 기록이 안뜯은거·뜯은거 둘 다 남음 (다시 열어도)');
   const bk = { app: 'cafedemung', v: 1, items: [{ id: 'yy-006', name: '유기농바나나', section: '윤영 정리', group: '유기농', note: '', min: null, order: 60, unopened: 5, opened: null, t: { u: Date.now(), o: 0, m: Date.now(), d: 0 }, b: { u: '옛폰', o: '', m: '옛폰' } }] };
   await F.setInputFiles('#restoreFile', { name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(bk)) });
   await F.waitForFunction(() => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-006'); return !!(it && it.unopened === 5); }, null, { timeout: 5000 });

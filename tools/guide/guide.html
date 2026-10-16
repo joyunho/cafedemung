@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>카페드명 재고체크 사용 안내서</title>
+<!-- 사용 안내서 원본. tools/guide/build.mjs 가 화면을 찍어 shots/ 에 넣고 이 파일을 A4 PDF(guide.pdf)로 만든다. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Jua&display=swap">
+<style>
+@page{size:A4;margin:0}
+:root{--g:#2c6b49;--g2:#1c3b2a;--soft:#e7f1ea;--line:#d7ddd4;--ink:#1c221e;--mute:#5d665f;--warn:#8e5f0b;--bad:#b03527;--paper:#fbfcf9}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff}
+body{font-family:'IBM Plex Sans KR',sans-serif;color:var(--ink);font-size:10.4pt;line-height:1.55;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;padding:13mm 14mm 11mm;position:relative;overflow:hidden;break-after:page;display:flex;flex-direction:column}
+.page:last-child{break-after:auto}
+.ft{position:absolute;left:14mm;right:14mm;bottom:7mm;display:flex;justify-content:space-between;font-size:8pt;color:#8b948d;border-top:0.3mm solid var(--line);padding-top:2mm}
+h1,h2,.disp{font-family:'Jua',sans-serif;font-weight:400}
+h1{font-size:30pt;line-height:1.1;margin:0;color:var(--g)}
+h2{font-size:17pt;margin:0 0 3mm;color:var(--g2);display:flex;align-items:center;gap:2.5mm}
+h2 .no{display:inline-flex;align-items:center;justify-content:center;width:8.5mm;height:8.5mm;border-radius:50%;background:var(--g);color:#fff;font-size:12.5pt}
+h3{font-size:11pt;margin:3.5mm 0 1.2mm;color:var(--g2)}
+p{margin:0 0 2mm}
+b,strong{font-weight:600}
+.lead{color:var(--mute);font-size:10.5pt;margin-top:1.5mm}
+.top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:0.8mm solid var(--g);padding-bottom:3.5mm;margin-bottom:5mm}
+.top .sub{font-size:13pt;color:var(--g2);font-family:'Jua',sans-serif}
+.top .date{font-size:9pt;color:var(--mute);text-align:right}
+.addr{display:flex;gap:6mm;align-items:center;background:var(--soft);border-radius:4mm;padding:5mm 6mm;margin-bottom:6mm}
+.addr .qr{width:34mm;height:34mm;background:#fff;border-radius:2mm;padding:1mm;flex:none}
+.addr .qr svg{width:100%;height:100%;display:block}
+.addr .k{font-size:9pt;color:var(--mute);margin:0}
+.addr .url{font-size:15.5pt;font-weight:700;color:var(--g2);letter-spacing:-0.2pt;margin:0.5mm 0 2.5mm;word-break:break-all}
+.addr ul{margin:0;padding-left:4.5mm}
+.addr li{margin:0.6mm 0}
+.cols{display:flex;gap:7mm;align-items:flex-start}
+.cols .txt{flex:1;min-width:0}
+.cols .pics{flex:none;display:flex;gap:4mm}
+.shot{width:56mm;border:0.5mm solid #c9d1c6;border-radius:4.5mm;overflow:hidden;background:#f3f5f0;box-shadow:0 1mm 3mm rgba(30,50,35,.12)}
+.shot img{display:block;width:100%}
+.shot.sm{width:50mm}
+.cap{font-size:8.2pt;color:var(--mute);text-align:center;margin-top:1.5mm}
+figure{margin:0}
+ol.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.steps>li{counter-increment:s;position:relative;padding-left:9mm;margin:0 0 3.2mm}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:0.3mm;width:6mm;height:6mm;border-radius:50%;border:0.45mm solid var(--g);color:var(--g);font-weight:700;font-size:9pt;display:flex;align-items:center;justify-content:center}
+ol.steps>li>.st{display:block;font-size:11pt;font-weight:600;color:var(--g2)}
+ul.dot{margin:0 0 2mm;padding-left:4.5mm}
+ul.dot li{margin:0.8mm 0}
+.box{border:0.4mm solid var(--line);border-radius:3mm;padding:3mm 4mm;margin:3mm 0;background:var(--paper)}
+.box.tip{background:var(--soft);border-color:#b9d4c2}
+.box.warn{background:#fbf3e3;border-color:#ead6ae}
+.box h3{margin-top:0}
+.kbd{display:inline-block;border:0.35mm solid #b8c2b5;border-radius:1.6mm;padding:0 1.6mm;background:#fff;font-size:9pt;font-weight:600;line-height:1.5;white-space:nowrap}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+.topic{display:inline-block;font-size:12.5pt;font-weight:700;letter-spacing:0.2pt;background:#fff;border:0.4mm dashed var(--g);border-radius:2mm;padding:1mm 3mm;color:var(--g2);margin:1mm 0}
+table.t{border-collapse:collapse;width:100%;font-size:9.4pt;margin:1.5mm 0 2mm}
+table.t td,table.t th{border-bottom:0.3mm solid var(--line);padding:1.3mm 2mm;text-align:left;vertical-align:top}
+table.t th{background:#eef2ec;font-weight:600;color:#3d463f}
+.chip{display:inline-block;border-radius:5mm;padding:0 2.4mm;font-weight:600;font-size:9pt;line-height:1.65;white-space:nowrap}
+.c-none{background:#f8e1dd;color:var(--bad)}.c-last{background:#f7ead0;color:var(--warn)}.c-low{background:#f7ead0;color:var(--warn)}.c-blank{background:#eceeea;color:#6f776f}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:3mm 5mm}
+.faq .q{font-weight:700;color:var(--g2);margin-bottom:0.8mm;font-size:10pt}
+.faq .a{font-size:9.4pt;color:#2d342f}
+.faq>div{border-left:0.8mm solid #b9d4c2;padding-left:3mm}
+.small{font-size:8.8pt;color:var(--mute)}
+.sp{flex:1}
+</style>
+</head>
+<body>
+
+<!-- 1쪽 -->
+<section class="page">
+  <div class="top">
+    <div>
+      <h1>카페드명 재고체크</h1>
+      <div class="sub">사용 안내서 · 사장님과 직원 모두</div>
+    </div>
+    <div class="date">2026년 10월판<br>앱이 바뀌면 설정 → 사용 안내서 (PDF)에서<br>새로 받을 수 있어요</div>
+  </div>
+
+  <div class="addr">
+    <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" class="segno"><path class="qrline" stroke="#1c3b2a" d="M2 2.5h7m1 0h1m3 0h1m1 0h2m1 0h2m1 0h1m1 0h7m-29 1h1m5 0h1m4 0h2m3 0h2m1 0h2m1 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m4 0h2m1 0h1m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h3m4 0h2m1 0h1m3 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h6m3 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m1 0h1m3 0h3m3 0h2m2 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h1m3 0h1m4 0h2m1 0h1m-21 1h1m3 0h1m1 0h4m1 0h5m1 0h1m1 0h1m1 0h5m2 0h1m-26 1h1m1 0h1m3 0h1m1 0h1m2 0h5m3 0h7m-27 1h7m2 0h1m1 0h3m2 0h1m9 0h1m-28 1h3m3 0h1m1 0h1m2 0h2m1 0h1m1 0h2m2 0h1m3 0h1m1 0h2m-29 1h1m2 0h1m1 0h2m3 0h1m2 0h1m2 0h3m1 0h2m1 0h1m3 0h1m-27 1h3m1 0h1m1 0h3m3 0h6m3 0h7m-26 1h1m2 0h1m4 0h2m2 0h1m2 0h1m2 0h1m3 0h2m1 0h1m-29 1h2m5 0h2m1 0h3m1 0h2m1 0h2m1 0h5m2 0h2m-29 1h3m1 0h5m1 0h2m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m-28 1h1m3 0h2m1 0h1m2 0h1m1 0h1m2 0h2m1 0h1m3 0h4m1 0h2m-26 1h4m2 0h1m1 0h5m4 0h1m3 0h1m1 0h1m1 0h1m-27 1h1m1 0h2m1 0h2m4 0h1m1 0h1m1 0h2m5 0h1m2 0h2m-29 1h3m3 0h2m1 0h1m1 0h1m1 0h1m3 0h1m2 0h6m2 0h1m-21 1h2m1 0h6m1 0h3m3 0h1m3 0h1m-29 1h7m1 0h2m1 0h1m3 0h3m1 0h2m1 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m2 0h2m3 0h2m1 0h4m3 0h1m3 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m3 0h3m2 0h1m1 0h7m1 0h1m-28 1h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h2m1 0h1m9 0h1m-29 1h1m1 0h3m1 0h1m3 0h1m2 0h3m2 0h2m1 0h1m3 0h4m-29 1h1m5 0h1m8 0h1m1 0h1m2 0h1m2 0h3m1 0h2m-29 1h7m1 0h3m1 0h2m3 0h1m2 0h1m1 0h1m2 0h1m1 0h1"/></svg></div>
+    <div>
+      <p class="k">앱 주소 (폰 카메라로 왼쪽 QR을 찍어도 열려요)</p>
+      <p class="url">joyunho.github.io/cafedemung</p>
+      <ul>
+        <li><b>가입·코드·비밀번호 없음.</b> 주소만 열면 누구 폰이든 같은 재고 화면이 나와요.</li>
+        <li>누가 숫자를 고치든 <b>모든 폰에 몇 초 안에</b> 똑같이 보여요.</li>
+        <li>인터넷이 잠깐 끊겨도 적을 수 있고, 다시 연결되면 알아서 보내요.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2><span class="no">1</span>처음 열기</h2>
+  <div class="cols">
+    <div class="txt">
+      <ol class="steps">
+        <li><b class="st">주소 열기</b>위의 QR을 찍거나, 카톡으로 받은 링크를 눌러요. 다른 사람에게 줄 때도 이 주소만 보내면 돼요(설정의 <span class="kbd">주소 보내기</span>).</li>
+        <li><b class="st">홈 화면에 추가 (앱처럼 쓰기)</b>
+          <b>아이폰</b>: Safari 아래 공유 버튼(네모에 화살표) → <span class="kbd">홈 화면에 추가</span><br>
+          <b>안드로이드</b>: 크롬 오른쪽 위 ⋮ → <span class="kbd">앱 설치</span> 또는 <span class="kbd">홈 화면에 추가</span><br>
+          다음부터는 홈 화면의 아이콘으로 열면 돼요.</li>
+        <li><b class="st">이름 넣기 (선택)</b>초록 칸에 이름을 적고 <span class="kbd">저장</span>. 숫자 옆에 누가 고쳤는지 이름이 남아요. 나중에 설정(톱니바퀴)에서 바꿀 수 있어요.</li>
+        <li><b class="st">노란 안내 "가게 숫자를 받아오는 중"</b>새 폰은 다른 폰에서 실제 숫자를 받아올 때까지 숫자를 고칠 수 없어요. 보통 몇 초면 사라져요. 오래 걸리면 사장님 폰에서 앱을 한 번 열어 주세요.</li>
+      </ol>
+      <div class="box warn">
+        <h3>"처음 숫자로 시작"은 누르지 마세요</h3>
+        <p style="margin:0">가게를 완전히 새로 시작할 때만 쓰는 버튼이에요. 받아오기 전에 누르고 숫자를 고치면 시트의 옛 숫자가 섞일 수 있어요.</p>
+      </div>
+    </div>
+    <div class="pics">
+      <figure><div class="shot" style="width:64mm;aspect-ratio:780/1560"><img src="shots/g01-first.png" alt=""></div><div class="cap">처음 연 화면 (노란 안내 · 이름 넣기)</div></figure>
+    </div>
+  </div>
+  <div class="ft"><span>카페드명 재고체크 사용 안내서</span><span>1 / 4</span></div>
+</section>
+
+<!-- 2쪽 -->
+<section class="page">
+  <h2><span class="no">2</span>숫자 적기</h2>
+  <div class="cols">
+    <div class="txt">
+      <ul class="dot">
+        <li>위의 <b>탭</b>으로 구역을 골라요: 음료 · 음료 재료 · 과일·케이크 · 포장·소모품</li>
+        <li><b>안뜯은거</b> = 아직 안 뜯은 새 것, <b>뜯은거</b> = 뜯어서 쓰고 있는 것</li>
+        <li><span class="kbd">−</span> <span class="kbd">+</span>를 누르거나, 가운데 숫자 칸을 눌러 직접 적어요. 비우면 "모름(미기입)"이에요.</li>
+        <li>적는 순간 저장되고, 몇 초 안에 모든 폰에 똑같이 보여요. 저장 버튼은 없어요.</li>
+        <li>이름 아래 <b>"보내는 중"</b>이 붙어 있으면 아직 다른 폰에 안 간 거예요. 인터넷이 연결되면 알아서 보내요.</li>
+      </ul>
+      <h3>언제 · 누가 고쳤는지 (수정 날짜)</h3>
+      <p>항목 이름 바로 아래에 마지막으로 고친 때와 사람이 나와요.</p>
+      <table class="t">
+        <tr><th style="width:42%">보이는 글자</th><th>뜻</th></tr>
+        <tr><td>방금 · 윤호</td><td>1분 안에 윤호가 고침</td></tr>
+        <tr><td>오늘 09:05 · 사장님</td><td>오늘 오전 9시 5분에 사장님이 고침</td></tr>
+        <tr><td>어제 18:40 · 윤호</td><td>어제 저녁 6시 40분</td></tr>
+        <tr><td>10/6(화) 09:30</td><td>그보다 전 (월/일, 요일)</td></tr>
+        <tr><td>시트에서 가져옴</td><td>아직 아무도 안 고친, 예전 시트의 처음 숫자</td></tr>
+      </table>
+      <h3>색깔 표시</h3>
+      <table class="t">
+        <tr><td style="width:24%"><span class="chip c-none">없음</span></td><td>안뜯은거 0, 뜯은 것도 없음 → 바로 주문</td></tr>
+        <tr><td><span class="chip c-last">마지막</span></td><td>안뜯은거 0, 뜯은 것만 남음</td></tr>
+        <tr><td><span class="chip c-low">부족</span></td><td>안뜯은거가 <b>최소 수량</b>보다 적음 (최소 수량은 항목 이름을 눌러 적어요)</td></tr>
+        <tr><td><span class="chip c-blank">미기입</span></td><td>안뜯은거 칸이 비어 있음</td></tr>
+      </table>
+    </div>
+    <div class="pics" style="flex-direction:column">
+      <figure><div class="shot" style="width:60mm;aspect-ratio:780/1450"><img src="shots/g02-list.png" alt=""></div><div class="cap">입력 화면: 구역 탭, −/+, 수정 날짜</div></figure>
+    </div>
+  </div>
+  <div class="box tip" style="display:flex;gap:5mm;align-items:center">
+    <div style="flex:1">
+      <h3>잘못 눌렀을 때: 되돌리기</h3>
+      <p>숫자를 바꾸면 화면에 <b>"탄산수 안뜯은거 96 → 94 · 되돌리기"</b>가 4초쯤 떠요. <span class="kbd">되돌리기</span>를 누르면 바로 전 숫자로 돌아가요.</p>
+      <ul class="dot" style="margin:0">
+        <li>1분 안에 연달아 누른 건 한 줄로 묶여서 한 번에 돌아가요.</li>
+        <li>놓쳤으면 항목 이름을 눌러 <b>최근 기록</b>에서 되돌릴 수 있어요(3쪽).</li>
+        <li>그 사이 다른 사람이 같은 칸을 또 바꿨으면, 그 사람 숫자를 지우지 않도록 되돌리지 않아요.</li>
+      </ul>
+    </div>
+    <figure><div class="shot sm" style="aspect-ratio:780/330"><img src="shots/g03-toast.png" alt="" style="margin-top:-170%"></div><div class="cap">숫자를 바꾸면 뜨는 안내</div></figure>
+  </div>
+  <div class="ft"><span>카페드명 재고체크 사용 안내서</span><span>2 / 4</span></div>
+</section>
+
+<!-- 3쪽 -->
+<section class="page">
+  <h2><span class="no">3</span>한눈에 · 주문 목록 · PDF</h2>
+  <div class="cols">
+    <div class="txt">
+      <ul class="dot">
+        <li>위의 <span class="kbd">한눈에</span>를 누르면 맨 위에 <b>주문 목록</b>(없음·마지막·부족)이 모여요.</li>
+        <li><span class="kbd">복사</span> → 카톡에 붙여넣기. 구역·분류까지 같이 들어가요.</li>
+        <li><span class="kbd">PDF</span> → <b>주문 목록만</b> 또는 <b>주문 목록 + 전체 재고표</b> → <span class="kbd">공유하기</span>(카톡 등)나 <span class="kbd">파일로 저장</span>. 사진은 빼고 항목·숫자·상태·메모·마지막 수정만 표로 담겨요. 처음 한 번은 인터넷이 필요해요.</li>
+        <li>그 아래 <b>최근 변경</b>(7일): 누가 언제 무엇을 바꿨는지. 누르면 그 항목으로 가요.</li>
+        <li>맨 아래 구역별 표의 <b>수정</b> 칸에 날짜와 이름. 줄을 누르면 입력 화면의 그 항목으로 가요.</li>
+        <li>입력 화면의 <span class="kbd">부족만</span>은 없음·마지막·부족만 모아 보여 주고, <span class="kbd">검색</span>으로 이름을 찾을 수 있어요.</li>
+      </ul>
+    </div>
+    <div class="pics">
+      <figure><div class="shot sm" style="aspect-ratio:780/1000"><img src="shots/g05-table.png" alt=""></div><div class="cap">한눈에: 주문 목록 · 복사 · PDF</div></figure>
+      <figure><div class="shot sm" style="aspect-ratio:780/1000"><img src="shots/g07-pdf.png" alt="" style="margin-top:-88%"></div><div class="cap">PDF로 저장</div></figure>
+    </div>
+  </div>
+
+  <h2 style="margin-top:6mm"><span class="no">4</span>항목 고치기 · 추가 · 사진</h2>
+  <div class="cols">
+    <div class="pics">
+      <figure><div class="shot sm" style="aspect-ratio:780/1080"><img src="shots/g04-editor.png" alt="" style="margin-top:-78%"></div><div class="cap">항목 편집 아래의 최근 기록</div></figure>
+    </div>
+    <div class="txt">
+      <ul class="dot">
+        <li>항목 <b>이름(›)</b>을 누르면 편집 화면이 열려요: 이름 · 구역 · 분류 · 메모 · <b>최소 수량</b> · 사진 주소. <span class="kbd">저장</span>을 눌러야 바뀌어요.</li>
+        <li>아래 <b>최근 기록</b>: 누가 · 언제 · 몇에서 몇으로 바꿨는지 (항목마다 최근 8개). 안뜯은거·뜯은거마다 가장 최근 줄에 <span class="kbd">되돌리기</span>가 있어요.</li>
+        <li>새 항목은 위의 <span class="kbd">+</span>, 지우기는 편집 화면 왼쪽 아래 <span class="kbd">삭제</span>. 모든 폰에 같이 반영돼요.</li>
+      </ul>
+      <h3>사진 바꾸기</h3>
+      <p>기본 사진은 <b>비슷한 제품의 예시 사진</b>이에요. 가게 제품과 다르면:</p>
+      <ol class="steps" style="margin-top:1.5mm">
+        <li>항목 이름 → <span class="kbd">구글 이미지에서 찾기</span></li>
+        <li>맞는 사진을 길게 눌러 <span class="kbd">이미지 주소 복사</span></li>
+        <li>편집 화면의 <b>사진 주소</b> 칸에 붙여넣고 <span class="kbd">저장</span> → 모든 폰에 같이 바뀌어요</li>
+      </ol>
+      <p class="small">사진을 누르면 크게 볼 수 있어요. 사진 주소를 비우면 기본 사진으로 돌아가요.</p>
+    </div>
+  </div>
+  <div class="ft"><span>카페드명 재고체크 사용 안내서</span><span>3 / 4</span></div>
+</section>
+
+<!-- 4쪽 -->
+<section class="page">
+  <h2><span class="no">5</span>사장님 폰 알림 (ntfy 앱)</h2>
+  <div class="cols">
+    <div class="txt">
+      <p>누가 숫자를 바꿔서 <span class="chip c-none">없음</span> <span class="chip c-last">마지막</span> <span class="chip c-low">부족</span>이 되면, <b>ntfy</b>(무료 알림 앱)를 깐 폰으로 푸시 알림이 와요. 처음 한 번만 설정하면 돼요.</p>
+      <h3>안드로이드</h3>
+      <ol class="steps">
+        <li>Play 스토어에서 <b>ntfy</b> 설치</li>
+        <li>재고 앱 → 설정(톱니바퀴) → <span class="kbd">알림 받기 (안드로이드)</span> → ntfy 앱에서 <span class="kbd">구독</span></li>
+      </ol>
+      <h3>아이폰</h3>
+      <ol class="steps">
+        <li>App Store에서 <b>ntfy</b> 설치 → 알림 허용</li>
+        <li>ntfy 앱 → <span class="kbd">+</span> → 주제(Topic)에 아래 이름을 그대로 적고 <span class="kbd">Subscribe</span> (서버는 바꾸지 않아요)<br>
+          <span class="topic mono">cdm-alert-5a38130f323e1e76331c</span><br>
+          <span class="small">설정의 <span class="kbd">주제 이름 복사</span>로 복사해서 붙여넣어도 돼요.</span></li>
+      </ol>
+      <p>마지막으로 설정의 <span class="kbd">테스트 알림 보내기</span>로 알림이 오는지 확인해요.</p>
+      <ul class="dot small" style="color:#3d463f">
+        <li>알림은 숫자를 바꾼 폰에서 6초쯤 뒤에 한 번만 가요. 그 사이 되돌리면 안 가요.</li>
+        <li>같은 항목이 같은 상태면 10분 안에 또 보내지 않아요.</li>
+        <li>알림을 누르면 재고 앱이 열려요(아이폰은 Safari로 열려요).</li>
+        <li>이 폰에서 알림을 보내지 않으려면 설정의 체크를 끄면 돼요.</li>
+      </ul>
+    </div>
+    <div class="pics">
+      <figure><div class="shot" style="width:66mm;aspect-ratio:780/860"><img src="shots/g09-alert.png" alt="" style="margin-top:-85%"></div><div class="cap">설정 → 알림 (사장님 폰)</div></figure>
+    </div>
+  </div>
+
+  <h2 style="margin-top:5mm"><span class="no">6</span>이럴 땐 이렇게</h2>
+  <div class="faq">
+    <div><div class="q">노란 "받아오는 중"이 안 없어져요</div><div class="a">다른 폰(사장님 폰 등)에서 앱을 한 번 열어 주세요. 그래도 그대로면 설정 → <span class="kbd">지금 받아오기</span>.</div></div>
+    <div><div class="q">다른 폰 숫자가 안 보여요</div><div class="a">오른쪽 위가 <b>동기화 중</b>인지 봐요. <b>오프라인 / 다시 연결 중</b>이면 인터넷을 확인하고 앱을 닫았다 다시 열어요.</div></div>
+    <div><div class="q">잘못 고쳤어요</div><div class="a">바로 뜨는 <span class="kbd">되돌리기</span>, 또는 항목 이름 → 최근 기록 → <span class="kbd">되돌리기</span>.</div></div>
+    <div><div class="q">새 직원 · 폰을 바꿨어요</div><div class="a">주소만 열면 끝이에요. 다른 폰이 켜져 있으면 숫자를 알아서 받아와요.</div></div>
+    <div><div class="q">구글 시트에 옮기고 싶어요</div><div class="a">설정 → <span class="kbd">표로 복사</span> → 시트에 붙여넣기. <span class="kbd">백업 파일 저장</span>으로 파일로도 남길 수 있어요.</div></div>
+    <div><div class="q">종이로 뽑고 싶어요</div><div class="a">한눈에 → 주문 목록 <span class="kbd">PDF</span>, 또는 설정 → <span class="kbd">재고표 PDF</span>.</div></div>
+  </div>
+  <div class="box warn" style="margin-top:4mm">
+    <h3>꼭 알아 두세요</h3>
+    <ul class="dot" style="margin:0">
+      <li>코드 없이 쓰도록 만들어서, <b>주소를 아는 사람은 누구나 보고 고칠 수 있어요.</b> 주소는 가게 사람끼리만 나눠 주세요.</li>
+      <li>설정의 <b>시트 값으로 초기화</b>는 모든 폰의 숫자를 예전 시트의 처음 숫자로 되돌려요. 실수로 누르지 않게 조심하세요.</li>
+    </ul>
+  </div>
+  <div class="ft"><span>카페드명 재고체크 사용 안내서 · joyunho.github.io/cafedemung</span><span>4 / 4</span></div>
+</section>
+</body>
+</html>

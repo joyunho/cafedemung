@@ -1,5 +1,5 @@
 // 카페드명 재고체크 — 서비스 워커. 앱 껍데기만 저장해 두고, 동기화 서버와 폰트 요청은 건드리지 않는다.
-const CACHE = 'cdm-shell-v4';
+const CACHE = 'cdm-shell-v5';
 const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/maskable-512.png'];
 
