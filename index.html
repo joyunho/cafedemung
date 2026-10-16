@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>카페드멍 재고체크</title>
-<meta name="description" content="카페드멍 재고를 사장님과 직원이 같은 숫자로 함께 적는 앱">
+<title>카페드명 재고체크</title>
+<meta name="description" content="카페드명 재고를 사장님과 직원이 같은 숫자로 함께 적는 앱">
 <meta name="theme-color" content="#f3f5f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141917" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
@@ -241,7 +241,7 @@ main{min-width:0}
 <body>
 <div class="wrap">
   <header class="brand">
-    <h1>카페드멍 재고체크</h1>
+    <h1>카페드명 재고체크</h1>
     <div class="right">
       <span class="sync" id="sync" data-state="connecting" hidden>연결 중…</span>
       <button class="iconbtn" id="gearBtn" type="button" title="설정 · 연결" aria-label="설정" hidden>
@@ -1198,7 +1198,7 @@ main{min-width:0}
   // ---------- 그리기: 한눈에 ----------
   function orderList() { return liveItems().filter(d => LOW_KEYS.has(statusOf(d).key)); }
   function orderText() {
-    const d = new Date(); const lines = [`카페드멍 주문 목록 (${d.getMonth() + 1}/${d.getDate()})`];
+    const d = new Date(); const lines = [`카페드명 주문 목록 (${d.getMonth() + 1}/${d.getDate()})`];
     const groups = groupsOf(orderList(), true);
     for (const g of groups) { lines.push(`[${g.section} · ${g.group}]`); for (const it of g.items) { const st = statusOf(it); lines.push(`- ${it.name}: ${st.label} (안뜯 ${fmtNum(num(it.unopened)) || '-'} / 뜯 ${fmtNum(num(it.opened)) || '-'})`); } }
     if (groups.length === 0) lines.push('부족한 항목이 없어요.');
@@ -1264,9 +1264,9 @@ main{min-width:0}
   }
   function joinLink() { return SHARED ? APP_URL : APP_URL + '#j=' + S.cfg.code; }
   async function shareLink() {
-    const text = SHARED ? '카페드멍 재고체크 앱이에요. 이 링크를 열면 바로 같은 재고 숫자를 함께 볼 수 있어요.'
-      : `카페드멍 재고체크 앱이에요. 이 링크를 열고 이름만 넣으면 같은 재고 숫자를 함께 볼 수 있어요.\n가게 코드: ${S.cfg.code}`;
-    if (navigator.share) { try { await navigator.share({ title: '카페드멍 재고체크', text, url: joinLink() }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    const text = SHARED ? '카페드명 재고체크 앱이에요. 이 링크를 열면 바로 같은 재고 숫자를 함께 볼 수 있어요.'
+      : `카페드명 재고체크 앱이에요. 이 링크를 열고 이름만 넣으면 같은 재고 숫자를 함께 볼 수 있어요.\n가게 코드: ${S.cfg.code}`;
+    if (navigator.share) { try { await navigator.share({ title: '카페드명 재고체크', text, url: joinLink() }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
     copyText(text + '\n' + joinLink(), '연결 링크를 복사했어요. 카톡 등으로 보내주세요.');
   }
   function tsvText() {
@@ -1277,7 +1277,7 @@ main{min-width:0}
   function backup() {
     const data = JSON.stringify({ app: 'cafedemung', v: 1, at: new Date().toISOString(), code: S.cfg.code, items: Array.from(S.items.values()) }, null, 1);
     const blob = new Blob([data], { type: 'application/json' }); const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `카페드멍-재고-백업-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); a.remove();
+    const a = document.createElement('a'); a.href = url; a.download = `카페드명-재고-백업-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000); toast('백업 파일을 저장했어요');
   }
   function restore(file) {
@@ -1360,7 +1360,7 @@ main{min-width:0}
     $('#st-name').value = S.cfg.name; $('#st-code').value = '';
     const host = (() => { try { return new URL(NTFY).host; } catch (e) { return 'ntfy.sh'; } })();
     $('#alertTopic').textContent = S.alertTopic || '연결 중…';
-    $('#alertSub').href = S.alertTopic ? `ntfy://${host}/${S.alertTopic}?display=${encodeURIComponent('카페드멍 재고')}` : '#';
+    $('#alertSub').href = S.alertTopic ? `ntfy://${host}/${S.alertTopic}?display=${encodeURIComponent('카페드명 재고')}` : '#';
     $('#alertSend').checked = !S.cfg.alertsOff;
     const ids = Object.keys(S.peers);
     const peerText = ids.length ? '연결된 폰: ' + ids.map(id => `${S.peers[id].name || '이름 없음'} (${ago(S.peers[id].seen)})`).join(', ') : '';
@@ -1379,7 +1379,7 @@ main{min-width:0}
   });
   $('#shareBtn').addEventListener('click', shareLink);
   $('#alertCopy').addEventListener('click', () => { if (S.alertTopic) copyText(S.alertTopic, '주제 이름을 복사했어요. ntfy 앱에서 + 를 눌러 붙여넣으세요.'); });
-  $('#alertTest').addEventListener('click', async () => { const ok = await sendAlert('테스트', `카페드멍 재고 알림이 이 폰에 잘 와요. (${S.cfg.name || '누군가'}가 보냄)`, 3); toast(ok ? '테스트 알림을 보냈어요' : '알림을 보내지 못했어요. 인터넷을 확인해 주세요'); });
+  $('#alertTest').addEventListener('click', async () => { const ok = await sendAlert('테스트', `카페드명 재고 알림이 이 폰에 잘 와요. (${S.cfg.name || '누군가'}가 보냄)`, 3); toast(ok ? '테스트 알림을 보냈어요' : '알림을 보내지 못했어요. 인터넷을 확인해 주세요'); });
   $('#alertSend').addEventListener('change', ev => { S.cfg.alertsOff = !ev.target.checked; saveCfg(); toast(ev.target.checked ? '이 폰에서 알림을 보내요' : '이 폰에서는 알림을 보내지 않아요'); });
   $('#pairShareBtn').addEventListener('click', shareLink);
   $('#pairClose').addEventListener('click', () => { S.cfg.hints.pair = true; saveCfg(); $('#pairHint').hidden = true; });
