@@ -17,8 +17,9 @@ const storeOf = page => page.evaluate(() => JSON.parse(localStorage.getItem('cdm
 const { log, close } = await startServers({ appPort: APP_PORT, ntfyPort: NTFY_PORT, delayScale: 5e-5 });
 const browser = await chromium.launch();
 
-async function phone(name, { ntfy = MOCK, hash = '', scheme = 'light', init = null, shared = '' } = {}) {
+async function phone(name, { ntfy = MOCK, hash = '', scheme = 'light', init = null, shared = '', skewMs = 0 } = {}) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: scheme, locale: 'ko-KR' });
+  if (skewMs) await ctx.addInitScript(ms => { const n = Date.now.bind(Date); Date.now = () => n() + ms; }, skewMs);   // 시계가 빠른 폰
   // init: [저장소, 설정] JSON. 처음 열 때만 넣어서 '예전에 쓰던 폰'을 흉내낸다.
   if (init) await ctx.addInitScript(([st, cfg]) => { if (!localStorage.getItem('cdm.store')) { localStorage.setItem('cdm.store', st); localStorage.setItem('cdm.settings', cfg); } }, init);
   await ctx.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
@@ -335,7 +336,7 @@ try {
   const savedG = await G.evaluate(() => [localStorage.getItem('cdm.store'), localStorage.getItem('cdm.settings')]);
   check(alerts().length === n3 && JSON.parse(savedG[0]).alerts.some(x => x.id === 'yy-007'), '끊긴 채로 닫아도 못 보낸 알림이 폰에 남음');
   await G.context().close();
-  const G2 = await phone('G2', { init: savedG });
+  const G2 = await phone('G2', { init: savedG, skewMs: 5 * 60 * 1000 });   // 시계가 5분 빠른 폰이어도
   for (let i = 0; i < 80 && alerts().length === n3; i++) await sleep(250);
   await sleep(1500);
   const sentG = alerts().slice(n3);
