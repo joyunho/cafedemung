@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>카페드멍 재고체크</title>
-<meta name="description" content="카페드멍 재고를 사장님과 직원이 같은 숫자로 함께 적는 앱">
+<title>카페드명 재고체크</title>
+<meta name="description" content="카페드명 재고를 사장님과 직원이 같은 숫자로 함께 적는 앱">
 <meta name="theme-color" content="#f3f5f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141917" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
@@ -149,6 +149,7 @@ main{min-width:0}
 .card .hd h2{font-size:15px;font-weight:600}
 .card .hd .sub{font-size:12.5px;color:var(--muted);font-weight:400;margin-left:6px}
 .card .hd .btn{height:32px;padding:0 12px;font-size:13px}
+.card .hd .btns{display:flex;gap:6px;flex:none}
 .orders{margin:0;padding:6px 14px 10px;list-style:none;columns:2;column-gap:18px}
 @media (max-width:420px){.orders{columns:1}}
 .orders li{break-inside:avoid;padding:5px 0;font-size:14px;display:flex;align-items:center;gap:8px;border-bottom:1px dashed var(--line)}
@@ -169,6 +170,8 @@ main{min-width:0}
 .grid td.n{font-weight:600;font-size:15px}
 .grid td.n.blank{color:var(--muted);font-weight:400}
 .grid th.m,.grid td.m{width:92px;color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid td.m .d,.grid td.m .by{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grid td.m .by{font-size:10.5px;opacity:.85}
 .grid tr.grp td{background:var(--surface-2);color:var(--muted);font-size:12px;font-weight:600;padding:4px 8px}
 .grid tr.row{cursor:pointer}
 .grid tr.row:active td{background:var(--accent-soft)}
@@ -180,7 +183,7 @@ main{min-width:0}
 .grid td .tag{margin-left:0;font-size:10.5px;padding:1px 6px}
 .grid td.n.s-none{color:var(--crit)}
 .grid td.n.s-last,.grid td.n.s-low{color:var(--warn)}
-@media (max-width:420px){.grid th.m,.grid td.m{width:70px}}
+@media (max-width:420px){.grid th.m,.grid td.m{width:84px}}
 
 /* ---- 시작 / 바텀 시트 ---- */
 .setup{min-height:60vh;display:flex;align-items:center;justify-content:center;padding-block:20px}
@@ -223,13 +226,48 @@ main{min-width:0}
   @keyframes rise{from{transform:translateY(16px);opacity:.6}to{transform:none;opacity:1}}
 }
 @media (prefers-reduced-motion:reduce){.item.flash{animation:none;background:var(--accent-soft)}}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
+/* 토스트는 글자 부분은 누름이 그대로 아래로 지나가고(되돌리기 버튼만 눌림), 방금 누른 줄이 화면 아래쪽이면 위에 뜬다 */
+.toast{position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;max-width:520px;bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:18px;font-size:14px;box-shadow:var(--shadow);text-align:center;display:flex;align-items:center;gap:4px;pointer-events:none}
+.toast.top{bottom:auto}
+/* PDF로 저장: 화면 밖에서 A4 쪽(794×1123px)을 그려 PDF로 옮긴다. 테마와 상관없이 흰 바탕 */
+#pdfStage{position:fixed;left:-10000px;top:0;width:794px;pointer-events:none}
+.pg{width:794px;height:1123px;box-sizing:border-box;padding:40px 38px 30px;background:#fff;color:#16181a;font-family:var(--font-body);font-size:12px;line-height:1.35;display:flex;flex-direction:column;overflow:hidden}
+.pg .ph{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #2c6b49;padding-bottom:6px;margin-bottom:8px}
+.pg .ph b{font-family:var(--font-display);font-size:21px;color:#2c6b49;font-weight:400}
+.pg .ph span{color:#555;font-size:11px}
+.pg .pb{flex:1;overflow:hidden;position:relative}
+.pg .sum{color:#333;margin:0 0 4px;font-size:12px}
+.pg .lg{color:#777;margin:0 0 8px;font-size:10.5px}
+.pg h2{font-size:14px;margin:12px 0 4px;color:#16181a}
+.pg h2 small{font-weight:400;color:#666;font-size:11px;margin-left:6px}
+.pg .r{display:grid;grid-template-columns:var(--cols);gap:0 8px;padding:4px 6px;border-bottom:1px solid #e3e6e1;align-items:baseline}
+.pg .r>span{overflow:hidden;white-space:nowrap}
+.pg .r>span.w{white-space:normal;overflow-wrap:anywhere;word-break:keep-all}
+.pg .r.h{font-weight:600;color:#555;font-size:10.5px;background:#f1f3ef;border-bottom:1px solid #cfd5cc}
+.pg .r.g{display:block;background:#f7f8f5;color:#555;font-weight:600;font-size:11px}
+.pg .n{text-align:right;font-variant-numeric:tabular-nums}
+.pg .s-none{color:#b03527;font-weight:600}.pg .s-last,.pg .s-low{color:#8e5f0b;font-weight:600}.pg .s-blank{color:#999}
+.pg .pe{color:#666;padding:8px 6px}
+.pg .pf{color:#999;font-size:10px;line-height:14px;height:14px;text-align:right;margin-top:6px}
+@media print{body.pdfprint{background:#fff}@page{size:A4;margin:0}body.pdfprint>*:not(#pdfStage){display:none!important}body.pdfprint #pdfStage{position:static;left:auto}.pg{break-after:page}}
+.toast .act{pointer-events:auto;margin-left:10px;padding:4px 2px;border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;white-space:nowrap}
+.hist,.feed{list-style:none;margin:0;padding:0}
+.hist li,.feed li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.hist li:last-child,.feed li:last-child{border-bottom:0}
+.hist .when,.feed .when{color:var(--muted);font-size:12px;white-space:nowrap;flex:none;min-width:84px}
+.hist .txt,.feed .txt{flex:1;min-width:0;overflow-wrap:anywhere}
+.hist .undo{flex:none;height:30px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12.5px;color:var(--accent)}
+.feed{padding:4px 14px 8px}
+.feed li{cursor:pointer}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0 4px}
+.check input{width:18px;height:18px}
+.topic{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:2px 6px;user-select:all;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="brand">
-    <h1>카페드멍 재고체크</h1>
+    <h1>카페드명 재고체크</h1>
     <div class="right">
       <span class="sync" id="sync" data-state="connecting" hidden>연결 중…</span>
       <button class="iconbtn" id="gearBtn" type="button" title="설정 · 연결" aria-label="설정" hidden>
@@ -313,6 +351,10 @@ main{min-width:0}
     <a class="btn sm" id="ed-img-search" target="_blank" rel="noopener" href="https://www.google.com/search?tbm=isch">구글 이미지에서 찾기</a>
     <p class="hint">사진을 길게 눌러 '이미지 주소 복사' 후 위 칸에 붙여넣으세요.</p>
   </div>
+  <div id="ed-hist" hidden>
+    <h4>최근 기록</h4>
+    <ul class="hist" id="ed-hist-list"></ul>
+  </div>
   <div class="actions">
     <button type="button" class="btn danger" id="ed-delete">삭제</button>
     <span class="spacer"></span>
@@ -341,11 +383,23 @@ main{min-width:0}
     <label class="field"><span>이름</span><input id="st-name" maxlength="20"></label>
     <label class="field" id="st-code-f"><span>다른 가게 코드로 바꾸기</span><input id="st-code" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX"></label>
   </div>
+  <h4>알림 (사장님 폰)</h4>
+  <p class="hint">재고가 <b>없음·마지막·부족</b>이 되면 ntfy 앱을 깐 폰으로 푸시 알림이 가요. 처음 한 번만 설정하면 돼요.</p>
+  <p class="hint">① ntfy 앱 설치: <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">안드로이드</a> · <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">아이폰</a><br>
+  ② 안드로이드는 아래 <b>알림 받기</b>를 누르고, 아이폰은 ntfy 앱에서 <b>+</b>를 눌러 이 주제 이름을 붙여넣으세요: <span class="topic" id="alertTopic">연결 중…</span></p>
+  <div class="btnrow">
+    <a class="btn sm" id="alertSub" href="#">알림 받기 (안드로이드)</a>
+    <button type="button" class="btn sm" id="alertCopy">주제 이름 복사</button>
+    <button type="button" class="btn sm" id="alertTest">테스트 알림 보내기</button>
+  </div>
+  <label class="check"><input type="checkbox" id="alertSend"> 이 폰에서 바꾼 숫자가 부족해지면 알림 보내기</label>
   <h4>데이터</h4>
   <div class="btnrow">
     <button type="button" class="btn sm" id="copyTableBtn">표로 복사 (시트에 붙여넣기)</button>
     <button type="button" class="btn sm" id="backupBtn">백업 파일 저장</button>
     <label class="btn sm" for="restoreFile">백업 불러오기</label>
+    <button type="button" class="btn sm" id="pdfBtn2">재고표 PDF</button>
+    <a class="btn sm" href="./guide.pdf" target="_blank" rel="noopener">사용 안내서 (PDF)</a>
     <input type="file" id="restoreFile" accept="application/json,.json" hidden>
   </div>
   <p class="hint" id="dataLine"></p>
@@ -374,6 +428,26 @@ main{min-width:0}
   </div>
 </div>
 
+<div class="sheet" id="pdfSheet" hidden>
+  <h3>PDF로 저장</h3>
+  <p class="hint">필요한 것만 담아요. 사진은 빼고 항목·숫자·상태·메모·마지막 수정만 표로 들어가요.</p>
+  <div class="btnrow">
+    <button type="button" class="btn sm" id="pdfOrders">주문 목록만</button>
+    <button type="button" class="btn sm primary" id="pdfAll">주문 목록 + 전체 재고표</button>
+  </div>
+  <p class="hint" id="pdfMsg"></p>
+  <div class="btnrow" id="pdfReady" hidden>
+    <button type="button" class="btn sm primary" id="pdfShare">공유하기 (카톡 등)</button>
+    <button type="button" class="btn sm" id="pdfSave">파일로 저장</button>
+  </div>
+  <div class="btnrow" id="pdfPrintRow" hidden>
+    <button type="button" class="btn sm" id="pdfPrint">인쇄 → PDF로 저장</button>
+  </div>
+  <div class="actions"><span class="spacer"></span><button type="button" class="btn" id="pdf-close">닫기</button></div>
+</div>
+
+<div id="pdfStage" aria-hidden="true"></div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script src="./config.js"></script>
@@ -383,7 +457,8 @@ main{min-width:0}
   const CFG = window.CDM_CONFIG || {};
   const NTFY = String(CFG.NTFY || 'https://ntfy.sh').replace(/\/+$/, '');
   const POLL_MS = Math.max(15000, Number(CFG.POLL_MS) || 60000);
-  const APP_URL = location.origin + location.pathname;
+  const ALERT_DELAY_MS = Math.max(500, Number(CFG.ALERT_DELAY_MS) || 6000);   // 연타가 끝난 뒤 알림을 보내기까지 기다리는 시간(되돌리기가 보이는 4.5초보다 길게)
+  const APP_URL = new URL('./', location.href).href;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const now = () => Date.now();
@@ -517,7 +592,7 @@ main{min-width:0}
     cfg: Object.assign({ name: '', code: '', deviceId: '', view: 'list', tab: '', hints: {} }, load('settings', {}) || {}),
     items: new Map(),
     lastId: '', lastIdAt: 0, peers: {}, lastSnapAt: 0, lastSchedSnapAt: 0, dirtySinceSnap: false, daily: { day: '', n: 0 },
-    q: '', low: false, lastStructure: '', editing: null,
+    q: '', low: false, lastStructure: '', editing: null, alertsSent: [],
     key: null, topic: '', es: null, online: navigator.onLine, status: 'connecting', dirty: new Set(), seen: new Set(), parts: new Map(),
   };
 
@@ -525,6 +600,25 @@ main{min-width:0}
   const num = v => (typeof v === 'number' && Number.isFinite(v)) ? v : null;
   const fmtNum = v => v === null ? '' : String(v);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // 수정 시각: 1분 안 "방금", 오늘·어제는 "오늘 21:10", 그 전은 "10/14(화) 21:10" (short면 요일 빼고)
+  const WD = ['일', '월', '화', '수', '목', '금', '토'];
+  const pad2 = n => String(n).padStart(2, '0');
+  function fmtWhen(ms, short = false) {
+    if (!ms) return '';
+    ms = Math.min(ms, now());   // 다른 폰 시계가 조금 빨라도 내일 날짜로 보이지 않게
+    if (now() - ms < 60000) return '방금';
+    const d = new Date(ms), t = new Date(now()), hm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    const day0 = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const diff = Math.round((day0(t) - day0(d)) / 86400000);
+    if (diff === 0) return `오늘 ${hm}`;
+    if (diff === 1) return `어제 ${hm}`;
+    const md = `${d.getMonth() + 1}/${d.getDate()}`;
+    if (d.getFullYear() !== t.getFullYear()) return short ? `${String(d.getFullYear()).slice(2)}/${md}` : `${d.getFullYear()}/${md}(${WD[d.getDay()]}) ${hm}`;
+    return short ? `${md} ${hm}` : `${md}(${WD[d.getDay()]}) ${hm}`;
+  }
+  // 시간 글자(data-ts)를 지금 기준으로 다시 쓴다: '방금' → '오늘 09:05' → '어제 …'
+  const tsSpan = (ms, short = true) => `<span data-ts="${ms}"${short ? ' data-s="1"' : ''}>${esc(fmtWhen(ms, short))}</span>`;
+  function refreshTimes() { for (const el of document.querySelectorAll('[data-ts]')) { const v = fmtWhen(Number(el.dataset.ts), el.dataset.s === '1'); if (el.textContent !== v) el.textContent = v; } }
   function ago(ms) {
     if (!ms) return '';
     const s = Math.max(0, (now() - ms) / 1000);
@@ -551,7 +645,27 @@ main{min-width:0}
   const editedAt = it => { const ts = lastTouched(it); return ts > 1e12 ? ts : 0; };
   const lastBy = it => { const t = it.t, b = it.b; const mx = editedAt(it); if (!mx) return ''; return mx === t.u ? b.u : mx === t.o ? b.o : b.m; };
   let toastTimer = 0;
-  function toast(msg, ms = 2400) { const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms); }
+  function toast(msg, ms = 2400, action = null, near = null) {
+    const el = $('#toast'); el.textContent = msg;
+    // 방금 누른 줄을 가리지 않게: 그 줄이 화면 아래쪽이면 위(검색줄 바로 밑)에 띄운다
+    const r = near && near.getBoundingClientRect(), top = !!r && r.bottom > window.innerHeight * 0.55;
+    el.classList.toggle('top', top);
+    el.style.top = top ? Math.max(12, Math.round((($('#app .bar') || el).getBoundingClientRect().bottom || 0) + 8)) + 'px' : '';
+    if (action) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'act'; b.textContent = action.label;
+      const armedAt = now() + 600;
+      b.addEventListener('click', ev => {
+        if (now() < armedAt) {   // 뜨자마자 손가락이 닿은 건 원래 누르려던 것(아래 버튼)으로 넘긴다
+          el.hidden = true; const under = document.elementFromPoint(ev.clientX, ev.clientY); el.hidden = false;
+          const t = under && under.closest('button, input'); if (t && !el.contains(t)) { if (t.tagName === 'INPUT') t.focus(); else t.click(); }
+          return;
+        }
+        el.hidden = true; clearTimeout(toastTimer); action.fn();
+      });
+      el.appendChild(b);
+    }
+    el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+  }
   const SYNC_TEXT = { connecting: '연결 중…', ok: '동기화 중', sending: '보내는 중…', retry: '다시 연결 중…', offline: '오프라인', error: '연결 안 됨' };
   function setSync(s, title) { S.status = s; const el = $('#sync'); el.dataset.state = s; el.textContent = SYNC_TEXT[s] || s; el.title = title || ''; }
   const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -692,16 +806,60 @@ main{min-width:0}
   function saveStore(immediate) {
     clearTimeout(saveTimer);
     const doSave = () => {
-      store('store', { v: 1, items: Array.from(S.items.values()), lastId: S.lastId, lastIdAt: S.lastIdAt, peers: S.peers, lastSnapAt: S.lastSnapAt, lastSchedSnapAt: S.lastSchedSnapAt, dirtySinceSnap: S.dirtySinceSnap, daily: S.daily, dirty: Array.from(S.dirty) });
+      store('store', { v: 1, items: Array.from(S.items.values()), lastId: S.lastId, lastIdAt: S.lastIdAt, peers: S.peers, lastSnapAt: S.lastSnapAt, lastSchedSnapAt: S.lastSchedSnapAt, dirtySinceSnap: S.dirtySinceSnap, daily: S.daily, dirty: Array.from(S.dirty), alerts: pendingAlerts(), alertsSent: S.alertsSent });
     };
     if (immediate) doSave(); else saveTimer = setTimeout(doSave, 300);
   }
   function saveCfg() { store('settings', S.cfg); }
+  // ---------- 변경 기록 ----------
+  // 항목마다 최근 기록 몇 개를 들고 다닌다: [기록 id, 시각, 종류, 전, 후, 이름]
+  // 종류: u 안뜯은거, o 뜯은거, m 이름·메모 등, a 추가, d 삭제. 폰끼리는 합집합으로 합쳐서(같은 id는 늦은 쪽) 서로의 기록이 지워지지 않는다.
+  // 같은 폰에서 같은 칸을 1분 안에 연달아 바꾸면 한 줄로 묶는다(120 → 123).
+  const HIST_MAX = 8, HIST_JOIN_MS = 60 * 1000;
+  const isCountF = f => f === 'u' || f === 'o';
+  function normHist(h) {
+    if (!Array.isArray(h)) return [];
+    const byId = new Map();
+    for (const e of h) {
+      if (!Array.isArray(e) || typeof e[0] !== 'string' || !num(e[1]) || !['u', 'o', 'm', 'a', 'd'].includes(e[2])) continue;
+      const f = e[2];
+      const x = [e[0].slice(0, 40), num(e[1]), f, isCountF(f) ? num(e[3]) : String(e[3] ?? '').slice(0, 120), isCountF(f) ? num(e[4]) : null, String(e[5] || '').slice(0, 20)];
+      const prev = byId.get(x[0]); if (!prev || x[1] > prev[1]) byId.set(x[0], x);
+    }
+    return Array.from(byId.values()).sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1)).slice(-HIST_MAX);
+  }
+  const myTag = () => (S.cfg.deviceId || 'd').slice(-4);
+  let histSeq = 0;
+  function addHist(it, f, a, b, ts = now()) {
+    const by = S.cfg.name || '';
+    const h = it.h || (it.h = []);
+    const last = h[h.length - 1];
+    // 이어 쓰기는 직전 줄의 '후' 값이 지금 바꾸기 전 값과 같을 때만(그 사이 다른 폰이 바꿨으면 새 줄)
+    if (isCountF(f) && last && last[2] === f && last[0].startsWith(myTag()) && ts - last[1] < HIST_JOIN_MS && last[4] === a) { last[1] = ts; last[4] = b; last[5] = by; }
+    else h.push([myTag() + ts.toString(36) + f + (histSeq++ % 1296).toString(36), ts, f, isCountF(f) ? a : String(a ?? '').slice(0, 120), b, by]);
+    if (h.length > HIST_MAX) h.splice(0, h.length - HIST_MAX);
+  }
+  const keyOf = f => f === 'u' ? 'unopened' : 'opened';
+  const fLabel = f => f === 'u' ? '안뜯은거' : '뜯은거';
+  function latestOf(it, f, shownOnly = false) { const h = it.h || []; for (let i = h.length - 1; i >= 0; i--) if (h[i][2] === f && (!shownOnly || histShown(h[i]))) return h[i]; return null; }
+  // 되돌릴 수 있는 기록: 그 칸의 (제자리 줄을 뺀) 가장 최근 기록이고, 지금 값이 그 기록의 '후' 값 그대로일 때만(그 뒤에 바뀐 숫자를 지우지 않게)
+  const undoable = (it, e) => !!e && isCountF(e[2]) && latestOf(it, e[2], true) === e && e[3] !== e[4] && e[4] === num(it[keyOf(e[2])]);
+  const fmtV = v => v === null || v === undefined ? '–' : String(v);
+  function histText(e) {
+    if (e[2] === 'u') return `안뜯은거 ${fmtV(e[3])} → ${fmtV(e[4])}`;
+    if (e[2] === 'o') return `뜯은거 ${fmtV(e[3])} → ${fmtV(e[4])}`;
+    if (e[2] === 'a') return '추가';
+    if (e[2] === 'd') return '삭제';
+    return String(e[3] || '정보 바꿈');
+  }
+  const histShown = e => !(isCountF(e[2]) && e[3] === e[4]);   // 되돌려서 제자리가 된 줄은 숨긴다
+
   function normalizeItem(r) {
     const t = r.t || {}, b = r.b || {};
     return { id: String(r.id), name: String(r.name || ''), section: String(r.section || ''), group: String(r.group || ''), note: String(r.note || ''),
       img: validImgUrl(r.img), min: num(r.min), order: num(r.order) ?? 0, unopened: num(r.unopened), opened: num(r.opened),
-      t: { u: num(t.u) || 0, o: num(t.o) || 0, m: num(t.m) || 0, d: num(t.d) || 0 }, b: { u: String(b.u || ''), o: String(b.o || ''), m: String(b.m || '') } };
+      t: { u: num(t.u) || 0, o: num(t.o) || 0, m: num(t.m) || 0, d: num(t.d) || 0 }, b: { u: String(b.u || ''), o: String(b.o || ''), m: String(b.m || '') },
+      h: normHist(r.h) };
   }
   function loadStore() {
     const st = load('store', null);
@@ -713,6 +871,7 @@ main{min-width:0}
       S.lastSnapAt = num(st.lastSnapAt) || 0; S.lastSchedSnapAt = num(st.lastSchedSnapAt) || 0;
       S.dirtySinceSnap = st.dirtySinceSnap === true; S.daily = st.daily || { day: '', n: 0 };
       for (const id of (st.dirty || [])) if (S.items.has(id)) S.dirty.add(id);
+      S.alertSeed = Array.isArray(st.alerts) ? st.alerts : null; S.alertsSent = Array.isArray(st.alertsSent) ? st.alertsSent.filter(x => x && typeof x.m === 'string' && num(x.ts)) : [];
     }
   }
 
@@ -726,6 +885,7 @@ main{min-width:0}
     if (r.t.o > local.t.o) { local.opened = r.opened; local.t.o = r.t.o; local.b.o = r.b.o; changed = true; }
     if (r.t.m > local.t.m) { local.name = r.name; local.section = r.section; local.group = r.group; local.note = r.note; local.img = r.img; local.min = r.min; local.order = r.order; local.t.m = r.t.m; local.b.m = r.b.m; changed = true; }
     if (r.t.d > local.t.d) { local.t.d = r.t.d; changed = true; }
+    if (r.h.length) { const h = normHist([...(local.h || []), ...r.h]); if (JSON.stringify(h) !== JSON.stringify(local.h || [])) { local.h = h; changed = true; } }
     return changed;
   }
   function mergeMany(list) { let n = 0; for (const r of list || []) { try { if (r && r.id && mergeItem(r)) n++; } catch (e) { /* 깨진 항목은 건너뜀 */ } } return n; }
@@ -733,17 +893,25 @@ main{min-width:0}
   // ---------- 로컬 수정 ----------
   function editCounts(id, patch) {
     const it = S.items.get(id); if (!it) return;
-    const ts = now(), by = S.cfg.name;
-    if ('unopened' in patch) { it.unopened = num(patch.unopened); it.t.u = ts; it.b.u = by; }
-    if ('opened' in patch) { it.opened = num(patch.opened); it.t.o = ts; it.b.o = by; }
-    markDirty(id); refreshRow(id);
+    const ts = now(), by = S.cfg.name, before = statusOf(it);
+    if ('unopened' in patch) { const v = num(patch.unopened); if (v !== it.unopened) addHist(it, 'u', it.unopened, v, ts); it.unopened = v; it.t.u = ts; it.b.u = by; }
+    if ('opened' in patch) { const v = num(patch.opened); if (v !== it.opened) addHist(it, 'o', it.opened, v, ts); it.opened = v; it.t.o = ts; it.b.o = by; }
+    markDirty(id); refreshRow(id); queueAlert(it, before, ts);
   }
   function editMeta(id, patch) {
     const it = S.items.get(id); if (!it) return;
+    const parts = [];
+    if ('name' in patch && patch.name !== it.name) parts.push(`이름 ${it.name} → ${patch.name}`);
+    if (('section' in patch && patch.section !== it.section) || ('group' in patch && patch.group !== it.group)) parts.push(`자리 → ${patch.section ?? it.section} / ${patch.group ?? it.group}`);
+    if ('note' in patch && (patch.note || '') !== (it.note || '')) parts.push(patch.note ? `메모 "${patch.note}"` : '메모 지움');
+    if ('min' in patch && patch.min !== it.min) parts.push(patch.min === null ? '최소 수량 지움' : `최소 수량 ${patch.min}`);
+    if ('img' in patch && (patch.img || '') !== (it.img || '')) parts.push(patch.img ? '사진 바꿈' : '기본 사진으로');
+    if (!parts.length) return;   // 기록만 보려고 열었다가 저장해도 '방금 고침'이 되지 않게
+    addHist(it, 'm', parts.join(', '), null);
     Object.assign(it, patch); it.t.m = now(); it.b.m = S.cfg.name;
     markDirty(id); render();
   }
-  function deleteItem(id) { const it = S.items.get(id); if (!it) return; it.t.d = now(); markDirty(id); render(); }
+  function deleteItem(id) { const it = S.items.get(id); if (!it) return; addHist(it, 'd', null, null); it.t.d = now(); markDirty(id); render(); }
   function addItem(patch) {
     const id = newId('n');
     const sec = patch.section;
@@ -751,6 +919,7 @@ main{min-width:0}
     for (const d of S.items.values()) if (secOf(d) === sec && !isDeleted(d)) maxOrder = Math.max(maxOrder, d.order || 0);
     if (!(sec in SEC_BASE)) { for (const d of S.items.values()) maxOrder = Math.max(maxOrder, d.order || 0); }
     const it = normalizeItem({ id, ...patch, order: maxOrder + 10, t: { m: now() }, b: { m: S.cfg.name } });
+    addHist(it, 'a', null, null);
     S.items.set(id, it); markDirty(id); render();
     return it;
   }
@@ -795,6 +964,7 @@ main{min-width:0}
 
   // ---------- ntfy 통신 ----------
   const CHUNK = 2400;
+  const MSG_BUDGET = 2400;   // 델타 한 통에 담는 항목 JSON 바이트 (암호화·base64 뒤에도 4096바이트 안)
   function bumpDaily() { const day = new Date().toISOString().slice(0, 10); if (S.daily.day !== day) S.daily = { day, n: 0 }; S.daily.n++; }
   async function publishRaw(body, delay) {
     const headers = { 'Content-Type': 'text/plain; charset=utf-8', 'Priority': '1', 'Firebase': 'no', 'Title': 'cdm' };
@@ -818,10 +988,21 @@ main{min-width:0}
     const ids = Array.from(S.dirty);
     let failed = false;
     try {
-      for (let i = 0; i < ids.length; i += 12) {
-        const items = ids.slice(i, i + 12).map(id => S.items.get(id)).filter(Boolean);
-        await publish({ k: 'delta', items });
-        for (const it of items) S.dirty.delete(it.id);
+      // 메시지 하나가 ntfy 한도(4096바이트) 안에 들어가도록 크기로 묶는다. 보내는 동안 또 고친 항목은 다음에 다시 보낸다.
+      let i = 0;
+      while (i < ids.length) {
+        const batch = []; let size = 0;
+        while (i < ids.length) {
+          const it = S.items.get(ids[i]); if (!it) { S.dirty.delete(ids[i]); i++; continue; }
+          const js = JSON.stringify(it); let wire = js, n = te.encode(wire).length + 1;
+          // 기록이 길어 한 항목만으로 한도를 넘으면 오래된 기록부터 빼고 보낸다(받는 폰은 기록을 합치므로 숫자는 그대로 맞음)
+          for (let k = 1; n > MSG_BUDGET && k <= HIST_MAX; k++) { wire = JSON.stringify({ ...it, h: (it.h || []).slice(k) }); n = te.encode(wire).length + 1; }
+          if (batch.length && size + n > MSG_BUDGET) break;
+          batch.push([it.id, js, wire]); size += n; i++;
+        }
+        if (!batch.length) break;
+        await publish({ k: 'delta', items: batch.map(([, , wire]) => JSON.parse(wire)) });
+        for (const [id, js] of batch) { const cur = S.items.get(id); if (!cur || JSON.stringify(cur) === js) S.dirty.delete(id); }
       }
       saveStore(); setSync('ok');
     } catch (e) {
@@ -836,16 +1017,104 @@ main{min-width:0}
     snapBusy = true;
     try {
       const snapTs = now();
-      const data = await packB64(JSON.stringify({ items: Array.from(S.items.values()) }));
-      const parts = []; for (let i = 0; i < data.length; i += CHUNK) parts.push(data.slice(i, i + CHUNK));
-      const delays = scheduled && S.daily.n < 180 ? ['', '11h', '22h', '33h', '44h', '55h', '66h'] : [''];
+      const split = data => { const parts = []; for (let i = 0; i < data.length; i += CHUNK) parts.push(data.slice(i, i + CHUNK)); return parts; };
+      const parts = split(await packB64(JSON.stringify({ items: Array.from(S.items.values()) })));
+      // 11~66시간 뒤에 도착하는 사본(오래 꺼져 있던 폰용)은 기록 없이 숫자만: 메시지 수를 아낀다
+      const lite = scheduled ? split(await packB64(JSON.stringify({ items: Array.from(S.items.values(), it => ({ ...it, h: [] })) }))) : [];
+      const delays = scheduled && S.daily.n + parts.length + lite.length * 6 < 180 ? ['11h', '22h', '33h', '44h', '55h', '66h'] : [];
       setSync('sending');
-      for (const delay of delays) for (let i = 0; i < parts.length; i++) await publish({ k: 'snap', snapTs, part: i, of: parts.length, data: parts[i] }, delay);
+      for (let i = 0; i < parts.length; i++) await publish({ k: 'snap', snapTs, part: i, of: parts.length, data: parts[i] });
+      for (const delay of delays) for (let i = 0; i < lite.length; i++) await publish({ k: 'snap', snapTs, part: i, of: lite.length, data: lite[i] }, delay);
       S.lastSnapAt = snapTs; if (scheduled) { S.lastSchedSnapAt = snapTs; S.dirtySinceSnap = false; }
       saveStore(); setSync('ok');
       return true;
     } catch (e) { setSync(S.online ? 'retry' : 'offline', '스냅샷을 보내지 못했어요: ' + e.message); return false; }
     finally { snapBusy = false; }
+  }
+  // ---------- 푸시 알림 (ntfy 앱) ----------
+  // 이 폰에서 바꾼 숫자 때문에 '없음·마지막·부족'이 더 나빠지면, 잠시(연타가 끝날 때까지) 기다렸다가 알림 주제로 평문 알림을 보낸다.
+  const SEVERITY = { low: 1, last: 2, none: 3 };
+  const sev = st => SEVERITY[st.key] || 0;
+  // 기다리는 알림: 항목마다 하나 { before(이번 수정 묶음 전 상태), after(이 폰이 바꾼 뒤 상태), ts(이 폰이 마지막으로 고친 시각),
+  //   timer(0이면 보낼 차례), tried(보냈는지 확실치 않은 시도 {m 표시, k 상태, tt 시각}), busy(보내는 중), again(보내는 중에 또 바뀜) }
+  // 알림마다 표시(a=항목.시각)를 누르는 주소에 붙인다. 결과를 모르는 시도(앱이 닫히며 보낸 것, 응답을 못 받은 것)가 있으면
+  // 다음에 보내기 전에 알림 주제에서 그 표시를 찾아본다: 있으면 보낸 것으로 치고 그 상태를 새 기준으로 삼는다.
+  // ntfy는 12시간만 보관하므로 그보다 오래된 시도는 확인할 수 없다 → 다시 보낸다(드물게 두 번 갈 수는 있어도 잃지는 않게).
+  // 인터넷이 없는 줄 알고 한 시도는 '확실히 못 감'이라 적지 않고 그냥 다시 보낸다. 저장소에도 같이 저장(하루 지난 건 버림).
+  const alertWait = new Map();
+  const alertSent = new Map();   // id → { key, at } 이 폰에서 같은 상태로 10분 안에 또 보내지 않음
+  const DAY_MS = 24 * 3600 * 1000, CACHE_MS = 11.5 * 3600 * 1000;
+  const alertMark = (id, ts) => `${id}.${Math.round(ts).toString(36)}`;
+  const wasSent = mark => S.alertsSent.some(x => x.m === mark);
+  function markSent(mark, ts) { S.alertsSent = S.alertsSent.filter(x => now() - x.ts < DAY_MS).concat({ m: mark, ts }).slice(-100); }
+  const triedOf = t => (t && typeof t === 'object' && typeof t.m === 'string' && num(t.tt) ? { m: t.m, k: String(t.k || ''), tt: t.tt } : null);
+  const pendingAlerts = () => Array.from(alertWait, ([id, w]) => ({ id, b: w.before.key, a: (w.after || w.before).key, ts: w.ts, t: w.tried || null }))
+    .concat((S.alertSeed || []).filter(r => r && !alertWait.has(String(r.id))));
+  const lowerSt = (x, y) => (sev(x) <= sev(y) ? x : y), worseSt = (x, y) => (sev(x) >= sev(y) ? x : y);
+  function restoreAlerts(list) {
+    for (const r of Array.isArray(list) ? list : []) {
+      const id = String((r && r.id) || ''); if (!S.items.has(id) || !num(r.ts) || now() - r.ts > DAY_MS) continue;
+      const before = { key: String(r.b || '') }, tried = triedOf(r.t), cur = alertWait.get(id);
+      if (cur) { cur.before = lowerSt(cur.before, before); if (!cur.tried) cur.tried = tried; continue; }   // 그 사이 같은 항목을 또 고쳤으면 합친다
+      alertWait.set(id, { before, after: { key: String(r.a || '') }, ts: r.ts, timer: 0, tried });
+    }
+  }
+  function queueAlert(it, before, ts) {
+    if (S.cfg.alertsOff) return;
+    const w = alertWait.get(it.id) || { before, tried: null };
+    clearTimeout(w.timer); w.ts = ts; w.after = statusOf(it);
+    if (w.busy) { w.again = true; w.timer = 0; }   // 보내는(확인하는) 중이면 끝난 뒤에 다시 판단
+    else w.timer = setTimeout(() => fireAlert(it.id), ALERT_DELAY_MS);
+    alertWait.set(it.id, w); saveStore();
+  }
+  // 알림 주제에 이 표시가 있나: true / false / null(확인 못 함). 시간 범위는 서버 기준 전부(알림 주제는 메시지가 적다)
+  async function alertOnTopic(mark) {
+    try {
+      const r = await fetch(`${NTFY}/${S.alertTopic}/json?poll=1&since=all`, { cache: 'no-store' });
+      return r.ok ? (await r.text()).includes('a=' + mark) : null;
+    } catch (e) { return null; }
+  }
+  async function fireAlert(id, unloading = false) {
+    const w = alertWait.get(id); if (!w || w.busy) return;
+    clearTimeout(w.timer); w.timer = 0;
+    if (!S.alertTopic) return;   // 아직 연결 전: 연결되면 다시
+    const drop = () => { if (alertWait.get(id) === w) alertWait.delete(id); saveStore(); };
+    if (S.cfg.alertsOff || now() - w.ts > DAY_MS) return drop();
+    // 결과를 모르는 지난 시도가 있으면 먼저 정리한다(닫히는 중에는 기다릴 수 없어 건너뜀)
+    if (w.tried && !unloading) {
+      const tr = w.tried;
+      let seen = wasSent(tr.m) ? true : now() - tr.tt > CACHE_MS ? false : null;   // 너무 오래돼 확인할 수 없으면 안 간 것으로
+      if (seen === null) { w.busy = true; seen = await alertOnTopic(tr.m); w.busy = false; }
+      if (seen === null) { saveStore(); return; }   // 확인 못 함(인터넷 없음): 다음에 다시
+      if (seen) { markSent(tr.m, tr.tt); alertSent.set(id, { key: tr.k, at: tr.tt }); w.before = worseSt(w.before, { key: tr.k }); }   // 10분 규칙은 실제로 보낸 때부터
+      w.tried = null; w.again = false;
+    }
+    const cur = S.items.get(id); if (!cur || isDeleted(cur)) return drop();
+    const st = statusOf(cur); if (sev(st) <= sev(w.before)) return drop();
+    // 그 사이 다른 폰이 숫자를 바꿨고 그 폰 때문에 더 나빠졌으면 그 폰이 알린다(두 번 가지 않게). 아니면 이 폰이 알린다.
+    if (Math.max(cur.t.u, cur.t.o) !== w.ts && sev(st) > sev(w.after || w.before)) return drop();
+    const last = alertSent.get(id); if (last && last.key === st.key && now() - last.at < 10 * 60 * 1000) return drop();
+    const sentTs = w.ts, mark = alertMark(id, sentTs);
+    if (wasSent(mark)) return drop();
+    // 보내기 전에 '보내려 함'을 먼저 남긴다. 인터넷이 없는 줄 알면 안 갈 게 확실하니 적지 않는다(다음에 그냥 다시 보냄).
+    w.busy = true; w.again = false; w.tried = navigator.onLine === false ? null : { m: mark, k: st.key, tt: now() }; saveStore(true);
+    const ok = await sendAlert(`${cur.name} ${st.label}`, [`${secOf(cur)} · ${grpOf(cur)}`, `안뜯은거 ${fmtV(num(cur.unopened))} / 뜯은거 ${fmtV(num(cur.opened))}`,
+      `${S.cfg.name || '누군가'} · ${new Date(sentTs).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`].join('\n'), st.key === 'none' ? 4 : 3, mark);
+    w.busy = false;
+    if (ok) { alertSent.set(id, { key: st.key, at: now() }); markSent(mark, sentTs); w.tried = null; }
+    if (w.again || w.ts !== sentTs) {   // 보내는 중에 또 바뀜: 보냈으면 그 상태를 기준으로, 아니면 처음 기준 그대로 다시 판단
+      if (ok) w.before = st;
+      w.again = false; w.timer = setTimeout(() => fireAlert(id), ALERT_DELAY_MS);
+    } else if (ok && alertWait.get(id) === w) alertWait.delete(id);
+    saveStore(true);   // 못 보냈으면 남겨 둔다(timer 0): 인터넷이 돌아오거나 다시 열 때 확인 후 보낸다
+  }
+  // unloading: 기다리는 것까지 지금 보냄(화면을 끄거나 앱을 닫을 때). 아니면 보낼 차례인 것만.
+  function flushAlerts(unloading = false) { for (const [id, w] of Array.from(alertWait)) if (unloading || !w.timer) fireAlert(id, unloading); }
+  // 알림은 늘 keepalive로 보낸다(본문이 작아서 앱이 닫혀도 끝까지 간다)
+  async function sendAlert(title, body, priority = 3, mark = '') {
+    if (!S.alertTopic) return false;
+    const q = new URLSearchParams({ title: '재고 알림: ' + title, priority: String(priority), tags: priority >= 4 ? 'rotating_light' : 'warning', click: APP_URL + (mark ? '#a=' + mark : '') });
+    try { const r = await fetch(`${NTFY}/${S.alertTopic}?${q}`, { method: 'POST', body, keepalive: true }); if (r.ok) bumpDaily(); return r.ok; } catch (e) { return false; }
   }
   async function requestSnapshot() { try { await publish({ k: 'need' }); } catch (e) { /* 다음에 */ } }
 
@@ -907,10 +1176,12 @@ main{min-width:0}
   }
   async function connect() {
     if (!S.cfg.code) return;
-    try { S.key = await deriveKey(S.cfg.code); S.topic = 'cdm-' + (await sha256hex('topic|' + S.cfg.code)).slice(0, 32); }
+    try { S.key = await deriveKey(S.cfg.code); S.topic = 'cdm-' + (await sha256hex('topic|' + S.cfg.code)).slice(0, 32); S.alertTopic = 'cdm-alert-' + (await sha256hex('alert|' + S.cfg.code)).slice(0, 20); }
     catch (e) { setSync('error', '이 브라우저에서는 암호화를 쓸 수 없어요 (https 필요)'); return; }
     setSync('connecting');
     await pollCatchUp();
+    if (S.alertSeed) { restoreAlerts(S.alertSeed); S.alertSeed = null; }
+    flushAlerts();   // 지난번에 못 보낸 알림(다른 폰 변경을 받은 뒤에 판단)
     if (!S.cfg.synced) { S.cfg.hints.needSentAt = now(); saveCfg(); requestSnapshot(); }   // 새 폰: 다른 폰에 전체 숫자를 바로 요청
     openStream();
     if (S.dirty.size) await flushDelta();
@@ -929,13 +1200,13 @@ main{min-width:0}
     tickTimer = setTimeout(syncTick, S.cfg.synced ? 10 * 60 * 1000 : 60 * 1000);
   }
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { clearTimeout(deltaTimer); flushDelta(); closeStream(); clearTimeout(tickTimer); }
-    else if (S.key) { pollCatchUp().then(() => { openStream(); syncTick(); renderSummary(); }); }
+    if (document.hidden) { clearTimeout(deltaTimer); flushDelta(); flushAlerts(true); saveStore(true); closeStream(); clearTimeout(tickTimer); }
+    else { tickTimes(); if (S.key) pollCatchUp().then(() => { openStream(); syncTick(); renderSummary(); flushAlerts(); }); }
   });
-  window.addEventListener('pagehide', () => { clearTimeout(deltaTimer); flushDelta(); saveStore(true); });
-  window.addEventListener('online', () => { S.online = true; if (S.key) { pollCatchUp().then(openStream); flushDelta(); } });
+  window.addEventListener('pagehide', () => { clearTimeout(deltaTimer); flushDelta(); flushAlerts(true); saveStore(true); });
+  window.addEventListener('online', () => { S.online = true; if (S.key) { pollCatchUp().then(() => { openStream(); flushAlerts(); }); flushDelta(); } });
   window.addEventListener('offline', () => { S.online = false; setSync('offline'); closeStream(); });
-  setInterval(() => { if (!document.hidden && S.key) { pollCatchUp(); if (!S.es) openStream(); } }, POLL_MS);
+  setInterval(() => { if (!document.hidden && S.key) { pollCatchUp().then(() => flushAlerts()); if (!S.es) openStream(); } }, POLL_MS);
 
   // ---------- 보기 계산 ----------
   function liveItems() { const out = []; for (const d of S.items.values()) if (!isDeleted(d)) out.push(d); out.sort((a, b) => (a.order || 0) - (b.order || 0) || String(a.name).localeCompare(String(b.name), 'ko')); return out; }
@@ -995,7 +1266,7 @@ main{min-width:0}
     if (last) parts.push(`<span class="s-warn">마지막 <b>${last}</b></span>`);
     if (low) parts.push(`<span class="s-warn">부족 <b>${low}</b></span>`);
     if (blank) parts.push(`미기입 <b>${blank}</b>`);
-    if (latest) parts.push(`최근 수정 <b>${esc(ago(editedAt(latest)))}</b>${lastBy(latest) ? ' · ' + esc(lastBy(latest)) : ''}`);
+    if (latest) parts.push(`최근 수정 <b>${esc(fmtWhen(editedAt(latest), true))}</b>${lastBy(latest) ? ' · ' + esc(lastBy(latest)) : ''}`);
     const pl = peerLine(); if (pl) parts.push(`연결된 폰 ${pl}`);
     el.innerHTML = parts.join('<span aria-hidden="true">·</span>');
     $('#pairHint').hidden = !!SHARED || Object.keys(S.peers).length > 0 || !!S.cfg.hints.pair;
@@ -1005,6 +1276,7 @@ main{min-width:0}
   }
   function render() {
     renderTabs(); renderSummary();
+    if (S.editing && S.editing.id && !sheets.editor.hidden) fillHist();   // 편집 화면이 열려 있으면 다른 폰에서 온 기록도 바로 보이게
     $('#viewList').setAttribute('aria-selected', String(S.cfg.view === 'list'));
     $('#viewTable').setAttribute('aria-selected', String(S.cfg.view === 'table'));
     $('#list').hidden = S.cfg.view !== 'list'; $('#table').hidden = S.cfg.view !== 'table';
@@ -1035,7 +1307,7 @@ main{min-width:0}
     if (th.dataset.k !== pk) { th.dataset.k = pk; th.innerHTML = picHTML(it); }
     const tag = li.querySelector('.tag'); tag.hidden = !st.label; tag.textContent = st.label; tag.className = 'tag' + (st.key ? ' s-' + st.key : '');
     const meta = li.querySelector('.meta'); const lt = editedAt(it);
-    const metaText = lt ? ago(lt) + (lastBy(it) ? ' · ' + lastBy(it) : '') + (S.dirty.has(it.id) ? ' · 보내는 중' : '') : '시트에서 가져옴';
+    const metaText = lt ? fmtWhen(lt) + (lastBy(it) ? ' · ' + lastBy(it) : '') + (S.dirty.has(it.id) ? ' · 보내는 중' : '') : '시트에서 가져옴';
     if (meta.textContent !== metaText) meta.textContent = metaText;
     for (const [f, key] of [['u', 'unopened'], ['o', 'opened']]) { const inp = li.querySelector(`input[data-f="${f}"]`); const v = fmtNum(num(it[key])); if (document.activeElement !== inp && inp.value !== v) inp.value = v; }
     const note = li.querySelector('.note'); const n = String(it.note || '').trim(); note.hidden = !n; if (note.textContent !== n) note.textContent = n;
@@ -1078,26 +1350,34 @@ main{min-width:0}
     if (li && it) fillRow(li, it); else render();
     renderSummary();
   }
-  setInterval(() => { if (!document.hidden && $('#setup').hidden) { renderSummary(); if (S.cfg.view === 'list') for (const li of $$('#list .item')) { const it = S.items.get(li.dataset.id); if (it) fillRow(li, it); } } }, 60000);
+  function tickTimes() { if (document.hidden || !$('#setup').hidden) return; renderSummary(); refreshTimes(); if (S.cfg.view === 'list') for (const li of $$('#list .item')) { const it = S.items.get(li.dataset.id); if (it) fillRow(li, it); } }
+  setInterval(tickTimes, 60000);
 
   // ---------- 그리기: 한눈에 ----------
   function orderList() { return liveItems().filter(d => LOW_KEYS.has(statusOf(d).key)); }
   function orderText() {
-    const d = new Date(); const lines = [`카페드멍 주문 목록 (${d.getMonth() + 1}/${d.getDate()})`];
+    const d = new Date(); const lines = [`카페드명 주문 목록 (${d.getMonth() + 1}/${d.getDate()})`];
     const groups = groupsOf(orderList(), true);
     for (const g of groups) { lines.push(`[${g.section} · ${g.group}]`); for (const it of g.items) { const st = statusOf(it); lines.push(`- ${it.name}: ${st.label} (안뜯 ${fmtNum(num(it.unopened)) || '-'} / 뜯 ${fmtNum(num(it.opened)) || '-'})`); } }
     if (groups.length === 0) lines.push('부족한 항목이 없어요.');
     return lines.join('\n');
   }
+  function recentChanges(n) {
+    const out = [], since = now() - 7 * 86400 * 1000;
+    for (const it of S.items.values()) for (const e of it.h || []) if (e[1] >= since && histShown(e)) out.push({ it, e });
+    return out.sort((a, b) => b.e[1] - a.e[1]).slice(0, n);
+  }
   function renderTable() {
     const root = $('#table');
     const q = S.q.trim().toLowerCase();
     const ol = orderList().filter(d => matches(d, q));
-    let html = `<div class="card"><div class="hd"><h2>주문 목록<span class="sub">없음·마지막·부족 ${ol.length}</span></h2><button type="button" class="btn sm" id="copyOrdersBtn">복사</button></div>`;
+    let html = `<div class="card"><div class="hd"><h2>주문 목록<span class="sub">없음·마지막·부족 ${ol.length}</span></h2><span class="btns"><button type="button" class="btn sm" id="pdfBtn">PDF</button><button type="button" class="btn sm" id="copyOrdersBtn">복사</button></span></div>`;
     if (ol.length) {
       html += '<ul class="orders">' + groupsOf(ol, true).flatMap(g => g.items.map(it => { const st = statusOf(it); return `<li data-id="${esc(it.id)}"><button type="button" class="mini" aria-label="사진 크게 보기">${picHTML(it)}</button><span class="txt"><span class="nm">${esc(it.name)}</span><span class="sec">${esc(g.section)} · ${esc(g.group)}</span></span><span class="st s-${st.key}">${st.label} <span>${fmtNum(num(it.unopened)) || '–'}/${fmtNum(num(it.opened)) || '–'}</span></span></li>`; })).join('') + '</ul>';
     } else html += '<div class="orders"><div class="ok">부족한 항목이 없어요.</div></div>';
     html += '</div>';
+    const feed = recentChanges(15);
+    if (feed.length) html += `<div class="card"><div class="hd"><h2>최근 변경<span class="sub">최근 7일</span></h2></div><ul class="feed">${feed.map(({ it, e }) => `<li data-id="${esc(it.id)}"><span class="when">${tsSpan(e[1])}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt"><b>${esc(it.name)}</b> ${esc(histText(e))}</span></li>`).join('')}</ul></div>`;
     const secs = sectionsList();
     const all = liveItems().filter(d => matches(d, q) && (!S.low || LOW_KEYS.has(statusOf(d).key)));
     for (const sec of secs) {
@@ -1108,7 +1388,7 @@ main{min-width:0}
         html += `<tr class="grp"><td colspan="5">${esc(g.group)}</td></tr>`;
         for (const it of g.items) {
           const st = statusOf(it); const u = num(it.unopened), o = num(it.opened); const lt = editedAt(it);
-          html += `<tr class="row${st.key ? ' s-' + st.key : ''}" data-id="${esc(it.id)}"><td class="p"><button type="button" class="mini" aria-label="${esc(it.name)} 사진 크게 보기">${picHTML(it)}</button></td><td><span class="nm">${esc(it.name)}${st.label ? ` <span class="tag s-${st.key}">${st.label}</span>` : ''}</span></td><td class="n${u === null ? ' blank' : ''}${st.key ? ' s-' + st.key : ''}">${u === null ? '–' : u}</td><td class="n${o === null ? ' blank' : ''}">${o === null ? '–' : o}</td><td class="m" title="${esc(lastBy(it))}">${lt ? esc(ago(lt)) + (lastBy(it) ? ' ' + esc(lastBy(it)) : '') : '시트'}</td></tr>`;
+          html += `<tr class="row${st.key ? ' s-' + st.key : ''}" data-id="${esc(it.id)}"><td class="p"><button type="button" class="mini" aria-label="${esc(it.name)} 사진 크게 보기">${picHTML(it)}</button></td><td><span class="nm">${esc(it.name)}${st.label ? ` <span class="tag s-${st.key}">${st.label}</span>` : ''}</span></td><td class="n${u === null ? ' blank' : ''}${st.key ? ' s-' + st.key : ''}">${u === null ? '–' : u}</td><td class="n${o === null ? ' blank' : ''}">${o === null ? '–' : o}</td><td class="m" title="${esc(lt ? new Date(lt).toLocaleString('ko-KR') + (lastBy(it) ? ' · ' + lastBy(it) : '') : '시트에서 가져옴')}">${lt ? `<span class="d" data-ts="${lt}" data-s="1">${esc(fmtWhen(lt, true))}</span>${lastBy(it) ? `<span class="by">${esc(lastBy(it))}</span>` : ''}` : '시트'}</td></tr>`;
         }
       }
       html += '</tbody></table></section>';
@@ -1118,8 +1398,10 @@ main{min-width:0}
   }
   $('#table').addEventListener('click', ev => {
     if (ev.target.closest('#copyOrdersBtn')) { copyText(orderText(), '주문 목록을 복사했어요'); return; }
+    if (ev.target.closest('#pdfBtn')) { openPdf(); return; }
     const row = ev.target.closest('[data-id]'); if (!row) return;
     if (ev.target.closest('.mini')) { openViewer(row.dataset.id); return; }
+    const it = S.items.get(row.dataset.id); if (!it || isDeleted(it)) return;
     jumpTo(row.dataset.id);
   });
   function jumpTo(id) {
@@ -1141,9 +1423,9 @@ main{min-width:0}
   }
   function joinLink() { return SHARED ? APP_URL : APP_URL + '#j=' + S.cfg.code; }
   async function shareLink() {
-    const text = SHARED ? '카페드멍 재고체크 앱이에요. 이 링크를 열면 바로 같은 재고 숫자를 함께 볼 수 있어요.'
-      : `카페드멍 재고체크 앱이에요. 이 링크를 열고 이름만 넣으면 같은 재고 숫자를 함께 볼 수 있어요.\n가게 코드: ${S.cfg.code}`;
-    if (navigator.share) { try { await navigator.share({ title: '카페드멍 재고체크', text, url: joinLink() }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    const text = SHARED ? '카페드명 재고체크 앱이에요. 이 링크를 열면 바로 같은 재고 숫자를 함께 볼 수 있어요.'
+      : `카페드명 재고체크 앱이에요. 이 링크를 열고 이름만 넣으면 같은 재고 숫자를 함께 볼 수 있어요.\n가게 코드: ${S.cfg.code}`;
+    if (navigator.share) { try { await navigator.share({ title: '카페드명 재고체크', text, url: joinLink() }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
     copyText(text + '\n' + joinLink(), '연결 링크를 복사했어요. 카톡 등으로 보내주세요.');
   }
   function tsvText() {
@@ -1154,7 +1436,7 @@ main{min-width:0}
   function backup() {
     const data = JSON.stringify({ app: 'cafedemung', v: 1, at: new Date().toISOString(), code: S.cfg.code, items: Array.from(S.items.values()) }, null, 1);
     const blob = new Blob([data], { type: 'application/json' }); const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `카페드멍-재고-백업-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); a.remove();
+    const a = document.createElement('a'); a.href = url; a.download = `카페드명-재고-백업-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000); toast('백업 파일을 저장했어요');
   }
   function restore(file) {
@@ -1207,9 +1489,149 @@ main{min-width:0}
   async function switchCode(code) { setCode(code); await connect(); render(); }
 
   // ---------- 설정 시트 ----------
-  const sheets = { editor: $('#editor'), settings: $('#settings'), viewer: $('#viewer'), scrim: $('#scrim') };
-  function openSheet(el) { for (const k of ['editor', 'settings', 'viewer']) sheets[k].hidden = sheets[k] !== el; sheets.scrim.hidden = false; }
-  function closeSheets() { sheets.editor.hidden = true; sheets.settings.hidden = true; sheets.viewer.hidden = true; sheets.scrim.hidden = true; S.editing = null; S.viewing = null; $('#ed-confirm').hidden = true; $('#resetConfirm').hidden = true; }
+  const sheets = { editor: $('#editor'), settings: $('#settings'), viewer: $('#viewer'), pdf: $('#pdfSheet'), scrim: $('#scrim') };
+  function openSheet(el) { for (const k of ['editor', 'settings', 'viewer', 'pdf']) sheets[k].hidden = sheets[k] !== el; sheets.scrim.hidden = false; }
+  function closeSheets() { sheets.editor.hidden = true; sheets.settings.hidden = true; sheets.viewer.hidden = true; sheets.pdf.hidden = true; sheets.scrim.hidden = true; S.editing = null; S.viewing = null; $('#ed-confirm').hidden = true; $('#resetConfirm').hidden = true; $('#pdfStage').innerHTML = ''; S.pdfGen = (S.pdfGen || 0) + 1; $('#pdfOrders').disabled = $('#pdfAll').disabled = false; }
+
+  // ---------- PDF로 저장 (재고표·주문 목록) ----------
+  // 화면 밖에 A4 쪽을 직접 나눠 그린 뒤(html2canvas) 쪽마다 이미지로 PDF에 넣는다(jsPDF). 한글 글꼴을 따로 넣지 않아도 화면 글꼴 그대로 나온다.
+  // 두 라이브러리는 PDF를 만들 때만 불러온다. 인터넷이 없으면 같은 쪽을 브라우저 인쇄로 PDF 저장한다.
+  const PDF_LIBS = [
+    ['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', 'sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H'],
+    ['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', 'sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk'],
+  ];
+  let pdfLibs = null;
+  const loadScript = ([src, integrity]) => new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.integrity = integrity; el.crossOrigin = 'anonymous'; el.onload = res; el.onerror = () => rej(new Error('불러오기 실패')); document.head.appendChild(el); });
+  function loadPdfLibs() { if (!pdfLibs) pdfLibs = Promise.all(PDF_LIBS.map(loadScript)).catch(e => { pdfLibs = null; throw e; }); return pdfLibs; }
+  function openPdf() { $('#pdfMsg').textContent = ''; $('#pdfReady').hidden = true; $('#pdfPrintRow').hidden = true; S.pdf = null; openSheet(sheets.pdf); loadPdfLibs().catch(() => {}); }
+  const pdfCell = (v, cls = '') => `<span class="${cls}">${esc(v)}</span>`;
+  function buildPdfPages(kind) {
+    const stage = $('#pdfStage'); stage.innerHTML = '';
+    const d = new Date(), stamp = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.(${WD[d.getDay()]}) ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    const title = kind === 'orders' ? '카페드명 주문 목록' : '카페드명 재고표';
+    const pages = []; let body = null;
+    const used = () => { const c = body.lastElementChild; return c ? c.offsetTop + c.offsetHeight : 0; };
+    const newPage = () => {
+      const pg = document.createElement('div'); pg.className = 'pg';
+      // 꼬리말(쪽 번호) 자리를 미리 채워 둬야 나중에 번호를 써도 본문 높이가 줄지 않는다
+      pg.innerHTML = `<div class="ph"><b>${esc(title)}</b><span>${esc(stamp)}</span></div><div class="pb"></div><div class="pf">0 / 0</div>`;
+      stage.appendChild(pg); pages.push(pg); body = pg.querySelector('.pb');
+    };
+    const html = h => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
+    // 제목(구역 제목 · 열 제목 · 분류 줄)은 바로 쓰지 않고 다음 줄과 함께 놓는다 → 쪽 끝에 제목만 남지 않음.
+    // 쪽이 넘어가면 열 제목과 분류 줄(이어서)을 다시 붙인다.
+    let head = null, grp = null, pend = { h2: null, head: false, grp: false };
+    const section = h => { pend = { h2: h, head: false, grp: false }; head = null; grp = null; };
+    const tableHead = h => { head = h; pend.head = true; };
+    const groupRow = name => { grp = name; pend.grp = true; };
+    const row = (h, plain = false) => {
+      const build = fresh => {
+        const out = [];
+        if (pend.h2) out.push(pend.h2);
+        if (!plain && head && (pend.head || fresh)) out.push(head);
+        if (!plain && grp && (pend.grp || fresh)) out.push(`<div class="r g">${esc(grp)}${fresh && !pend.grp ? ' (이어서)' : ''}</div>`);
+        out.push(h);
+        return out.map(html);
+      };
+      let els = build(false); els.forEach(e => body.appendChild(e));
+      if (used() > body.clientHeight && body.children.length > els.length) {
+        els.forEach(e => body.removeChild(e)); newPage();
+        els = build(true); els.forEach(e => body.appendChild(e));
+      }
+      pend = { h2: null, head: false, grp: false };
+    };
+    newPage();
+    const live = liveItems(); let none = 0, last = 0, low = 0, blank = 0;
+    for (const it of live) { const k = statusOf(it).key; if (k === 'none') none++; else if (k === 'last') last++; else if (k === 'low') low++; else if (k === 'blank') blank++; }
+    row(`<p class="sum">항목 ${live.length} · 없음 ${none} · 마지막 ${last} · 부족 ${low} · 미기입 ${blank}</p>`, true);
+    row(`<p class="lg">없음 = 안뜯은거 0, 뜯은 것도 없음 · 마지막 = 뜯은 것만 남음 · 부족 = 최소 수량보다 적음 · – = 안 적음</p>`, true);
+    const val = v => fmtV(num(v));
+    // 종이는 나중에 읽으므로 '방금·오늘' 대신 날짜로 (다른 해는 두 자리 연도)
+    const whenBy = it => { const lt = editedAt(it); if (!lt) return '시트'; const d = new Date(Math.min(lt, now())), y = d.getFullYear() !== new Date().getFullYear() ? String(d.getFullYear()).slice(2) + '/' : '';
+      return `${y}${d.getMonth() + 1}/${d.getDate()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}${lastBy(it) ? ' ' + lastBy(it) : ''}`; };
+    // 주문 목록
+    const ol = orderList();
+    const OC = '--cols:1.5fr 2fr .75fr .55fr .55fr .55fr 1.6fr';
+    section(`<h2>주문할 것<small>없음·마지막·부족 ${ol.length}개</small></h2>`);
+    if (!ol.length) row(`<div class="pe">부족한 항목이 없어요.</div>`, true);
+    else {
+      tableHead(`<div class="r h" style="${OC}"><span>구역 · 분류</span><span>항목</span><span>상태</span><span class="n">안뜯</span><span class="n">뜯</span><span class="n">최소</span><span>메모</span></div>`);
+      for (const g of groupsOf(ol, true)) for (const it of g.items) {
+        const st = statusOf(it);
+        row(`<div class="r" style="${OC}">${pdfCell(`${g.section} · ${g.group}`, 'w')}${pdfCell(it.name, 'w')}${pdfCell(st.label, 's-' + st.key)}${pdfCell(val(it.unopened), 'n')}${pdfCell(val(it.opened), 'n')}${pdfCell(val(it.min), 'n')}${pdfCell(it.note || '', 'w')}</div>`);
+      }
+    }
+    // 전체 재고표
+    if (kind === 'all') {
+      const IC = '--cols:2.1fr .55fr .55fr .55fr .75fr 1.5fr 1.35fr';
+      for (const sec of sectionsList()) {
+        const items = live.filter(it => secOf(it) === sec); if (!items.length) continue;
+        section(`<h2>${esc(sec)}<small>${items.length}개</small></h2>`);
+        tableHead(`<div class="r h" style="${IC}"><span>항목</span><span class="n">안뜯</span><span class="n">뜯</span><span class="n">최소</span><span>상태</span><span>메모</span><span>마지막 수정</span></div>`);
+        for (const g of groupsOf(items, false)) {
+          groupRow(g.group);
+          for (const it of g.items) {
+            const st = statusOf(it);
+            row(`<div class="r" style="${IC}">${pdfCell(it.name, 'w')}${pdfCell(val(it.unopened), 'n')}${pdfCell(val(it.opened), 'n')}${pdfCell(val(it.min), 'n')}${pdfCell(st.label, 's-' + st.key)}${pdfCell(it.note || '', 'w')}${pdfCell(whenBy(it), 'w')}</div>`);
+          }
+        }
+      }
+    }
+    pages.forEach((pg, i) => { pg.querySelector('.pf').textContent = `${i + 1} / ${pages.length}`; });
+    return pages;
+  }
+  // 만들기마다 번호를 붙인다. 시트를 닫으면(closeSheets) 번호가 바뀌어, 하던 것은 조용히 멈춘다.
+  let pdfBusy = 0;
+  const pdfButtons = on => { $('#pdfOrders').disabled = $('#pdfAll').disabled = !on; };
+  async function makePdf(kind) {
+    if (pdfBusy && pdfBusy === S.pdfGen) return;   // 만드는 중에 또 누르면 무시(같은 그리기 자리를 같이 쓰므로)
+    const gen = S.pdfGen = (S.pdfGen || 0) + 1; pdfBusy = gen; pdfButtons(false);
+    try { await makePdfNow(kind, gen); } finally { if (pdfBusy === gen) { pdfBusy = 0; pdfButtons(true); } }
+  }
+  async function makePdfNow(kind, gen) {
+    const live = () => S.pdfGen === gen;
+    const msg = $('#pdfMsg'); $('#pdfReady').hidden = true; $('#pdfPrintRow').hidden = true; S.pdf = null;
+    msg.textContent = 'PDF 만드는 중…';
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    if (!live()) return;
+    const pages = buildPdfPages(kind);
+    const d = new Date(), name = `${kind === 'orders' ? '카페드명-주문목록' : '카페드명-재고표'}-${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}.pdf`;
+    try {
+      await loadPdfLibs();
+      if (!live()) return;
+      const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4', compress: true });
+      for (let i = 0; i < pages.length; i++) {
+        msg.textContent = `PDF 만드는 중… (${i + 1}/${pages.length}쪽)`;
+        const canvas = await window.html2canvas(pages[i], { scale: 2, backgroundColor: '#ffffff', logging: false });
+        if (!live()) return;
+        if (i) doc.addPage();
+        doc.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', 0, 0, 595.28, 841.89);
+      }
+      const blob = doc.output('blob');
+      S.pdf = new File([blob], name, { type: 'application/pdf' });
+      msg.textContent = `${pages.length}쪽 PDF를 만들었어요 (${Math.max(1, Math.round(blob.size / 1024))}KB). 공유하거나 저장하세요.`;
+      $('#pdfShare').hidden = !(navigator.canShare && navigator.canShare({ files: [S.pdf] }));
+      $('#pdfReady').hidden = false;
+    } catch (e) {
+      if (!live()) return;
+      msg.textContent = 'PDF 파일을 만들지 못했어요(처음 한 번은 인터넷이 필요해요). 대신 아래 "인쇄"에서 PDF로 저장할 수 있어요.';
+      $('#pdfPrintRow').hidden = false;
+    }
+  }
+  $('#pdfOrders').addEventListener('click', () => makePdf('orders'));
+  $('#pdfAll').addEventListener('click', () => makePdf('all'));
+  $('#pdf-close').addEventListener('click', closeSheets);
+  $('#pdfBtn2').addEventListener('click', () => openPdf());
+  // 인쇄: 이때만 화면을 숨기고 PDF 쪽만 찍는다(평소 인쇄는 그대로)
+  $('#pdfPrint').addEventListener('click', () => { document.body.classList.add('pdfprint'); window.print(); });
+  window.addEventListener('afterprint', () => document.body.classList.remove('pdfprint'));
+  $('#pdfShare').addEventListener('click', async () => { if (!S.pdf) return; try { await navigator.share({ files: [S.pdf], title: S.pdf.name }); } catch (e) { if (!e || e.name !== 'AbortError') toast('공유하지 못했어요. "파일로 저장"을 써 주세요'); } });
+  $('#pdfSave').addEventListener('click', () => {
+    if (!S.pdf) return;
+    const url = URL.createObjectURL(S.pdf); const a = document.createElement('a'); a.href = url; a.download = S.pdf.name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000); toast('PDF를 저장했어요');
+  });
+  window.CDM_LAST_PDF = () => S.pdf;   // 검사용
 
   // ---------- 사진 크게 보기 ----------
   function openViewer(id) {
@@ -1233,7 +1655,12 @@ main{min-width:0}
   function openSettings() {
     $('#codeBox').textContent = SHARED ? APP_URL : S.cfg.code; $('#codeBox').classList.toggle('url', !!SHARED);
     $('#st-link-h').textContent = SHARED ? '같이 보기' : '사장님 폰과 연결'; $('#st-code-f').hidden = !!SHARED;
+    $('#shareBtn').textContent = SHARED ? '주소 보내기' : '연결 링크 보내기'; $('#copyLinkBtn').textContent = SHARED ? '주소 복사' : '링크 복사';
     $('#st-name').value = S.cfg.name; $('#st-code').value = '';
+    const host = (() => { try { return new URL(NTFY).host; } catch (e) { return 'ntfy.sh'; } })();
+    $('#alertTopic').textContent = S.alertTopic || '연결 중…';
+    $('#alertSub').href = S.alertTopic ? `ntfy://${host}/${S.alertTopic}?display=${encodeURIComponent('카페드명 재고')}` : '#';
+    $('#alertSend').checked = !S.cfg.alertsOff;
     const ids = Object.keys(S.peers);
     const peerText = ids.length ? '연결된 폰: ' + ids.map(id => `${S.peers[id].name || '이름 없음'} (${ago(S.peers[id].seen)})`).join(', ') : '';
     $('#peersLine').textContent = SHARED ? '이 주소를 열면 누구나 코드 없이 같은 화면을 봐요.' + (peerText ? ' ' + peerText : '')
@@ -1250,6 +1677,9 @@ main{min-width:0}
     closeSheets(); render(); toast('저장했어요');
   });
   $('#shareBtn').addEventListener('click', shareLink);
+  $('#alertCopy').addEventListener('click', () => { if (S.alertTopic) copyText(S.alertTopic, '주제 이름을 복사했어요. ntfy 앱에서 + 를 눌러 붙여넣으세요.'); });
+  $('#alertTest').addEventListener('click', async () => { const ok = await sendAlert('테스트', `카페드명 재고 알림이 이 폰에 잘 와요. (${S.cfg.name || '누군가'}가 보냄)`, 3); toast(ok ? '테스트 알림을 보냈어요' : '알림을 보내지 못했어요. 인터넷을 확인해 주세요'); });
+  $('#alertSend').addEventListener('change', ev => { S.cfg.alertsOff = !ev.target.checked; saveCfg(); toast(ev.target.checked ? '이 폰에서 알림을 보내요' : '이 폰에서는 알림을 보내지 않아요'); });
   $('#pairShareBtn').addEventListener('click', shareLink);
   $('#pairClose').addEventListener('click', () => { S.cfg.hints.pair = true; saveCfg(); $('#pairHint').hidden = true; });
   $('#nh-save').addEventListener('click', () => { const n = $('#nh-name').value.trim(); if (!n) { $('#nh-name').focus(); return; } S.cfg.name = n; saveCfg(); $('#nameHint').hidden = true; render(); toast('이름을 저장했어요'); });
@@ -1275,6 +1705,8 @@ main{min-width:0}
     for (const [id, s] of seed) {
       if (isDeleted(s)) continue;   // 배치 정리로 다른 항목에 합쳐진 것
       const it = S.items.get(id) || s; const wasDel = isDeleted(it);
+      if (it.unopened !== s.unopened) addHist(it, 'u', it.unopened, s.unopened);
+      if (it.opened !== s.opened) addHist(it, 'o', it.opened, s.opened);
       it.unopened = s.unopened; it.opened = s.opened; it.t.u = ts; it.t.o = ts; it.b.u = S.cfg.name; it.b.o = S.cfg.name;
       if (wasDel) { it.section = s.section; it.group = s.group; it.order = s.order; it.t.m = ts; it.b.m = S.cfg.name; }   // 지웠던 항목은 새 배치 자리로 되살린다
       S.items.set(id, it); S.dirty.add(id);
@@ -1300,13 +1732,23 @@ main{min-width:0}
     ed.groups.innerHTML = Array.from(seen).map(g => `<option value="${esc(g)}"></option>`).join('');
   }
   ed.sec.addEventListener('input', fillLists);
+  function fillHist() {
+    const id = S.editing && S.editing.id; const it = id ? S.items.get(id) : null;
+    const rows = it ? (it.h || []).filter(histShown).slice().reverse() : [];
+    $('#ed-hist').hidden = !rows.length;
+    $('#ed-hist-list').innerHTML = rows.map(e => `<li><span class="when">${tsSpan(e[1])}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt">${esc(histText(e))}</span>${undoable(it, e) ? `<button type="button" class="undo" data-h="${esc(e[0])}">되돌리기 (${esc(fmtV(e[3]))})</button>` : ''}</li>`).join('');
+  }
+  $('#ed-hist-list').addEventListener('click', ev => {
+    const b = ev.target.closest('button.undo'); if (!b) return;
+    const id = S.editing && S.editing.id; if (id) undoEntry(id, b.dataset.h);
+  });
   function openEditor(id, section) {
     const it = id ? S.items.get(id) : null;
     S.editing = { id: id || null };
     ed.title.textContent = it ? '항목 편집' : '항목 추가';
     ed.name.value = it ? String(it.name || '') : ''; ed.sec.value = it ? secOf(it) : (section || S.cfg.tab || ''); fillLists();
     ed.group.value = it ? grpOf(it) : ''; ed.note.value = it ? String(it.note || '') : ''; ed.min.value = it ? fmtNum(num(it.min)) : '';
-    ed.img.value = it ? String(it.img || '') : ''; updateImgPreview();
+    ed.img.value = it ? String(it.img || '') : ''; updateImgPreview(); fillHist();
     ed.del.hidden = !it; ed.confirm.hidden = true;
     openSheet(sheets.editor); setTimeout(() => ed.name.focus(), 50);
   }
@@ -1339,18 +1781,39 @@ main{min-width:0}
     if (!canEdit()) return;
     const it = S.items.get(id); if (!it) return; const cur = num(it[key]);
     const next = btn.classList.contains('inc') ? (cur === null ? 1 : cur + 1) : (cur === null ? 0 : Math.max(0, cur - 1));
-    editCounts(id, { [key]: next });
+    if (next === cur) return;   // 0에서 − 처럼 바뀌는 게 없으면 그대로
+    editCounts(id, { [key]: next }); countToast(id, f);
   });
   list.addEventListener('change', ev => {
     const inp = ev.target; if (!(inp instanceof HTMLInputElement) || !inp.dataset.f) return;
     const li = inp.closest('.item'); if (!li) return; const id = li.dataset.id, key = inp.dataset.f === 'u' ? 'unopened' : 'opened';
     if (!canEdit()) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; return; }
     const raw = inp.value.trim().replace(/,/g, '');
-    if (raw === '') { editCounts(id, { [key]: null }); return; }
+    const it0 = S.items.get(id); const cur = it0 ? num(it0[key]) : null;
+    if (raw === '') { if (cur !== null) { editCounts(id, { [key]: null }); countToast(id, inp.dataset.f); } return; }
     const n = Number(raw);
-    if (!Number.isFinite(n) || n < 0) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; toast('숫자만 적어주세요'); return; }
-    editCounts(id, { [key]: Math.round(n * 10) / 10 });
+    if (!Number.isFinite(n) || n < 0) { inp.value = fmtNum(cur); toast('숫자만 적어주세요'); return; }
+    const v = Math.round(n * 10) / 10;
+    if (v === cur) { inp.value = fmtNum(cur); return; }
+    editCounts(id, { [key]: v }); countToast(id, inp.dataset.f);
   });
+  // 숫자를 바꾸면 "전 → 후 · 되돌리기"를 잠깐 보여준다. 되돌리기는 1분 안에 연달아 바꾼 것을 한꺼번에 되돌린다.
+  function countToast(id, f) {
+    // 방금 이 수정이 쓰거나 이어 쓴 줄일 때만(시각이 그 칸의 마지막 수정 시각과 같음). 오래된 줄을 되돌리라고 내밀지 않는다.
+    const it = S.items.get(id); const e = it && latestOf(it, f); if (!e || !e[0].startsWith(myTag()) || e[1] !== it.t[f]) return;
+    const row = list.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
+    if (!histShown(e)) { toast(`${it.name} ${fLabel(f)} ${fmtV(e[4])} (원래대로)`, 1500, null, row); return; }
+    const hid = e[0];
+    toast(`${it.name} ${fLabel(f)} ${fmtV(e[3])} → ${fmtV(e[4])}`, 4500, { label: '되돌리기', fn: () => undoEntry(id, hid) }, row);
+  }
+  // 기록 한 줄을 되돌린다. 그 뒤에 (다른 폰에서라도) 숫자가 또 바뀌었으면 덮어쓰지 않는다.
+  function undoEntry(id, hid) {
+    const it = S.items.get(id); if (!it || !canEdit()) return;
+    const e = (it.h || []).find(x => x[0] === hid);
+    if (!undoable(it, e)) { toast('그 사이 숫자가 또 바뀌어서 되돌리지 않았어요'); fillHist(); return; }
+    editCounts(id, { [keyOf(e[2])]: e[3] }); fillHist();
+    toast(`되돌렸어요: ${it.name} ${fLabel(e[2])} ${fmtV(e[3])}`);
+  }
   list.addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target instanceof HTMLInputElement) ev.target.blur(); });
   list.addEventListener('focusin', ev => { if (ev.target instanceof HTMLInputElement) ev.target.select(); });
   $('#tabs').addEventListener('click', ev => { const b = ev.target.closest('button[data-sec]'); if (!b) return; S.cfg.tab = b.dataset.sec; saveCfg(); render(); window.scrollTo({ top: 0 }); });
@@ -1385,6 +1848,7 @@ main{min-width:0}
   if (!S.cfg.deviceId) { S.cfg.deviceId = newId('d'); saveCfg(); }
   if (S.cfg.synced === undefined) { S.cfg.synced = !!(S.cfg.code && S.cfg.name); saveCfg(); }   // 이미 쓰던 폰은 실제 숫자를 갖고 있다
   const join = pendingJoinCode();
+  if (/^#a=/.test(location.hash || '')) clearHash();   // 알림을 눌러 열린 주소의 표시는 지운다
   if (SHARED) {
     // 모두 같은 코드: 처음 설정 없이 바로 시작.
     if (join) clearHash();

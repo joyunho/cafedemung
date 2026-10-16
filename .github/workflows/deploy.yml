@@ -25,7 +25,7 @@ jobs:
       - name: Collect site files
         run: |
           mkdir -p _site/img
-          cp -r index.html 404.html config.js sw.js manifest.webmanifest icons .nojekyll _site/
+          cp -r index.html 404.html config.js sw.js manifest.webmanifest guide.pdf icons .nojekyll _site/
           if [ -d img/items ]; then
             cp -r img/items img/manifest.json img/CREDITS.md _site/img/
           fi
