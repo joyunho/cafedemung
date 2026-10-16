@@ -38,7 +38,7 @@ export function startServers({ appPort = 8080, ntfyPort = 8081, delayScale = 1 }
       let body = ''; req.on('data', c => { body += c; }); req.on('end', () => {
         const delay = String(req.headers['delay'] || '');
         const msg = { id: newId(), time: nowSec(), expires: 0, event: 'message', topic: name, message: body };
-        log.push({ topic: name, delay, size: body.length, at: Date.now() });
+        log.push({ topic: name, delay, size: body.length, at: Date.now(), query: url.search, body: body.slice(0, 500) });
         const ms = parseDelay(delay);
         if (ms > 0) setTimeout(() => deliver(t, { ...msg }), ms * delayScale); else deliver(t, msg);
         res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(msg));

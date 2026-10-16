@@ -20,7 +20,7 @@ async function phone(name, { ntfy = MOCK, hash = '', scheme = 'light', init = nu
   // init: [저장소, 설정] JSON. 처음 열 때만 넣어서 '예전에 쓰던 폰'을 흉내낸다.
   if (init) await ctx.addInitScript(([st, cfg]) => { if (!localStorage.getItem('cdm.store')) { localStorage.setItem('cdm.store', st); localStorage.setItem('cdm.settings', cfg); } }, init);
   await ctx.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
-  await ctx.route('**/config.js', route => route.fulfill({ contentType: 'text/javascript', body: `window.CDM_CONFIG={NTFY:${JSON.stringify(ntfy)},POLL_MS:15000,SHARED_CODE:${JSON.stringify(shared)}};` }));
+  await ctx.route('**/config.js', route => route.fulfill({ contentType: 'text/javascript', body: `window.CDM_CONFIG={NTFY:${JSON.stringify(ntfy)},POLL_MS:15000,ALERT_DELAY_MS:600,SHARED_CODE:${JSON.stringify(shared)}};` }));
   const page = await ctx.newPage();
   page.on('pageerror', e => errors.push(`[${name}] ${e.message}`));
   page.on('console', m => { if (m.type() === 'error' && !offlinePhase && !/ERR_INTERNET_DISCONNECTED|ERR_FAILED|ERR_NETWORK/.test(m.text())) errors.push(`[${name}] console: ${m.text()}`); });
@@ -107,6 +107,26 @@ try {
   check(metaB.includes('윤호'), 'B에 수정자 표시: ' + metaB);
   check(log.filter(l => !l.delay).length >= 2, '서버로 보낸 메시지 ' + log.length + '개');
 
+  console.log('3b) 변경 기록 · 되돌리기');
+  const hA = (await storeOf(A)).items.find(i => i.id === 'yy-001').h;
+  check(hA.length === 1 && hA[0][2] === 'u' && hA[0][3] === 120 && hA[0][4] === 122 && hA[0][5] === '윤호', '연달아 누른 +2가 기록 한 줄로 (120 → 122, 윤호)');
+  await B.waitForFunction(() => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-001'); return !!(it && it.h && it.h.some(e => e[3] === 120 && e[4] === 122)); }, null, { timeout: 20000 });
+  check(true, 'B에도 기록 도착');
+  await A.locator('.item[data-id="yy-004"] button.inc[data-f="u"]').click();
+  await A.waitForSelector('#toast .act', { timeout: 3000 });
+  check((await A.textContent('#toast')).includes('30 → 31'), '숫자를 바꾸면 "전 → 후 · 되돌리기": ' + (await A.textContent('#toast')));
+  await A.click('#toast .act');
+  check((await inputVal(A, '#u-yy-004')) === '30', '되돌리기 누르면 30으로');
+  await B.click('.item[data-id="yy-001"] .name'); await B.waitForSelector('#editor:not([hidden])');
+  const histB = await B.textContent('#ed-hist-list');
+  check(histB.includes('안뜯은거 120 → 122') && histB.includes('윤호'), '편집 화면에 최근 기록: ' + histB.trim().slice(0, 60));
+  await B.click('#ed-cancel');
+  await A.fill('#u-yy-010', '5'); await A.press('#u-yy-010', 'Enter');
+  await A.click('.item[data-id="yy-010"] .name'); await A.waitForSelector('#editor:not([hidden])');
+  await A.click('#ed-hist-list button.undo');
+  check((await inputVal(A, '#u-yy-010')) === '' && (await A.textContent('#ed-hist-list')).trim() === '', '기록에서 되돌리기 (5 → 비움), 제자리가 된 줄은 숨김');
+  await A.click('#ed-cancel');
+
   console.log('4) B에서 직접 입력 → A에 반영');
   await B.fill('#o-yy-001', '3'); await B.press('#o-yy-001', 'Enter');
   await A.waitForFunction(() => document.querySelector('#o-yy-001').value === '3', null, { timeout: 20000 });
@@ -119,6 +139,8 @@ try {
   await A.waitForFunction(() => document.querySelector('#u-yy-002').value === '7', null, { timeout: 20000 });
   await sleep(2500);
   check((await inputVal(B, '#u-yy-002')) === '7' && (await inputVal(A, '#u-yy-002')) === '7', '양쪽 모두 7');
+  const h2a = (await storeOf(A)).items.find(i => i.id === 'yy-002').h.map(e => e[4]).sort().join(','), h2b = (await storeOf(B)).items.find(i => i.id === 'yy-002').h.map(e => e[4]).sort().join(',');
+  check(h2a === '5,7' && h2b === '5,7', '동시에 고쳐도 두 폰의 기록이 모두 남음 (' + h2a + ' / ' + h2b + ')');
 
   console.log('6) 한눈에 보기');
   await B.click('#viewTable'); await B.waitForSelector('#table:not([hidden])');
@@ -132,6 +154,8 @@ try {
   check((await B.textContent('#vw-name')) === '망고', '표에서 사진 누르면 크게 보기');
   await B.click('#vw-close');
   check(await B.isVisible('#table'), '크게 보기 닫아도 표 화면 유지');
+  const feed = await B.$$eval('#table .feed li', ls => ls.map(l => l.textContent));
+  check(feed.length >= 3 && feed.some(t => t.includes('탄산수') && t.includes('120 → 122')), '한눈에 "최근 변경" 목록 ' + feed.length + '줄');
   await B.click('#copyOrdersBtn');
   await B.waitForFunction(() => { const t = document.querySelector('#toast'); return !t.hidden && t.textContent.includes('복사'); }, null, { timeout: 5000 }).catch(() => {});
   check((await B.textContent('#toast')).includes('복사'), '주문 목록 복사 토스트: ' + (await B.textContent('#toast')));
@@ -165,6 +189,23 @@ try {
   check(true, 'A 화면 사진이 바뀜');
   await B.waitForFunction(src => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-003'); return !!(it && it.img === src); }, customImg, { timeout: 20000 });
   check(true, 'B에 바뀐 사진 주소 도착');
+
+  console.log('7c) 사장님 폰 알림 (ntfy 앱)');
+  const alerts = () => log.filter(l => l.topic.startsWith('cdm-alert-'));
+  const n0 = alerts().length;
+  await A.fill('#u-yy-011', '0'); await A.press('#u-yy-011', 'Enter');
+  await sleep(1500);
+  const al = alerts();
+  check(al.length === n0 + 1 && (new URLSearchParams(al[al.length - 1].query).get('title') || '').includes('뽀로로딸기 없음') && al[al.length - 1].body.includes('윤호'), '없음이 되면 알림 1통 (바꾼 폰에서만): ' + (al.length - n0) + '통');
+  await A.click('#gearBtn'); await A.waitForSelector('#settings:not([hidden])');
+  const topicShown = await A.textContent('#alertTopic');
+  check(topicShown === al[al.length - 1].topic && (await A.getAttribute('#alertSub', 'href')).startsWith('ntfy://'), '설정에 알림 주제 이름과 안드로이드 구독 링크');
+  await A.click('#alertTest'); await sleep(600);
+  check(alerts().length === n0 + 2 && alerts()[alerts().length - 1].body.includes('잘 와요'), '테스트 알림 보내기');
+  await A.uncheck('#alertSend'); await A.click('#st-cancel');
+  await A.fill('#u-yy-012', '0'); await A.press('#u-yy-012', 'Enter'); await sleep(1500);
+  check(alerts().length === n0 + 2, '알림 보내기를 끄면 이 폰은 안 보냄');
+  await A.click('#gearBtn'); await A.waitForSelector('#settings:not([hidden])'); await A.check('#alertSend'); await A.click('#st-cancel');
 
   console.log('8) 오프라인 수정 후 복구');
   offlinePhase = true;

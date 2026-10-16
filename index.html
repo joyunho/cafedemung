@@ -223,7 +223,19 @@ main{min-width:0}
   @keyframes rise{from{transform:translateY(16px);opacity:.6}to{transform:none;opacity:1}}
 }
 @media (prefers-reduced-motion:reduce){.item.flash{animation:none;background:var(--accent-soft)}}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:18px;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center;display:flex;align-items:center;gap:4px}
+.toast .act{margin-left:10px;padding:4px 2px;border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;white-space:nowrap}
+.hist,.feed{list-style:none;margin:0;padding:0}
+.hist li,.feed li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.hist li:last-child,.feed li:last-child{border-bottom:0}
+.hist .when,.feed .when{color:var(--muted);font-size:12px;white-space:nowrap;flex:none;min-width:84px}
+.hist .txt,.feed .txt{flex:1;min-width:0;overflow-wrap:anywhere}
+.hist .undo{flex:none;height:30px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12.5px;color:var(--accent)}
+.feed{padding:4px 14px 8px}
+.feed li{cursor:pointer}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0 4px}
+.check input{width:18px;height:18px}
+.topic{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:2px 6px;user-select:all;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -313,6 +325,10 @@ main{min-width:0}
     <a class="btn sm" id="ed-img-search" target="_blank" rel="noopener" href="https://www.google.com/search?tbm=isch">구글 이미지에서 찾기</a>
     <p class="hint">사진을 길게 눌러 '이미지 주소 복사' 후 위 칸에 붙여넣으세요.</p>
   </div>
+  <div id="ed-hist" hidden>
+    <h4>최근 기록</h4>
+    <ul class="hist" id="ed-hist-list"></ul>
+  </div>
   <div class="actions">
     <button type="button" class="btn danger" id="ed-delete">삭제</button>
     <span class="spacer"></span>
@@ -341,6 +357,16 @@ main{min-width:0}
     <label class="field"><span>이름</span><input id="st-name" maxlength="20"></label>
     <label class="field" id="st-code-f"><span>다른 가게 코드로 바꾸기</span><input id="st-code" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX"></label>
   </div>
+  <h4>알림 (사장님 폰)</h4>
+  <p class="hint">재고가 <b>없음·마지막·부족</b>이 되면 ntfy 앱을 깐 폰으로 푸시 알림이 가요. 처음 한 번만 설정하면 돼요.</p>
+  <p class="hint">① ntfy 앱 설치: <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">안드로이드</a> · <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">아이폰</a><br>
+  ② 안드로이드는 아래 <b>알림 받기</b>를 누르고, 아이폰은 ntfy 앱에서 <b>+</b>를 눌러 이 주제 이름을 붙여넣으세요: <span class="topic" id="alertTopic">연결 중…</span></p>
+  <div class="btnrow">
+    <a class="btn sm" id="alertSub" href="#">알림 받기 (안드로이드)</a>
+    <button type="button" class="btn sm" id="alertCopy">주제 이름 복사</button>
+    <button type="button" class="btn sm" id="alertTest">테스트 알림 보내기</button>
+  </div>
+  <label class="check"><input type="checkbox" id="alertSend"> 이 폰에서 바꾼 숫자가 부족해지면 알림 보내기</label>
   <h4>데이터</h4>
   <div class="btnrow">
     <button type="button" class="btn sm" id="copyTableBtn">표로 복사 (시트에 붙여넣기)</button>
@@ -383,6 +409,7 @@ main{min-width:0}
   const CFG = window.CDM_CONFIG || {};
   const NTFY = String(CFG.NTFY || 'https://ntfy.sh').replace(/\/+$/, '');
   const POLL_MS = Math.max(15000, Number(CFG.POLL_MS) || 60000);
+  const ALERT_DELAY_MS = Math.max(500, Number(CFG.ALERT_DELAY_MS) || 4000);   // 연타가 끝난 뒤 알림을 보내기까지 기다리는 시간
   const APP_URL = location.origin + location.pathname;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -551,7 +578,11 @@ main{min-width:0}
   const editedAt = it => { const ts = lastTouched(it); return ts > 1e12 ? ts : 0; };
   const lastBy = it => { const t = it.t, b = it.b; const mx = editedAt(it); if (!mx) return ''; return mx === t.u ? b.u : mx === t.o ? b.o : b.m; };
   let toastTimer = 0;
-  function toast(msg, ms = 2400) { const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms); }
+  function toast(msg, ms = 2400, action = null) {
+    const el = $('#toast'); el.textContent = msg;
+    if (action) { const b = document.createElement('button'); b.type = 'button'; b.className = 'act'; b.textContent = action.label; b.addEventListener('click', () => { el.hidden = true; clearTimeout(toastTimer); action.fn(); }); el.appendChild(b); }
+    el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+  }
   const SYNC_TEXT = { connecting: '연결 중…', ok: '동기화 중', sending: '보내는 중…', retry: '다시 연결 중…', offline: '오프라인', error: '연결 안 됨' };
   function setSync(s, title) { S.status = s; const el = $('#sync'); el.dataset.state = s; el.textContent = SYNC_TEXT[s] || s; el.title = title || ''; }
   const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -697,11 +728,50 @@ main{min-width:0}
     if (immediate) doSave(); else saveTimer = setTimeout(doSave, 300);
   }
   function saveCfg() { store('settings', S.cfg); }
+  // ---------- 변경 기록 ----------
+  // 항목마다 최근 기록 몇 개를 들고 다닌다: [기록 id, 시각, 종류, 전, 후, 이름]
+  // 종류: u 안뜯은거, o 뜯은거, m 이름·메모 등, a 추가, d 삭제. 폰끼리는 합집합으로 합쳐서(같은 id는 늦은 쪽) 서로의 기록이 지워지지 않는다.
+  // 같은 폰에서 같은 칸을 1분 안에 연달아 바꾸면 한 줄로 묶는다(120 → 123).
+  const HIST_MAX = 8, HIST_JOIN_MS = 60 * 1000;
+  const isCountF = f => f === 'u' || f === 'o';
+  function normHist(h) {
+    if (!Array.isArray(h)) return [];
+    const byId = new Map();
+    for (const e of h) {
+      if (!Array.isArray(e) || typeof e[0] !== 'string' || !num(e[1]) || !['u', 'o', 'm', 'a', 'd'].includes(e[2])) continue;
+      const f = e[2];
+      const x = [e[0].slice(0, 40), num(e[1]), f, isCountF(f) ? num(e[3]) : String(e[3] ?? '').slice(0, 120), isCountF(f) ? num(e[4]) : null, String(e[5] || '').slice(0, 20)];
+      const prev = byId.get(x[0]); if (!prev || x[1] > prev[1]) byId.set(x[0], x);
+    }
+    return Array.from(byId.values()).sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1)).slice(-HIST_MAX);
+  }
+  const myTag = () => (S.cfg.deviceId || 'd').slice(-4);
+  function addHist(it, f, a, b) {
+    const ts = now(), by = S.cfg.name || '';
+    const h = it.h || (it.h = []);
+    const last = h[h.length - 1];
+    if (isCountF(f) && last && last[2] === f && last[0].startsWith(myTag()) && ts - last[1] < HIST_JOIN_MS) { last[1] = ts; last[4] = b; last[5] = by; }
+    else h.push([myTag() + ts.toString(36), ts, f, a, b, by]);
+    if (h.length > HIST_MAX) h.splice(0, h.length - HIST_MAX);
+  }
+  // 이 폰이 방금(1분 안) 같은 칸을 바꾼 기록 = 되돌리기 대상
+  function myRecent(it, f) { const e = (it.h || [])[(it.h || []).length - 1]; return e && e[2] === f && e[0].startsWith(myTag()) && now() - e[1] < HIST_JOIN_MS ? e : null; }
+  const fmtV = v => v === null || v === undefined ? '–' : String(v);
+  function histText(e) {
+    if (e[2] === 'u') return `안뜯은거 ${fmtV(e[3])} → ${fmtV(e[4])}`;
+    if (e[2] === 'o') return `뜯은거 ${fmtV(e[3])} → ${fmtV(e[4])}`;
+    if (e[2] === 'a') return '추가';
+    if (e[2] === 'd') return '삭제';
+    return String(e[3] || '정보 바꿈');
+  }
+  const histShown = e => !(isCountF(e[2]) && e[3] === e[4]);   // 되돌려서 제자리가 된 줄은 숨긴다
+
   function normalizeItem(r) {
     const t = r.t || {}, b = r.b || {};
     return { id: String(r.id), name: String(r.name || ''), section: String(r.section || ''), group: String(r.group || ''), note: String(r.note || ''),
       img: validImgUrl(r.img), min: num(r.min), order: num(r.order) ?? 0, unopened: num(r.unopened), opened: num(r.opened),
-      t: { u: num(t.u) || 0, o: num(t.o) || 0, m: num(t.m) || 0, d: num(t.d) || 0 }, b: { u: String(b.u || ''), o: String(b.o || ''), m: String(b.m || '') } };
+      t: { u: num(t.u) || 0, o: num(t.o) || 0, m: num(t.m) || 0, d: num(t.d) || 0 }, b: { u: String(b.u || ''), o: String(b.o || ''), m: String(b.m || '') },
+      h: normHist(r.h) };
   }
   function loadStore() {
     const st = load('store', null);
@@ -726,6 +796,7 @@ main{min-width:0}
     if (r.t.o > local.t.o) { local.opened = r.opened; local.t.o = r.t.o; local.b.o = r.b.o; changed = true; }
     if (r.t.m > local.t.m) { local.name = r.name; local.section = r.section; local.group = r.group; local.note = r.note; local.img = r.img; local.min = r.min; local.order = r.order; local.t.m = r.t.m; local.b.m = r.b.m; changed = true; }
     if (r.t.d > local.t.d) { local.t.d = r.t.d; changed = true; }
+    if (r.h.length) { const h = normHist([...(local.h || []), ...r.h]); if (JSON.stringify(h) !== JSON.stringify(local.h || [])) { local.h = h; changed = true; } }
     return changed;
   }
   function mergeMany(list) { let n = 0; for (const r of list || []) { try { if (r && r.id && mergeItem(r)) n++; } catch (e) { /* 깨진 항목은 건너뜀 */ } } return n; }
@@ -733,17 +804,24 @@ main{min-width:0}
   // ---------- 로컬 수정 ----------
   function editCounts(id, patch) {
     const it = S.items.get(id); if (!it) return;
-    const ts = now(), by = S.cfg.name;
-    if ('unopened' in patch) { it.unopened = num(patch.unopened); it.t.u = ts; it.b.u = by; }
-    if ('opened' in patch) { it.opened = num(patch.opened); it.t.o = ts; it.b.o = by; }
-    markDirty(id); refreshRow(id);
+    const ts = now(), by = S.cfg.name, before = statusOf(it);
+    if ('unopened' in patch) { const v = num(patch.unopened); if (v !== it.unopened) addHist(it, 'u', it.unopened, v); it.unopened = v; it.t.u = ts; it.b.u = by; }
+    if ('opened' in patch) { const v = num(patch.opened); if (v !== it.opened) addHist(it, 'o', it.opened, v); it.opened = v; it.t.o = ts; it.b.o = by; }
+    markDirty(id); refreshRow(id); queueAlert(it, before);
   }
   function editMeta(id, patch) {
     const it = S.items.get(id); if (!it) return;
+    const parts = [];
+    if ('name' in patch && patch.name !== it.name) parts.push(`이름 ${it.name} → ${patch.name}`);
+    if (('section' in patch && patch.section !== it.section) || ('group' in patch && patch.group !== it.group)) parts.push(`자리 → ${patch.section ?? it.section} / ${patch.group ?? it.group}`);
+    if ('note' in patch && patch.note !== it.note) parts.push(patch.note ? `메모 "${patch.note}"` : '메모 지움');
+    if ('min' in patch && patch.min !== it.min) parts.push(patch.min === null ? '최소 수량 지움' : `최소 수량 ${patch.min}`);
+    if ('img' in patch && patch.img !== it.img) parts.push(patch.img ? '사진 바꿈' : '기본 사진으로');
+    if (parts.length) addHist(it, 'm', parts.join(', '), null);
     Object.assign(it, patch); it.t.m = now(); it.b.m = S.cfg.name;
     markDirty(id); render();
   }
-  function deleteItem(id) { const it = S.items.get(id); if (!it) return; it.t.d = now(); markDirty(id); render(); }
+  function deleteItem(id) { const it = S.items.get(id); if (!it) return; addHist(it, 'd', null, null); it.t.d = now(); markDirty(id); render(); }
   function addItem(patch) {
     const id = newId('n');
     const sec = patch.section;
@@ -751,6 +829,7 @@ main{min-width:0}
     for (const d of S.items.values()) if (secOf(d) === sec && !isDeleted(d)) maxOrder = Math.max(maxOrder, d.order || 0);
     if (!(sec in SEC_BASE)) { for (const d of S.items.values()) maxOrder = Math.max(maxOrder, d.order || 0); }
     const it = normalizeItem({ id, ...patch, order: maxOrder + 10, t: { m: now() }, b: { m: S.cfg.name } });
+    addHist(it, 'a', null, null);
     S.items.set(id, it); markDirty(id); render();
     return it;
   }
@@ -795,6 +874,7 @@ main{min-width:0}
 
   // ---------- ntfy 통신 ----------
   const CHUNK = 2400;
+  const MSG_BUDGET = 2400;   // 델타 한 통에 담는 항목 JSON 바이트 (암호화·base64 뒤에도 4096바이트 안)
   function bumpDaily() { const day = new Date().toISOString().slice(0, 10); if (S.daily.day !== day) S.daily = { day, n: 0 }; S.daily.n++; }
   async function publishRaw(body, delay) {
     const headers = { 'Content-Type': 'text/plain; charset=utf-8', 'Priority': '1', 'Firebase': 'no', 'Title': 'cdm' };
@@ -818,10 +898,19 @@ main{min-width:0}
     const ids = Array.from(S.dirty);
     let failed = false;
     try {
-      for (let i = 0; i < ids.length; i += 12) {
-        const items = ids.slice(i, i + 12).map(id => S.items.get(id)).filter(Boolean);
-        await publish({ k: 'delta', items });
-        for (const it of items) S.dirty.delete(it.id);
+      // 메시지 하나가 ntfy 한도(4096바이트) 안에 들어가도록 크기로 묶는다. 보내는 동안 또 고친 항목은 다음에 다시 보낸다.
+      let i = 0;
+      while (i < ids.length) {
+        const batch = []; let size = 0;
+        while (i < ids.length) {
+          const it = S.items.get(ids[i]); if (!it) { S.dirty.delete(ids[i]); i++; continue; }
+          const js = JSON.stringify(it), n = te.encode(js).length + 1;
+          if (batch.length && size + n > MSG_BUDGET) break;
+          batch.push([it.id, js]); size += n; i++;
+        }
+        if (!batch.length) break;
+        await publish({ k: 'delta', items: batch.map(([, js]) => JSON.parse(js)) });
+        for (const [id, js] of batch) { const cur = S.items.get(id); if (!cur || JSON.stringify(cur) === js) S.dirty.delete(id); }
       }
       saveStore(); setSync('ok');
     } catch (e) {
@@ -846,6 +935,32 @@ main{min-width:0}
       return true;
     } catch (e) { setSync(S.online ? 'retry' : 'offline', '스냅샷을 보내지 못했어요: ' + e.message); return false; }
     finally { snapBusy = false; }
+  }
+  // ---------- 푸시 알림 (ntfy 앱) ----------
+  // 이 폰에서 바꾼 숫자 때문에 '없음·마지막·부족'이 더 나빠지면, 잠시(연타가 끝날 때까지) 기다렸다가 알림 주제로 평문 알림을 보낸다.
+  const SEVERITY = { low: 1, last: 2, none: 3 };
+  const sev = st => SEVERITY[st.key] || 0;
+  const alertWait = new Map();   // id → { before, timer }
+  const alertSent = new Map();   // id → { key, at } 같은 상태로 10분 안에 또 보내지 않음
+  function queueAlert(it, before) {
+    if (S.cfg.alertsOff) return;
+    const w = alertWait.get(it.id) || { before };
+    clearTimeout(w.timer);
+    w.timer = setTimeout(() => {
+      alertWait.delete(it.id);
+      const cur = S.items.get(it.id); if (!cur || isDeleted(cur)) return;
+      const st = statusOf(cur); if (sev(st) <= sev(w.before)) return;
+      const last = alertSent.get(cur.id); if (last && last.key === st.key && now() - last.at < 10 * 60 * 1000) return;
+      alertSent.set(cur.id, { key: st.key, at: now() });
+      sendAlert(`${cur.name} ${st.label}`, [`${secOf(cur)} · ${grpOf(cur)}`, `안뜯은거 ${fmtV(num(cur.unopened))} / 뜯은거 ${fmtV(num(cur.opened))}`,
+        `${S.cfg.name || '누군가'} · ${new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`].join('\n'), st.key === 'none' ? 4 : 3);
+    }, ALERT_DELAY_MS);
+    alertWait.set(it.id, w);
+  }
+  async function sendAlert(title, body, priority = 3) {
+    if (!S.alertTopic) return false;
+    const q = new URLSearchParams({ title: '재고 알림: ' + title, priority: String(priority), tags: priority >= 4 ? 'rotating_light' : 'warning', click: APP_URL });
+    try { const r = await fetch(`${NTFY}/${S.alertTopic}?${q}`, { method: 'POST', body }); if (r.ok) bumpDaily(); return r.ok; } catch (e) { return false; }
   }
   async function requestSnapshot() { try { await publish({ k: 'need' }); } catch (e) { /* 다음에 */ } }
 
@@ -907,7 +1022,7 @@ main{min-width:0}
   }
   async function connect() {
     if (!S.cfg.code) return;
-    try { S.key = await deriveKey(S.cfg.code); S.topic = 'cdm-' + (await sha256hex('topic|' + S.cfg.code)).slice(0, 32); }
+    try { S.key = await deriveKey(S.cfg.code); S.topic = 'cdm-' + (await sha256hex('topic|' + S.cfg.code)).slice(0, 32); S.alertTopic = 'cdm-alert-' + (await sha256hex('alert|' + S.cfg.code)).slice(0, 20); }
     catch (e) { setSync('error', '이 브라우저에서는 암호화를 쓸 수 없어요 (https 필요)'); return; }
     setSync('connecting');
     await pollCatchUp();
@@ -1089,6 +1204,11 @@ main{min-width:0}
     if (groups.length === 0) lines.push('부족한 항목이 없어요.');
     return lines.join('\n');
   }
+  function recentChanges(n) {
+    const out = [], since = now() - 7 * 86400 * 1000;
+    for (const it of S.items.values()) for (const e of it.h || []) if (e[1] >= since && histShown(e)) out.push({ it, e });
+    return out.sort((a, b) => b.e[1] - a.e[1]).slice(0, n);
+  }
   function renderTable() {
     const root = $('#table');
     const q = S.q.trim().toLowerCase();
@@ -1098,6 +1218,8 @@ main{min-width:0}
       html += '<ul class="orders">' + groupsOf(ol, true).flatMap(g => g.items.map(it => { const st = statusOf(it); return `<li data-id="${esc(it.id)}"><button type="button" class="mini" aria-label="사진 크게 보기">${picHTML(it)}</button><span class="txt"><span class="nm">${esc(it.name)}</span><span class="sec">${esc(g.section)} · ${esc(g.group)}</span></span><span class="st s-${st.key}">${st.label} <span>${fmtNum(num(it.unopened)) || '–'}/${fmtNum(num(it.opened)) || '–'}</span></span></li>`; })).join('') + '</ul>';
     } else html += '<div class="orders"><div class="ok">부족한 항목이 없어요.</div></div>';
     html += '</div>';
+    const feed = recentChanges(15);
+    if (feed.length) html += `<div class="card"><div class="hd"><h2>최근 변경<span class="sub">최근 7일</span></h2></div><ul class="feed">${feed.map(({ it, e }) => `<li data-id="${esc(it.id)}"><span class="when">${esc(ago(e[1]))}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt"><b>${esc(it.name)}</b> ${esc(histText(e))}</span></li>`).join('')}</ul></div>`;
     const secs = sectionsList();
     const all = liveItems().filter(d => matches(d, q) && (!S.low || LOW_KEYS.has(statusOf(d).key)));
     for (const sec of secs) {
@@ -1120,6 +1242,7 @@ main{min-width:0}
     if (ev.target.closest('#copyOrdersBtn')) { copyText(orderText(), '주문 목록을 복사했어요'); return; }
     const row = ev.target.closest('[data-id]'); if (!row) return;
     if (ev.target.closest('.mini')) { openViewer(row.dataset.id); return; }
+    const it = S.items.get(row.dataset.id); if (!it || isDeleted(it)) return;
     jumpTo(row.dataset.id);
   });
   function jumpTo(id) {
@@ -1233,7 +1356,12 @@ main{min-width:0}
   function openSettings() {
     $('#codeBox').textContent = SHARED ? APP_URL : S.cfg.code; $('#codeBox').classList.toggle('url', !!SHARED);
     $('#st-link-h').textContent = SHARED ? '같이 보기' : '사장님 폰과 연결'; $('#st-code-f').hidden = !!SHARED;
+    $('#shareBtn').textContent = SHARED ? '주소 보내기' : '연결 링크 보내기'; $('#copyLinkBtn').textContent = SHARED ? '주소 복사' : '링크 복사';
     $('#st-name').value = S.cfg.name; $('#st-code').value = '';
+    const host = (() => { try { return new URL(NTFY).host; } catch (e) { return 'ntfy.sh'; } })();
+    $('#alertTopic').textContent = S.alertTopic || '연결 중…';
+    $('#alertSub').href = S.alertTopic ? `ntfy://${host}/${S.alertTopic}?display=${encodeURIComponent('카페드멍 재고')}` : '#';
+    $('#alertSend').checked = !S.cfg.alertsOff;
     const ids = Object.keys(S.peers);
     const peerText = ids.length ? '연결된 폰: ' + ids.map(id => `${S.peers[id].name || '이름 없음'} (${ago(S.peers[id].seen)})`).join(', ') : '';
     $('#peersLine').textContent = SHARED ? '이 주소를 열면 누구나 코드 없이 같은 화면을 봐요.' + (peerText ? ' ' + peerText : '')
@@ -1250,6 +1378,9 @@ main{min-width:0}
     closeSheets(); render(); toast('저장했어요');
   });
   $('#shareBtn').addEventListener('click', shareLink);
+  $('#alertCopy').addEventListener('click', () => { if (S.alertTopic) copyText(S.alertTopic, '주제 이름을 복사했어요. ntfy 앱에서 + 를 눌러 붙여넣으세요.'); });
+  $('#alertTest').addEventListener('click', async () => { const ok = await sendAlert('테스트', `카페드멍 재고 알림이 이 폰에 잘 와요. (${S.cfg.name || '누군가'}가 보냄)`, 3); toast(ok ? '테스트 알림을 보냈어요' : '알림을 보내지 못했어요. 인터넷을 확인해 주세요'); });
+  $('#alertSend').addEventListener('change', ev => { S.cfg.alertsOff = !ev.target.checked; saveCfg(); toast(ev.target.checked ? '이 폰에서 알림을 보내요' : '이 폰에서는 알림을 보내지 않아요'); });
   $('#pairShareBtn').addEventListener('click', shareLink);
   $('#pairClose').addEventListener('click', () => { S.cfg.hints.pair = true; saveCfg(); $('#pairHint').hidden = true; });
   $('#nh-save').addEventListener('click', () => { const n = $('#nh-name').value.trim(); if (!n) { $('#nh-name').focus(); return; } S.cfg.name = n; saveCfg(); $('#nameHint').hidden = true; render(); toast('이름을 저장했어요'); });
@@ -1275,6 +1406,8 @@ main{min-width:0}
     for (const [id, s] of seed) {
       if (isDeleted(s)) continue;   // 배치 정리로 다른 항목에 합쳐진 것
       const it = S.items.get(id) || s; const wasDel = isDeleted(it);
+      if (it.unopened !== s.unopened) addHist(it, 'u', it.unopened, s.unopened);
+      if (it.opened !== s.opened) addHist(it, 'o', it.opened, s.opened);
       it.unopened = s.unopened; it.opened = s.opened; it.t.u = ts; it.t.o = ts; it.b.u = S.cfg.name; it.b.o = S.cfg.name;
       if (wasDel) { it.section = s.section; it.group = s.group; it.order = s.order; it.t.m = ts; it.b.m = S.cfg.name; }   // 지웠던 항목은 새 배치 자리로 되살린다
       S.items.set(id, it); S.dirty.add(id);
@@ -1300,13 +1433,26 @@ main{min-width:0}
     ed.groups.innerHTML = Array.from(seen).map(g => `<option value="${esc(g)}"></option>`).join('');
   }
   ed.sec.addEventListener('input', fillLists);
+  function fillHist() {
+    const id = S.editing && S.editing.id; const it = id ? S.items.get(id) : null;
+    const rows = it ? (it.h || []).filter(histShown).slice().reverse() : [];
+    $('#ed-hist').hidden = !rows.length;
+    $('#ed-hist-list').innerHTML = rows.map(e => `<li><span class="when">${esc(ago(e[1]))}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt">${esc(histText(e))}</span>${isCountF(e[2]) ? `<button type="button" class="undo" data-f="${e[2]}" data-v="${e[3] === null ? '' : esc(e[3])}">되돌리기 (${esc(fmtV(e[3]))})</button>` : ''}</li>`).join('');
+  }
+  $('#ed-hist-list').addEventListener('click', ev => {
+    const b = ev.target.closest('button.undo'); if (!b) return;
+    const id = S.editing && S.editing.id; const it = id && S.items.get(id); if (!it || !canEdit()) return;
+    const v = b.dataset.v === '' ? null : Number(b.dataset.v), f = b.dataset.f;
+    editCounts(id, { [f === 'u' ? 'unopened' : 'opened']: v }); fillHist();
+    toast(`되돌렸어요: ${it.name} ${f === 'u' ? '안뜯은거' : '뜯은거'} ${fmtV(v)}`);
+  });
   function openEditor(id, section) {
     const it = id ? S.items.get(id) : null;
     S.editing = { id: id || null };
     ed.title.textContent = it ? '항목 편집' : '항목 추가';
     ed.name.value = it ? String(it.name || '') : ''; ed.sec.value = it ? secOf(it) : (section || S.cfg.tab || ''); fillLists();
     ed.group.value = it ? grpOf(it) : ''; ed.note.value = it ? String(it.note || '') : ''; ed.min.value = it ? fmtNum(num(it.min)) : '';
-    ed.img.value = it ? String(it.img || '') : ''; updateImgPreview();
+    ed.img.value = it ? String(it.img || '') : ''; updateImgPreview(); fillHist();
     ed.del.hidden = !it; ed.confirm.hidden = true;
     openSheet(sheets.editor); setTimeout(() => ed.name.focus(), 50);
   }
@@ -1339,18 +1485,28 @@ main{min-width:0}
     if (!canEdit()) return;
     const it = S.items.get(id); if (!it) return; const cur = num(it[key]);
     const next = btn.classList.contains('inc') ? (cur === null ? 1 : cur + 1) : (cur === null ? 0 : Math.max(0, cur - 1));
-    editCounts(id, { [key]: next });
+    editCounts(id, { [key]: next }); countToast(id, f);
   });
   list.addEventListener('change', ev => {
     const inp = ev.target; if (!(inp instanceof HTMLInputElement) || !inp.dataset.f) return;
     const li = inp.closest('.item'); if (!li) return; const id = li.dataset.id, key = inp.dataset.f === 'u' ? 'unopened' : 'opened';
     if (!canEdit()) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; return; }
     const raw = inp.value.trim().replace(/,/g, '');
-    if (raw === '') { editCounts(id, { [key]: null }); return; }
+    if (raw === '') { editCounts(id, { [key]: null }); countToast(id, inp.dataset.f); return; }
     const n = Number(raw);
     if (!Number.isFinite(n) || n < 0) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; toast('숫자만 적어주세요'); return; }
-    editCounts(id, { [key]: Math.round(n * 10) / 10 });
+    editCounts(id, { [key]: Math.round(n * 10) / 10 }); countToast(id, inp.dataset.f);
   });
+  // 숫자를 바꾸면 "전 → 후 · 되돌리기"를 잠깐 보여준다. 되돌리기는 1분 안에 연달아 바꾼 것을 한꺼번에 되돌린다.
+  function countToast(id, f) {
+    const it = S.items.get(id); const e = it && myRecent(it, f); if (!e || !histShown(e)) return;
+    toast(`${it.name} ${f === 'u' ? '안뜯은거' : '뜯은거'} ${fmtV(e[3])} → ${fmtV(e[4])}`, 4500, { label: '되돌리기', fn: () => undoRecent(id, f) });
+  }
+  function undoRecent(id, f) {
+    const it = S.items.get(id); const e = it && myRecent(it, f); if (!e || !canEdit()) return;
+    editCounts(id, { [f === 'u' ? 'unopened' : 'opened']: e[3] });
+    toast(`되돌렸어요: ${it.name} ${f === 'u' ? '안뜯은거' : '뜯은거'} ${fmtV(e[3])}`);
+  }
   list.addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target instanceof HTMLInputElement) ev.target.blur(); });
   list.addEventListener('focusin', ev => { if (ev.target instanceof HTMLInputElement) ev.target.select(); });
   $('#tabs').addEventListener('click', ev => { const b = ev.target.closest('button[data-sec]'); if (!b) return; S.cfg.tab = b.dataset.sec; saveCfg(); render(); window.scrollTo({ top: 0 }); });
