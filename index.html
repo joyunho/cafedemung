@@ -126,12 +126,35 @@ main{min-width:0}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .stepper input::placeholder{color:var(--muted);font-weight:400}
 .stepper input:focus{outline:none;box-shadow:inset 0 0 0 2px var(--focus)}
+/* 폰: 기본은 촘촘하게(사진 작게, 이름·수정 한 줄, 안뜯은거·뜯은거를 나란히, 칸 이름은 분류마다 한 번).
+   설정의 '버튼 크게 보기'(body.roomy)를 켜면 예전처럼 줄마다 칸 이름과 큰 버튼. */
+.colhead{display:none}
+.colhead + .item{border-top:0}
 @media (max-width:480px){
-  .item{grid-template-columns:56px minmax(0,1fr);grid-template-areas:"thumb head" "counters counters" "note note";gap:6px 10px}
-  .counters{justify-content:space-between}
-  .counter{flex:1}
-  .stepper{width:100%;justify-content:center}
-  .stepper input{flex:1;max-width:none}
+  .wrap{padding-inline:12px}
+  .bar{margin-inline:-12px;padding-inline:12px}
+  body.roomy .item{grid-template-columns:56px minmax(0,1fr);grid-template-areas:"thumb head" "counters counters" "note note";gap:6px 10px}
+  body.roomy .counters{justify-content:space-between}
+  body.roomy .counter{flex:1}
+  body.roomy .stepper{width:100%;justify-content:center}
+  body.roomy .stepper input{flex:1;max-width:none}
+  body:not(.roomy) .group{margin-top:12px}
+  body:not(.roomy) .group h2{padding-bottom:4px}
+  body:not(.roomy) .colhead{display:grid;grid-template-columns:40px 1fr 1fr;gap:0 10px;padding:4px 10px 3px;font-size:11.5px;color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--line)}
+  body:not(.roomy) .colhead span{text-align:center}
+  body:not(.roomy) .item{grid-template-columns:40px minmax(0,1fr);grid-template-areas:"thumb head" "thumb counters" "thumb note";gap:3px 10px;padding:6px 10px 8px;align-items:start}
+  body:not(.roomy) .thumb{width:40px;height:40px;border-radius:9px;margin-top:3px}
+  body:not(.roomy) .thumb .ph{font-size:17px}
+  body:not(.roomy) .head{gap:0 6px;align-items:baseline}
+  body:not(.roomy) .name{padding:2px 0;font-size:15px;line-height:1.3}
+  body:not(.roomy) .meta{flex-basis:auto;margin-left:auto;font-size:11.5px;white-space:nowrap}
+  body:not(.roomy) .counters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;min-width:0}
+  body:not(.roomy) .counter{min-width:0}
+  body:not(.roomy) .counter .lbl{display:none}
+  body:not(.roomy) .stepper{width:100%;min-width:0}
+  body:not(.roomy) .stepper button{width:40px;height:38px;flex:none}
+  body:not(.roomy) .stepper input{flex:1 1 0;min-width:0;width:0;height:38px}
+  body:not(.roomy) .note{font-size:12px}
 }
 .addrow{margin-top:14px;display:flex;justify-content:center}
 .addrow button{height:44px;padding:0 18px;border:1px dashed var(--line);border-radius:999px;background:transparent;color:var(--accent);font-weight:500}
@@ -383,6 +406,8 @@ main{min-width:0}
     <label class="field"><span>이름</span><input id="st-name" maxlength="20"></label>
     <label class="field" id="st-code-f"><span>다른 가게 코드로 바꾸기</span><input id="st-code" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX"></label>
   </div>
+  <h4>화면</h4>
+  <label class="check"><input type="checkbox" id="roomy"> 버튼 크게 보기 (한 화면에 보이는 항목은 줄어요)</label>
   <h4>알림 (사장님 폰)</h4>
   <p class="hint">재고가 <b>없음·마지막·부족</b>이 되면 ntfy 앱을 깐 폰으로 푸시 알림이 가요. 처음 한 번만 설정하면 돼요.</p>
   <p class="hint">① ntfy 앱 설치: <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">안드로이드</a> · <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">아이폰</a><br>
@@ -1329,7 +1354,7 @@ main{min-width:0}
       const frag = document.createDocumentFragment();
       for (const g of groups) {
         const sec = document.createElement('section'); sec.className = 'group';
-        sec.innerHTML = `<h2>${groupHeadHTML(g)}</h2><ul></ul>`;
+        sec.innerHTML = `<h2>${groupHeadHTML(g)}</h2><ul><li class="colhead" aria-hidden="true"><span></span><span>안뜯은거</span><span>뜯은거</span></li></ul>`;
         const ul = sec.querySelector('ul');
         for (const it of g.items) { const li = buildRow(it); fillRow(li, it); ul.appendChild(li); }
         frag.appendChild(sec);
@@ -1660,7 +1685,7 @@ main{min-width:0}
     const host = (() => { try { return new URL(NTFY).host; } catch (e) { return 'ntfy.sh'; } })();
     $('#alertTopic').textContent = S.alertTopic || '연결 중…';
     $('#alertSub').href = S.alertTopic ? `ntfy://${host}/${S.alertTopic}?display=${encodeURIComponent('카페드명 재고')}` : '#';
-    $('#alertSend').checked = !S.cfg.alertsOff;
+    $('#alertSend').checked = !S.cfg.alertsOff; $('#roomy').checked = !!S.cfg.roomy;
     const ids = Object.keys(S.peers);
     const peerText = ids.length ? '연결된 폰: ' + ids.map(id => `${S.peers[id].name || '이름 없음'} (${ago(S.peers[id].seen)})`).join(', ') : '';
     $('#peersLine').textContent = SHARED ? '이 주소를 열면 누구나 코드 없이 같은 화면을 봐요.' + (peerText ? ' ' + peerText : '')
@@ -1679,6 +1704,7 @@ main{min-width:0}
   $('#shareBtn').addEventListener('click', shareLink);
   $('#alertCopy').addEventListener('click', () => { if (S.alertTopic) copyText(S.alertTopic, '주제 이름을 복사했어요. ntfy 앱에서 + 를 눌러 붙여넣으세요.'); });
   $('#alertTest').addEventListener('click', async () => { const ok = await sendAlert('테스트', `카페드명 재고 알림이 이 폰에 잘 와요. (${S.cfg.name || '누군가'}가 보냄)`, 3); toast(ok ? '테스트 알림을 보냈어요' : '알림을 보내지 못했어요. 인터넷을 확인해 주세요'); });
+  $('#roomy').addEventListener('change', ev => { S.cfg.roomy = ev.target.checked; saveCfg(); document.body.classList.toggle('roomy', S.cfg.roomy); });
   $('#alertSend').addEventListener('change', ev => { S.cfg.alertsOff = !ev.target.checked; saveCfg(); toast(ev.target.checked ? '이 폰에서 알림을 보내요' : '이 폰에서는 알림을 보내지 않아요'); });
   $('#pairShareBtn').addEventListener('click', shareLink);
   $('#pairClose').addEventListener('click', () => { S.cfg.hints.pair = true; saveCfg(); $('#pairHint').hidden = true; });
@@ -1843,6 +1869,7 @@ main{min-width:0}
   // ---------- 시작 ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
   loadStore();
+  document.body.classList.toggle('roomy', !!S.cfg.roomy);   // 설정: 버튼 크게 보기
   migrateLayout();
   loadImages();
   if (!S.cfg.deviceId) { S.cfg.deviceId = newId('d'); saveCfg(); }
