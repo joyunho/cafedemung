@@ -150,7 +150,9 @@ main{min-width:0}
   body:not(.roomy) .group{margin-top:12px}
   body:not(.roomy) .group h2{padding-bottom:4px}
   body:not(.roomy) .colhead{display:grid;grid-template-columns:40px 1fr 1fr;gap:0 16px;padding:4px 10px 3px;font-size:11.5px;color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--line);position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--bar-h,98px));z-index:2}
-  body:has(.stepper input:focus) .colhead{top:calc(env(safe-area-inset-top,0px) + var(--bar-h,98px) - var(--tools-h,56px))}
+  body.typing .colhead{top:calc(env(safe-area-inset-top,0px) + var(--bar-h,98px) - var(--tools-h,56px))}
+  body.typing .bar{top:calc(env(safe-area-inset-top,0px) - var(--tools-h,56px))}
+  html.typing{scroll-padding-top:calc(var(--bar-h,98px) - var(--tools-h,56px) + 32px + env(safe-area-inset-top,0px))}
   body:not(.roomy) .colhead span{text-align:center}
   body:not(.roomy) .item{grid-template-columns:40px minmax(0,1fr);grid-template-areas:"thumb head" "thumb counters" "thumb note";gap:3px 10px;padding:6px 10px 8px;align-items:start}
   body:not(.roomy) .thumb{width:40px;height:40px;border-radius:9px;margin-top:3px}
@@ -175,10 +177,8 @@ main{min-width:0}
   .tabs button .n{display:none}
 }
 @media (max-width:300px){body:not(.roomy) .stepper button{width:34px}}
-/* 숫자를 치는 동안(키보드가 올라와 있을 때)은 위 도구 줄을 밀어 올리고 구역 탭만 남긴다(높이는 그대로라 화면이 튀지 않음) */
-body:has(.stepper input:focus) .bar{top:calc(env(safe-area-inset-top,0px) - var(--tools-h,56px))}
+/* 폰에서 숫자를 치는 동안(body.typing)은 위 도구 줄을 밀어 올리고 구역 탭만 남긴다(높이는 그대로라 화면이 튀지 않음) — 위 480px 규칙 */
 html{scroll-padding-top:calc(var(--bar-h,98px) + 32px + env(safe-area-inset-top,0px))}
-html:has(.stepper input:focus){scroll-padding-top:calc(var(--bar-h,98px) - var(--tools-h,56px) + 32px + env(safe-area-inset-top,0px))}
 /* 빈 칸은 '–' 대신 빈 자리로(− 버튼과 헷갈리지 않게) */
 .stepper input:placeholder-shown{background:var(--surface-2)}
 .addrow{margin-top:14px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
@@ -213,7 +213,7 @@ html:has(.stepper input:focus){scroll-padding-top:calc(var(--bar-h,98px) - var(-
 /* 한눈에: 구역 바로가기 */
 .secjump{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .secjump .chip{height:36px;font-size:13.5px}
-.tsec{scroll-margin-top:calc(var(--bar-h,56px) + 6px + env(safe-area-inset-top,0px))}
+
 .tsec{margin-top:18px}
 .tsec h2{font-size:14px;font-weight:600;color:var(--muted);padding:0 4px 6px;display:flex;gap:8px;align-items:baseline}
 .tsec h2 .n{font-weight:400;font-variant-numeric:tabular-nums}
@@ -244,10 +244,7 @@ html:has(.stepper input:focus){scroll-padding-top:calc(var(--bar-h,98px) - var(-
   .grid th.n,.grid td.n{width:48px}
   .grid td .sub .when{display:inline}
   .grid td .nm{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all;overflow-wrap:anywhere;line-height:1.3}
-  .feed li{flex-direction:column;align-items:flex-start;gap:1px;min-height:44px}
-  .feed .when{order:2;min-width:0}
 }
-.feed .chg{white-space:nowrap}
 .grid th.p,.grid td.p{width:46px;padding-right:0}
 .grid td .tag{margin-left:0;font-size:10.5px;padding:1px 6px}
 .grid td.n.s-none{color:var(--crit)}
@@ -266,6 +263,7 @@ body.sheet-open{overflow:hidden}
 /* 시트 아래 버튼 줄: 늘 보이게 아래에 붙인다 */
 .sheet-foot{position:sticky;bottom:0;z-index:1;background:var(--surface);margin:12px -16px 0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
 .sheet-foot .actions{margin-top:0}
+.sheet{scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .sheet h3{font-size:17px;margin-bottom:12px}
 .sheet h4{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.02em;margin:16px 0 8px}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
@@ -325,6 +323,9 @@ body.sheet-open{overflow:hidden}
 .pg .pe{color:#666;padding:8px 6px}
 .pg .pf{color:#999;font-size:10px;line-height:14px;height:14px;text-align:right;margin-top:6px}
 @media print{body.pdfprint{background:#fff}@page{size:A4;margin:0}body.pdfprint>*:not(#pdfStage){display:none!important}body.pdfprint #pdfStage{position:static;left:auto}.pg{break-after:page}}
+/* 숫자를 바꾼 줄 안에 '전 → 후 · 되돌리기'(다른 줄·위 도구 줄 버튼을 가리지 않음) */
+.undo{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.undo .undo-btn{height:30px;padding:0 10px;border:1px solid var(--accent);border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:12.5px}
 .toast .act{pointer-events:auto;margin-left:6px;min-height:36px;padding:0 10px;border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;white-space:nowrap}
 .hist,.feed{list-style:none;margin:0;padding:0}
 .hist li,.feed li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
@@ -334,6 +335,8 @@ body.sheet-open{overflow:hidden}
 .hist .undo{flex:none;height:30px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12.5px;color:var(--accent)}
 .feed{padding:4px 14px 8px}
 .feed li{cursor:pointer}
+.feed .chg.cnt{white-space:nowrap}
+@media (max-width:480px){#table .feed li{flex-direction:column;align-items:flex-start;gap:1px;min-height:44px}#table .feed .when{order:2;min-width:0}}
 .check{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0 4px}
 .check input{width:18px;height:18px}
 .topic{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:2px 6px;user-select:all;overflow-wrap:anywhere}
@@ -414,7 +417,7 @@ body.sheet-open{overflow:hidden}
 <div class="scrim" id="scrim" hidden></div>
 
 <form class="sheet" id="editor" hidden autocomplete="off">
-  <h3 id="ed-title">항목 편집</h3>
+  <h3 id="ed-title" tabindex="-1">항목 편집</h3>
   <label class="field"><span>이름</span><input id="ed-name" enterkeyhint="next" required maxlength="60" placeholder="예: 바닐라시럽"></label>
   <div class="row2">
     <label class="field"><span>구역</span><input id="ed-sec" enterkeyhint="next" list="ed-secs" maxlength="30" placeholder="예: 윤호 정리"><datalist id="ed-secs"></datalist></label>
@@ -1406,6 +1409,12 @@ body.sheet-open{overflow:hidden}
     if (th.dataset.k !== pk) { th.dataset.k = pk; th.innerHTML = picHTML(it); }
     const tag = li.querySelector('.tag'); tag.hidden = !st.label; tag.textContent = st.label; tag.className = 'tag' + (st.key ? ' s-' + st.key : '');
     const meta = li.querySelector('.meta'); const lt = editedAt(it);
+    const off = S.undoOffer && S.undoOffer.id === it.id ? S.undoOffer : null; let ub = li.querySelector('.undo');
+    if (off) {
+      if (!ub) { ub = document.createElement('span'); ub.className = 'undo'; li.querySelector('.head').appendChild(ub); }
+      if (ub.dataset.k !== off.hid + off.text) { ub.dataset.k = off.hid + off.text; ub.innerHTML = `<span class="chg">${esc(off.text)}</span><button type="button" class="undo-btn" data-h="${esc(off.hid)}" aria-label="${esc(it.name)} ${esc(off.text)} 되돌리기">되돌리기</button>`; }
+    } else if (ub) ub.remove();
+    meta.hidden = !!off;
     const metaText = lt ? fmtWhen(lt) + (lastBy(it) ? ' · ' + lastBy(it) : '') + (S.dirty.has(it.id) ? ' · 보내는 중' : '') : '시트에서 가져옴';
     if (meta.textContent !== metaText) meta.textContent = metaText;
     for (const [f, key] of [['u', 'unopened'], ['o', 'opened']]) { const inp = li.querySelector(`input[data-f="${f}"]`); const v = fmtNum(num(it[key])); if (document.activeElement !== inp && inp.value !== v) inp.value = v; }
@@ -1478,7 +1487,7 @@ body.sheet-open{overflow:hidden}
     } else html += '<div class="orders"><div class="ok">부족한 항목이 없어요.</div></div>';
     html += '</div>';
     const feed = recentChanges(15);
-    if (feed.length) html += `<div class="card"><div class="hd"><h2>최근 변경<span class="sub">최근 7일</span></h2></div><ul class="feed">${feed.map(({ it, e }) => `<li data-id="${esc(it.id)}"><span class="when">${tsSpan(e[1])}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt"><b>${esc(it.name)}</b> <span class="chg">${esc(histText(e))}</span></span></li>`).join('')}</ul></div>`;
+    if (feed.length) html += `<div class="card"><div class="hd"><h2>최근 변경<span class="sub">최근 7일</span></h2></div><ul class="feed">${feed.map(({ it, e }) => `<li data-id="${esc(it.id)}"><span class="when">${tsSpan(e[1])}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt"><b>${esc(it.name)}</b> <span class="chg${isCountF(e[2]) ? ' cnt' : ''}">${esc(histText(e))}</span></span></li>`).join('')}</ul></div>`;
     const secs = sectionsList();
     const all = liveItems().filter(d => matches(d, q) && (!S.low || LOW_KEYS.has(statusOf(d).key)));
     const withItems = secs.filter(sec => all.some(d => secOf(d) === sec));
@@ -1486,7 +1495,7 @@ body.sheet-open{overflow:hidden}
     for (const sec of secs) {
       const items = all.filter(d => secOf(d) === sec); if (!items.length) continue;
       const groups = groupsOf(items, false);
-      html += `<section class="tsec" data-sec="${esc(sec)}"><h2>${esc(sec)} <span class="n">${items.length}</span></h2><table class="grid"><thead><tr><th class="p"><span class="sr">사진</span></th><th>항목</th><th class="n">안뜯</th><th class="n">뜯</th><th class="m">수정</th></tr></thead><tbody>`;
+      html += `<section class="tsec" data-sec="${esc(sec)}"><h2 tabindex="-1">${esc(sec)} <span class="n">${items.length}</span></h2><table class="grid"><thead><tr><th class="p"><span class="sr">사진</span></th><th>항목</th><th class="n">안뜯</th><th class="n">뜯</th><th class="m">수정</th></tr></thead><tbody>`;
       for (const g of groups) {
         html += `<tr class="grp"><td colspan="4">${esc(g.group)}</td><td class="m"></td></tr>`;
         for (const it of g.items) {
@@ -1503,16 +1512,22 @@ body.sheet-open{overflow:hidden}
     if (ev.target.closest('#copyOrdersBtn')) { copyText(orderText(), '주문 목록을 복사했어요'); return; }
     if (ev.target.closest('#pdfBtn')) { openPdf(); return; }
     const j = ev.target.closest('[data-jump]');
-    if (j) { const t = $('#table').querySelector(`.tsec[data-sec="${CSS.escape(j.dataset.jump)}"]`); if (t) t.scrollIntoView({ block: 'start' }); return; }
+    if (j) {
+      const t = $('#table').querySelector(`.tsec[data-sec="${CSS.escape(j.dataset.jump)}"]`); if (!t) return;
+      const safe = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
+      window.scrollTo(0, Math.max(0, Math.round(t.getBoundingClientRect().top + scrollY - $('#app .bar').offsetHeight - 6 - safe)));
+      const h = t.querySelector('h2'); if (h) h.focus({ preventScroll: true });
+      return;
+    }
     const row = ev.target.closest('[data-id]'); if (!row) return;
     if (ev.target.closest('.mini, td.p')) { openViewer(row.dataset.id); return; }
     const it = S.items.get(row.dataset.id); if (!it || isDeleted(it)) return;
-    jumpTo(row.dataset.id);
+    jumpTo(row.dataset.id, !!ev.target.closest('tr.row'));
   });
-  function jumpTo(id) {
+  function jumpTo(id, fromGrid = false) {
     const it = S.items.get(id); if (!it) return;
-    if (S.cfg.view === 'table') S.tableReturn = { y: scrollY, id, q: S.q, low: S.low };   // 한눈에로 돌아오면 이 자리로
-    S.cfg.view = 'list'; S.cfg.tab = secOf(it); S.q = ''; $('#q').value = ''; S.low = false; $('#lowBtn').setAttribute('aria-pressed', 'false'); setSearching(false); saveCfg();
+    if (S.cfg.view === 'table') S.tableReturn = { y: scrollY, id: fromGrid ? id : null, q: S.q, low: S.low };   // 한눈에로 돌아오면 이 자리로
+    S.cfg.view = 'list'; S.cfg.tab = secOf(it); S.q = ''; $('#q').value = ''; S.low = false; $('#lowBtn').setAttribute('aria-pressed', 'false'); setSearching(false); S.searchHit = null; saveCfg();
     render();
     const li = $('#list').querySelector(`.item[data-id="${CSS.escape(id)}"]`);
     if (li) { li.scrollIntoView({ block: 'center' }); li.classList.add('flash'); setTimeout(() => li.classList.remove('flash'), 1700); }
@@ -1603,6 +1618,7 @@ body.sheet-open{overflow:hidden}
     if (backPending) { backPending = false; if (pushAfterPop) { pushAfterPop = false; if (!sheets.scrim.hidden) pushSheetState(); } return; }
     if (sheetHist) { sheetHist = false; closeSheets(true); }
   });
+  if (history.state && history.state.sheet) { backPending = true; try { history.back(); } catch (e) { backPending = false; } }
   function openSheet(el) { for (const k of ['editor', 'settings', 'viewer', 'pdf']) sheets[k].hidden = sheets[k] !== el; sheets.scrim.hidden = false; document.body.classList.add('sheet-open'); pushSheetState(); }
   function closeSheets(fromPop) {
     document.body.classList.remove('sheet-open'); pushAfterPop = false;
@@ -1868,11 +1884,11 @@ body.sheet-open{overflow:hidden}
     ed.group.value = it ? grpOf(it) : ''; ed.note.value = it ? String(it.note || '') : ''; ed.min.value = it ? fmtNum(num(it.min)) : '';
     ed.img.value = it ? String(it.img || '') : ''; updateImgPreview(); fillHist();
     ed.del.hidden = !it; ed.confirm.hidden = true;
-    openSheet(sheets.editor); if (!it) setTimeout(() => ed.name.focus(), 50);   // 새 항목만 바로 이름 칸에(있는 항목은 기록만 보러 열 때가 많음)
+    openSheet(sheets.editor); if (!it) setTimeout(() => ed.name.focus(), 50); else $('#ed-title').focus({ preventScroll: true });   // 새 항목만 바로 이름 칸에(있는 항목은 기록만 보러 열 때가 많음)
   }
   $('#ed-cancel').addEventListener('click', closeSheets);
   sheets.editor.addEventListener('keydown', ev => {   // Enter: 저장하지 않고 다음 칸으로(마지막 칸이면 키보드만 내림)
-    if (ev.key !== 'Enter' || !(ev.target instanceof HTMLInputElement)) return;
+    if (ev.key !== 'Enter' || ev.isComposing || ev.keyCode === 229 || !(ev.target instanceof HTMLInputElement)) return;
     ev.preventDefault();
     const ins = $$('input', sheets.editor).filter(i => i.offsetParent !== null); const i = ins.indexOf(ev.target);
     if (i >= 0 && i < ins.length - 1) ins[i + 1].focus(); else ev.target.blur();
@@ -1901,13 +1917,14 @@ body.sheet-open{overflow:hidden}
     const li = btn.closest('.item'); if (!li) return; const id = li.dataset.id;
     if (btn.classList.contains('name')) { openEditor(id); return; }
     if (btn.classList.contains('thumb')) { openViewer(id); return; }
+    if (btn.classList.contains('undo-btn')) { const h = btn.dataset.h; S.undoOffer = null; clearTimeout(undoTimer); undoEntry(id, h); return; }
     const f = btn.dataset.f; if (!f) return; const key = f === 'u' ? 'unopened' : 'opened';
     if (!canEdit()) return;
     const it = S.items.get(id); if (!it) return; const cur = num(it[key]);
     const next = btn.classList.contains('inc') ? (cur === null ? 1 : cur + 1) : (cur === null ? 0 : Math.max(0, cur - 1));
     if (next === cur) return;   // 0에서 − 처럼 바뀌는 게 없으면 그대로
     if (S.q.trim()) S.searchHit = id;
-    editCounts(id, { [key]: next }); countToast(id, f);
+    editCounts(id, { [key]: next }); offerUndo(id, f);
   });
   list.addEventListener('change', ev => {
     const inp = ev.target; if (!(inp instanceof HTMLInputElement) || !inp.dataset.f) return;
@@ -1915,22 +1932,28 @@ body.sheet-open{overflow:hidden}
     if (!canEdit()) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; return; }
     const raw = inp.value.trim().replace(/,/g, '');
     const it0 = S.items.get(id); const cur = it0 ? num(it0[key]) : null;
-    if (raw === '') { if (cur !== null) { editCounts(id, { [key]: null }); countToast(id, inp.dataset.f); } return; }
+    if (raw === '') { if (cur !== null) { editCounts(id, { [key]: null }); offerUndo(id, inp.dataset.f); } return; }
     const n = Number(raw);
     if (!Number.isFinite(n) || n < 0) { inp.value = fmtNum(cur); toast('숫자만 적어주세요'); return; }
     const v = Math.round(n * 10) / 10;
     if (v === cur) { inp.value = fmtNum(cur); return; }
     if (S.q.trim()) S.searchHit = id;
-    editCounts(id, { [key]: v }); countToast(id, inp.dataset.f);
+    editCounts(id, { [key]: v }); offerUndo(id, inp.dataset.f);
   });
   // 숫자를 바꾸면 "전 → 후 · 되돌리기"를 잠깐 보여준다. 되돌리기는 1분 안에 연달아 바꾼 것을 한꺼번에 되돌린다.
-  function countToast(id, f) {
-    // 방금 이 수정이 쓰거나 이어 쓴 줄일 때만(시각이 그 칸의 마지막 수정 시각과 같음). 오래된 줄을 되돌리라고 내밀지 않는다.
-    const it = S.items.get(id); const e = it && latestOf(it, f); if (!e || !e[0].startsWith(myTag()) || e[1] !== it.t[f]) return;
-    const row = list.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
-    if (!histShown(e)) { toast({ nm: it.name, ch: ` ${fLabel(f)} ${fmtV(e[4])} (원래대로)` }, 1500, null, row); return; }
-    const hid = e[0];
-    toast({ nm: it.name, ch: ` ${fLabel(f)} ${fmtV(e[3])} → ${fmtV(e[4])}` }, 4500, { label: '되돌리기', fn: () => undoEntry(id, hid) }, row);
+  // 숫자를 바꾸면 그 줄 안에 '전 → 후 · 되돌리기'를 5초 보여 준다(한 번에 한 줄). 1분 안에 연달아 바꾼 건 한 줄로 묶여 한꺼번에 되돌린다.
+  // 방금 이 수정이 쓰거나 이어 쓴 기록일 때만(시각이 그 칸의 마지막 수정 시각과 같음) — 오래된 기록을 되돌리라고 내밀지 않는다.
+  let undoTimer = 0;
+  function refreshUndoRow(id) { const li = list.querySelector(`.item[data-id="${CSS.escape(id)}"]`), it = S.items.get(id); if (li && it) fillRow(li, it); }
+  function offerUndo(id, f) {
+    const it = S.items.get(id), e = it && latestOf(it, f), prev = S.undoOffer;
+    S.undoOffer = null; clearTimeout(undoTimer);
+    if (e && e[0].startsWith(myTag()) && e[1] === it.t[f] && histShown(e)) {
+      S.undoOffer = { id, hid: e[0], text: `${fLabel(f)} ${fmtV(e[3])} → ${fmtV(e[4])}` };
+      undoTimer = setTimeout(() => { const o = S.undoOffer; S.undoOffer = null; if (o) refreshUndoRow(o.id); }, 5000);
+    }
+    if (prev && prev.id !== id) refreshUndoRow(prev.id);
+    refreshUndoRow(id);
   }
   // 기록 한 줄을 되돌린다. 그 뒤에 (다른 폰에서라도) 숫자가 또 바뀌었으면 덮어쓰지 않는다.
   function undoEntry(id, hid) {
@@ -1940,7 +1963,7 @@ body.sheet-open{overflow:hidden}
     editCounts(id, { [keyOf(e[2])]: e[3] }); fillHist();
     toast(`되돌렸어요: ${it.name} ${fLabel(e[2])} ${fmtV(e[3])}`);
   }
-  list.addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target instanceof HTMLInputElement) ev.target.blur(); });
+  list.addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.isComposing && ev.keyCode !== 229 && ev.target instanceof HTMLInputElement) ev.target.blur(); });
   list.addEventListener('focusin', ev => { if (ev.target instanceof HTMLInputElement) ev.target.select(); });
   // 구역 고르기: 검색·부족만은 끄고, 위 제목·요약은 다시 내려오지 않게 고정 바 위치까지만 올린다
   function selectTab(sec) {
@@ -1952,10 +1975,10 @@ body.sheet-open{overflow:hidden}
   $('#tabs').addEventListener('click', ev => { const b = ev.target.closest('button[data-sec]'); if (b) selectTab(b.dataset.sec); });
   $('#nextSec').addEventListener('click', ev => selectTab(ev.currentTarget.dataset.sec));
   $$('.seg button').forEach(b => b.addEventListener('click', () => {
-    const back = b.dataset.view === 'table' && S.cfg.view !== 'table' ? S.tableReturn : null; S.tableReturn = null;
+    const back = b.dataset.view === 'table' && S.cfg.view !== 'table' ? S.tableReturn : null; S.tableReturn = null; S.searchHit = null;
     if (back) { S.q = back.q; $('#q').value = back.q; S.low = back.low; $('#lowBtn').setAttribute('aria-pressed', String(back.low)); if (typeof setSearching === 'function') setSearching(!!back.q.trim()); }
     S.cfg.view = b.dataset.view; saveCfg(); render();
-    if (back) { const tr = $('#table').querySelector(`.grid tr.row[data-id="${CSS.escape(back.id)}"]`); if (tr) tr.scrollIntoView({ block: 'center' }); else window.scrollTo(0, back.y); }
+    if (back) { const tr = back.id && $('#table').querySelector(`.grid tr.row[data-id="${CSS.escape(back.id)}"]`); if (tr) tr.scrollIntoView({ block: 'center' }); else window.scrollTo(0, back.y); }
     else window.scrollTo({ top: 0 });
   }));
   const qInput = $('#q');
@@ -1966,12 +1989,15 @@ body.sheet-open{overflow:hidden}
     if (scrollY > y) window.scrollTo(0, Math.max(0, Math.round(y)));
   }
   function setSearching(on) { $('#app .tools').classList.toggle('searching', on); $('#qCancel').hidden = !on; }
-  qInput.addEventListener('input', () => { S.q = qInput.value; render(); toResultsTop(); });
+  qInput.addEventListener('input', () => { S.q = qInput.value; if (!S.q.trim()) S.searchHit = null; render(); toResultsTop(); });
   qInput.addEventListener('focus', () => setSearching(true));
   qInput.addEventListener('blur', () => setSearching(!!S.q.trim()));
   qInput.addEventListener('keydown', ev => { if (ev.key === 'Enter') qInput.blur(); });
   // 검색 취소: 검색해서 센 항목이 있으면 그 항목 자리로 돌아간다
-  $('#qCancel').addEventListener('click', () => { const hit = S.searchHit; S.searchHit = null; S.q = ''; qInput.value = ''; setSearching(false); if (hit && S.items.has(hit)) jumpTo(hit); else render(); });
+  $('#qCancel').addEventListener('click', () => {
+    const hit = S.searchHit, it = hit && S.items.get(hit); S.searchHit = null; S.q = ''; qInput.value = ''; setSearching(false);
+    if (it && !isDeleted(it) && S.cfg.view === 'list') jumpTo(hit); else render();
+  });
   $('#lowBtn').addEventListener('click', ev => { S.low = !S.low; ev.currentTarget.setAttribute('aria-pressed', String(S.low)); render(); toResultsTop(); });
   $('#addBtn').addEventListener('click', () => openEditor(null, S.cfg.tab));
   $('#addBtn2').addEventListener('click', () => openEditor(null, S.cfg.tab));
@@ -2007,6 +2033,12 @@ body.sheet-open{overflow:hidden}
     setBar();
   }
   document.addEventListener('touchstart', () => {}, { passive: true });   // 아이폰에서 누를 때 색(:active)이 보이게
+  {   // 숫자 칸에 커서가 있는 동안 body.typing. 나갈 때는 조금 늦게 풀어서, 누르는 순간 바가 내려와 탭이 빗나가지 않게
+    let offT = 0; const isNum = el => el instanceof HTMLInputElement && !!el.closest('.stepper');
+    const setTyping = on => { document.body.classList.toggle('typing', on); document.documentElement.classList.toggle('typing', on); replaceToast(); };
+    document.addEventListener('focusin', ev => { if (isNum(ev.target)) { clearTimeout(offT); setTyping(true); } });
+    document.addEventListener('focusout', ev => { if (isNum(ev.target)) { clearTimeout(offT); offT = setTimeout(() => { if (!isNum(document.activeElement)) setTyping(false); }, 350); } });
+  }
   if (window.visualViewport) {   // 키보드가 올라오면 시트를 키보드 위로, 시트 높이는 보이는 화면 기준으로
     const vv = window.visualViewport, rs2 = document.documentElement.style;
     const fit = () => { rs2.setProperty('--kb', (vv.scale > 1.01 ? 0 : Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop))) + 'px'); rs2.setProperty('--vvh', Math.round(vv.height) + 'px'); };
