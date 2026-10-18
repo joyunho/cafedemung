@@ -46,7 +46,7 @@ async function setupPhone(page, nick, code) {
 const inputVal = (page, sel) => page.$eval(sel, el => el.value);
 async function openEd(page, id) {
   await page.click(id ? `.item[data-id="${id}"] .name` : '#addBtn'); await page.waitForSelector('#editor:not([hidden])');
-  await page.waitForFunction(() => document.activeElement && document.activeElement.id === 'ed-name', null, { timeout: 3000 }).catch(() => {});
+  if (!id) await page.waitForFunction(() => document.activeElement && document.activeElement.id === 'ed-name', null, { timeout: 3000 }).catch(() => {});   // 새 항목만 이름 칸에 바로 커서
 }
 
 try {
