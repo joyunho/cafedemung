@@ -46,7 +46,7 @@ async function setupPhone(page, nick, code) {
 const inputVal = (page, sel) => page.$eval(sel, el => el.value);
 async function openEd(page, id) {
   await page.click(id ? `.item[data-id="${id}"] .name` : '#addBtn'); await page.waitForSelector('#editor:not([hidden])');
-  await page.waitForFunction(() => document.activeElement && document.activeElement.id === 'ed-name', null, { timeout: 3000 }).catch(() => {});
+  if (!id) await page.waitForFunction(() => document.activeElement && document.activeElement.id === 'ed-name', null, { timeout: 3000 }).catch(() => {});   // 새 항목만 이름 칸에 바로 커서
 }
 
 try {
@@ -125,21 +125,26 @@ try {
   check(hA.length === 1 && hA[0][2] === 'u' && hA[0][3] === 120 && hA[0][4] === 122 && hA[0][5] === '윤호', '연달아 누른 +2가 기록 한 줄로 (120 → 122, 윤호)');
   await B.waitForFunction(() => { const it = JSON.parse(localStorage.getItem('cdm.store')).items.find(i => i.id === 'yy-001'); return !!(it && it.h && it.h.some(e => e[3] === 120 && e[4] === 122)); }, null, { timeout: 20000 });
   check(true, 'B에도 기록 도착');
+  // 되돌리기는 숫자를 바꾼 그 줄 안에(다른 줄·위 도구 줄 버튼을 가리지 않음)
   await A.locator('.item[data-id="yy-004"] button.inc[data-f="u"]').click();
-  await A.waitForSelector('#toast .act', { timeout: 3000 });
-  check((await A.textContent('#toast')).includes('30 → 31'), '숫자를 바꾸면 "전 → 후 · 되돌리기": ' + (await A.textContent('#toast')));
-  await A.evaluate(() => document.querySelector('#toast .act').click());
-  check((await inputVal(A, '#u-yy-004')) === '31' && await A.isVisible('#toast'), '토스트가 뜨자마자 닿은 탭은 되돌리기로 치지 않음');
-  await sleep(700); await A.click('#toast .act');
+  await A.waitForSelector('.item[data-id="yy-004"] .undo-btn', { timeout: 3000 });
+  const und = await A.$eval('.item[data-id="yy-004"] .undo', el => el.textContent);
+  check(und.includes('30 → 31') && !(await A.isVisible('.item[data-id="yy-004"] .meta')), '숫자를 바꾸면 그 줄에 "전 → 후 · 되돌리기": ' + und);
+  const inRow = await A.evaluate(() => { const b = document.querySelector('.undo-btn').getBoundingClientRect(), r = document.querySelector('.item[data-id="yy-004"]').getBoundingClientRect(); return b.top >= r.top && b.bottom <= r.bottom && document.querySelectorAll('.undo-btn').length === 1; });
+  check(inRow, '되돌리기 버튼은 그 줄 안에만 하나');
+  await A.locator('.item[data-id="yy-005"] button.inc[data-f="o"]').click();
+  check(!(await A.$('.item[data-id="yy-004"] .undo')) && !!(await A.$('.item[data-id="yy-005"] .undo-btn')), '다른 줄을 바꾸면 되돌리기는 그 줄로 옮겨 감');
+  await A.click('.item[data-id="yy-005"] .undo-btn');
+  check((await inputVal(A, '#o-yy-005')) === '' && !(await A.$('.item[data-id="yy-005"] .undo')), '그 줄의 되돌리기 누르면 원래대로');
+  await A.locator('.item[data-id="yy-004"] button.inc[data-f="u"]').click(); await A.locator('.item[data-id="yy-004"] button.inc[data-f="u"]').click();
+  check((await A.textContent('.item[data-id="yy-004"] .undo')).includes('30 → 33'), '1분 안에 연달아 누른 건 한 줄로 (30 → 33): ' + (await A.textContent('.item[data-id="yy-004"] .undo')));
+  await A.click('.item[data-id="yy-004"] .undo-btn');
   check((await inputVal(A, '#u-yy-004')) === '30', '되돌리기 누르면 30으로');
-  await A.evaluate(() => { const el = document.querySelector('.item[data-id="yy-012"]'); window.scrollBy(0, el.getBoundingClientRect().bottom - window.innerHeight + 8); });
   await A.locator('.item[data-id="yy-012"] button.inc[data-f="o"]').click();
-  await A.waitForSelector('#toast .act', { timeout: 3000 });
-  const ov = await A.evaluate(() => { const tEl = document.querySelector('#toast'), t = tEl.getBoundingClientRect(), r = document.querySelector('.item[data-id="yy-012"]').getBoundingClientRect(); return { top: tEl.classList.contains('top'), overlap: !(t.bottom <= r.top || t.top >= r.bottom), pe: getComputedStyle(tEl).pointerEvents, act: getComputedStyle(tEl.querySelector('.act')).pointerEvents }; });
-  check(ov.top && !ov.overlap && ov.pe === 'none' && ov.act === 'auto', '화면 아래쪽 줄을 누르면 토스트가 위에 떠서 누른 줄을 가리지 않음 ' + JSON.stringify(ov));
-  await sleep(700); await A.click('#toast .act');
-  check((await inputVal(A, '#o-yy-012')) === '', '위에 뜬 토스트로도 되돌리기');
-  await A.evaluate(() => window.scrollTo(0, 0));
+  await sleep(5300);
+  check(!(await A.$('.item[data-id="yy-012"] .undo')) && await A.isVisible('.item[data-id="yy-012"] .meta'), '5초 지나면 되돌리기는 사라지고 수정 시각이 다시 보임');
+  await openEd(A, 'yy-012'); await A.click('#ed-hist-list button.undo'); await A.click('#ed-cancel');
+  check((await inputVal(A, '#o-yy-012')) === '', '놓쳤으면 편집 화면 기록에서 되돌리기');
   await openEd(B, 'yy-001');
   const histB = await B.textContent('#ed-hist-list');
   check(histB.includes('안뜯은거 120 → 122') && histB.includes('윤호'), '편집 화면에 최근 기록: ' + histB.trim().slice(0, 60));
@@ -162,9 +167,9 @@ try {
   check((await A.textContent('#ed-hist-list')).includes('1 → 50'), '편집 화면이 열린 동안 다른 폰 기록도 바로 보임 (사장님 1 → 50)');
   await A.click('#ed-cancel');
   await A.locator('.item[data-id="yy-005"] button.inc[data-f="u"]').click();
-  await A.waitForSelector('#toast .act', { timeout: 3000 });
-  check((await A.textContent('#toast')).includes('50 → 51'), '다른 폰이 바꾼 뒤에는 새 줄로 (50 → 51): ' + (await A.textContent('#toast')));
-  await sleep(700); await A.click('#toast .act');
+  await A.waitForSelector('.item[data-id="yy-005"] .undo-btn', { timeout: 3000 });
+  check((await A.textContent('.item[data-id="yy-005"] .undo')).includes('50 → 51'), '다른 폰이 바꾼 뒤에는 새 줄로 (50 → 51): ' + (await A.textContent('.item[data-id="yy-005"] .undo')));
+  await A.click('.item[data-id="yy-005"] .undo-btn');
   check((await inputVal(A, '#u-yy-005')) === '50', '되돌리면 다른 폰의 50으로');
   await A.locator('.item[data-id="yy-005"] button.inc[data-f="u"]').click();
   await sleep(800);   // 저장(0.3초 뒤)이 끝난 뒤에 읽는다(되돌리기 전 51이 남아 있을 수 있음)
@@ -175,9 +180,9 @@ try {
   check((await A.$$('#ed-hist-list button.undo')).length === 0, '기록 없이 숫자가 바뀌면(옛 버전·백업) 이 폰의 마지막 줄도 되돌리기 없음');
   await A.click('#ed-cancel');
   await A.locator('.item[data-id="yy-005"] button.inc[data-f="u"]').click();
-  await A.waitForSelector('#toast .act', { timeout: 3000 });
-  check((await A.textContent('#toast')).includes('60 → 61'), '그 다음 수정은 새 줄로 (60 → 61): ' + (await A.textContent('#toast')));
-  await sleep(700); await A.click('#toast .act');
+  await A.waitForSelector('.item[data-id="yy-005"] .undo-btn', { timeout: 3000 });
+  check((await A.textContent('.item[data-id="yy-005"] .undo')).includes('60 → 61'), '그 다음 수정은 새 줄로 (60 → 61): ' + (await A.textContent('.item[data-id="yy-005"] .undo')));
+  await A.click('.item[data-id="yy-005"] .undo-btn');
   check((await inputVal(A, '#u-yy-005')) === '60', '되돌리면 60으로');
   const metaNow = await A.locator('.item[data-id="yy-005"] .meta').textContent();
   check(metaNow.startsWith('방금 · 윤호'), '항목마다 수정 시각 · 이름: ' + metaNow);
@@ -315,9 +320,9 @@ try {
   check(alerts().length === n1 + 1 && (new URLSearchParams(alerts()[alerts().length - 1].query).get('title') || '').includes('애플스파클링 없음'), '다시 연결되면 못 보낸 알림을 보냄');
   await sleep(1500); offlinePhase = false;
   const t3 = (await storeOf(A)).items.find(i => i.id === 'yy-003').t.u;
-  await A.evaluate(() => { document.querySelector('#toast').hidden = true; });
+  await A.waitForSelector('.item[data-id="yy-003"] .undo', { state: 'detached', timeout: 8000 }).catch(() => {});   // 방금 바꾼 것의 되돌리기(5초)가 지나간 뒤
   await A.locator('.item[data-id="yy-003"] button.dec[data-f="u"]').click(); await sleep(300);
-  check((await inputVal(A, '#u-yy-003')) === '0' && !(await A.isVisible('#toast')) && (await storeOf(A)).items.find(i => i.id === 'yy-003').t.u === t3, '0에서 − 는 아무것도 바꾸지 않고 오래된 기록의 되돌리기도 안 띄움');
+  check((await inputVal(A, '#u-yy-003')) === '0' && !(await A.$('.item[data-id="yy-003"] .undo')) && (await storeOf(A)).items.find(i => i.id === 'yy-003').t.u === t3, '0에서 − 는 아무것도 바꾸지 않고 오래된 기록의 되돌리기도 안 띄움');
   const n2 = alerts().length;
   await A.fill('#u-yy-004', '0'); await A.press('#u-yy-004', 'Enter');
   await A.evaluate(() => window.dispatchEvent(new Event('pagehide')));

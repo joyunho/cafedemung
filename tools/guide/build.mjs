@@ -76,8 +76,8 @@ await shot(A, 'g02-list');
 await A.locator('.item[data-id="yy-001"] button.dec[data-f="u"]').click();
 await A.locator('.item[data-id="yy-001"] button.dec[data-f="u"]').click();
 await sleep(300);
-await shot(A, 'g03-toast');
-await sleep(700); await A.click('#toast .act'); await sleep(400);
+await A.locator('.item[data-id="yy-001"]').screenshot({ path: OUT + 'g03-toast.png' });   // 그 줄 안의 되돌리기
+await A.click('.item[data-id="yy-001"] .undo-btn'); await sleep(400);
 // 편집 + 기록
 await sleep(2600); await A.click('.item[data-id="yy-011"] .name'); await A.waitForSelector('#editor:not([hidden])'); await sleep(400);
 await A.evaluate(() => document.querySelector('#ed-hist').scrollIntoView({ block: 'end' })); await sleep(200);

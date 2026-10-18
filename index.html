@@ -43,6 +43,11 @@
 html{background:var(--bg)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent;padding-top:env(safe-area-inset-top,0px);overscroll-behavior-y:none}
 button,input,select,textarea{font:inherit;color:inherit}
+/* 아이폰은 16px보다 작은 입력칸을 누르면 화면을 확대한다 → 입력칸은 모두 16px 이상(숫자 칸은 17px) */
+input,select,textarea{font-size:16px}
+/* 연타해도 확대(두 번 탭)되지 않게, 버튼 글자가 선택되지 않게 */
+.stepper,.tools,.tabs,.thumb,.name,.secjump{touch-action:manipulation}
+.stepper button{-webkit-user-select:none;user-select:none}
 button{cursor:pointer}
 a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
@@ -53,14 +58,15 @@ h1,h2,h3{margin:0;text-wrap:balance}
 
 /* ---- 제목 줄 ---- */
 .brand{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 4px}
-.brand h1{font-family:var(--font-display);font-weight:400;font-size:28px;letter-spacing:.01em;color:var(--accent);line-height:1.1}
+.brand h1{font-family:var(--font-display);font-weight:400;font-size:28px;letter-spacing:.01em;color:var(--accent);line-height:1.1;word-break:keep-all}
+@media (max-width:380px){.brand h1{font-size:23px}}
 .brand .right{display:flex;align-items:center;gap:8px}
 .sync{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);white-space:nowrap}
 .sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
 .sync[data-state="ok"]::before{background:var(--accent)}
 .sync[data-state="sending"]::before,.sync[data-state="retry"]::before,.sync[data-state="offline"]::before{background:var(--warn)}
 .sync[data-state="error"]::before{background:var(--crit)}
-.iconbtn{width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;padding:0}
+.iconbtn{width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;padding:0}
 .iconbtn svg{width:20px;height:20px}
 .summary{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px;padding-block:2px 10px;font-variant-numeric:tabular-nums;min-height:22px}
 .summary b{color:var(--ink);font-weight:500}
@@ -74,8 +80,11 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .seg button{height:34px;padding:0 14px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-weight:500;white-space:nowrap}
 .seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
 .search{flex:1;min-width:0;position:relative}
-.search input{width:100%;height:40px;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:0 14px 0 36px}
-.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+.search input{width:100%;height:40px;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:0 8px 0 32px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+/* 검색하는 동안은 검색칸을 넓게(켜져 있는 부족만은 그대로 보임) */
+.tools.searching > :not(.search):not(#qCancel):not([aria-pressed="true"]){display:none}
+.tabs.cross button{opacity:.55}
 .chip{height:40px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font-size:14px;text-decoration:none}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .chip.icon{width:40px;padding:0;justify-content:center;flex:none}
@@ -94,8 +103,8 @@ main{min-width:0}
 .group h2{font-size:13.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;display:flex;align-items:baseline;gap:8px;padding:0 4px 6px}
 .group h2 .n{font-weight:400;font-variant-numeric:tabular-nums}
 .group h2 .bad{color:var(--crit);font-weight:500}
-.group ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.item{display:grid;grid-template-columns:56px minmax(0,1fr) auto;grid-template-areas:"thumb head counters" "thumb note counters";gap:4px 12px;align-items:center;padding:10px 12px;border-top:1px solid var(--line);scroll-margin-top:170px}
+.group ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;overflow:clip}
+.item{display:grid;grid-template-columns:56px minmax(0,1fr) auto;grid-template-areas:"thumb head counters" "thumb note counters";gap:4px 12px;align-items:center;padding:10px 12px;border-top:1px solid var(--line);scroll-margin-top:8px}
 .thumb{grid-area:thumb;align-self:start;width:56px;height:56px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);padding:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .thumb img,.mini img{width:100%;height:100%;object-fit:cover;display:block;background:#fff}
 .ph{font-family:var(--font-display);color:var(--muted);line-height:1}
@@ -126,14 +135,54 @@ main{min-width:0}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .stepper input::placeholder{color:var(--muted);font-weight:400}
 .stepper input:focus{outline:none;box-shadow:inset 0 0 0 2px var(--focus)}
+/* 폰: 기본은 촘촘하게(사진 작게, 이름·수정 한 줄, 안뜯은거·뜯은거를 나란히, 칸 이름은 분류마다 한 번).
+   설정의 '버튼 크게 보기'(body.roomy)를 켜면 예전처럼 줄마다 칸 이름과 큰 버튼. */
+.colhead{display:none}
+.colhead + .item{border-top:0}
 @media (max-width:480px){
-  .item{grid-template-columns:56px minmax(0,1fr);grid-template-areas:"thumb head" "counters counters" "note note";gap:6px 10px}
-  .counters{justify-content:space-between}
-  .counter{flex:1}
-  .stepper{width:100%;justify-content:center}
-  .stepper input{flex:1;max-width:none}
+  .wrap{padding-inline:12px}
+  .bar{margin-inline:-12px;padding-inline:12px}
+  body.roomy .item{grid-template-columns:56px minmax(0,1fr);grid-template-areas:"thumb head" "counters counters" "note note";gap:6px 10px}
+  body.roomy .counters{justify-content:space-between}
+  body.roomy .counter{flex:1}
+  body.roomy .stepper{width:100%;justify-content:center}
+  body.roomy .stepper input{flex:1;max-width:none}
+  body:not(.roomy) .group{margin-top:12px}
+  body:not(.roomy) .group h2{padding-bottom:4px}
+  body:not(.roomy) .colhead{display:grid;grid-template-columns:40px 1fr 1fr;gap:0 16px;padding:4px 10px 3px;font-size:11.5px;color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--line);position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--bar-h,98px));z-index:2}
+  body.typing .colhead{top:calc(env(safe-area-inset-top,0px) + var(--bar-h,98px) - var(--tools-h,56px))}
+  body.typing .bar{top:calc(env(safe-area-inset-top,0px) - var(--tools-h,56px))}
+  html.typing{scroll-padding-top:calc(var(--bar-h,98px) - var(--tools-h,56px) + 32px + env(safe-area-inset-top,0px))}
+  body:not(.roomy) .colhead span{text-align:center}
+  body:not(.roomy) .item{grid-template-columns:40px minmax(0,1fr);grid-template-areas:"thumb head" "thumb counters" "thumb note";gap:3px 10px;padding:6px 10px 8px;align-items:start}
+  body:not(.roomy) .thumb{width:40px;height:40px;border-radius:9px;margin-top:3px}
+  body:not(.roomy) .thumb .ph{font-size:17px}
+  body:not(.roomy) .head{gap:0 6px;align-items:baseline}
+  body:not(.roomy) .name{padding:2px 0;font-size:15px;line-height:1.3}
+  body:not(.roomy) .meta{flex-basis:auto;margin-left:auto;font-size:11.5px;white-space:nowrap}
+  body:not(.roomy) .counters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;min-width:0}
+  body:not(.roomy) .counter{min-width:0}
+  body:not(.roomy) .counter .lbl{display:none}
+  body:not(.roomy) .stepper{width:100%;min-width:0}
+  body:not(.roomy) .stepper button{width:40px;height:40px;flex:none}
+  body:not(.roomy) .stepper input{flex:1 1 0;min-width:0;width:0;height:40px}
+  body:not(.roomy) .note{font-size:12px}
 }
-.addrow{margin-top:14px;display:flex;justify-content:center}
+/* 아주 좁은 화면·글자 크게(≤359px): 사진을 줄이고 숫자 칸을 아래 줄 전체로 */
+@media (max-width:359px){
+  body:not(.roomy) .item{grid-template-columns:32px minmax(0,1fr);grid-template-areas:"thumb head" "counters counters" "note note"}
+  body:not(.roomy) .thumb{width:32px;height:32px;margin-top:0;border-radius:8px}
+  body:not(.roomy) .colhead{grid-template-columns:1fr 1fr}
+  body:not(.roomy) .colhead span:first-child{display:none}
+  .tabs button .n{display:none}
+}
+@media (max-width:300px){body:not(.roomy) .stepper button{width:34px}}
+/* 폰에서 숫자를 치는 동안(body.typing)은 위 도구 줄을 밀어 올리고 구역 탭만 남긴다(높이는 그대로라 화면이 튀지 않음) — 위 480px 규칙 */
+html{scroll-padding-top:calc(var(--bar-h,98px) + 32px + env(safe-area-inset-top,0px))}
+/* 빈 칸은 '–' 대신 빈 자리로(− 버튼과 헷갈리지 않게) */
+.stepper input:placeholder-shown{background:var(--surface-2)}
+.addrow{margin-top:14px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.addrow .next{height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:600}
 .addrow button{height:44px;padding:0 18px;border:1px dashed var(--line);border-radius:999px;background:transparent;color:var(--accent);font-weight:500}
 .empty{margin-top:28px;padding:28px 20px;text-align:center;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
 .empty h3{font-size:16px;color:var(--ink);margin-bottom:6px}
@@ -148,8 +197,8 @@ main{min-width:0}
 .card .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
 .card .hd h2{font-size:15px;font-weight:600}
 .card .hd .sub{font-size:12.5px;color:var(--muted);font-weight:400;margin-left:6px}
-.card .hd .btn{height:32px;padding:0 12px;font-size:13px}
-.card .hd .btns{display:flex;gap:6px;flex:none}
+.card .hd .btn{height:40px;padding:0 14px;font-size:14px}
+.card .hd .btns{display:flex;gap:8px;flex:none}
 .orders{margin:0;padding:6px 14px 10px;list-style:none;columns:2;column-gap:18px}
 @media (max-width:420px){.orders{columns:1}}
 .orders li{break-inside:avoid;padding:5px 0;font-size:14px;display:flex;align-items:center;gap:8px;border-bottom:1px dashed var(--line)}
@@ -160,10 +209,17 @@ main{min-width:0}
 .orders .st.s-none{color:var(--crit)}
 .orders .st.s-last,.orders .st.s-low{color:var(--warn)}
 .orders .ok{padding:10px 0;color:var(--muted);font-size:14px}
+.orders li:active,.feed li:active{background:var(--accent-soft)}
+/* 한눈에: 구역 바로가기 */
+.secjump{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.secjump .chip{height:36px;font-size:13.5px}
+
 .tsec{margin-top:18px}
 .tsec h2{font-size:14px;font-weight:600;color:var(--muted);padding:0 4px 6px;display:flex;gap:8px;align-items:baseline}
 .tsec h2 .n{font-weight:400;font-variant-numeric:tabular-nums}
-.grid{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);font-size:14px;table-layout:fixed}
+.grid{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;overflow:clip;box-shadow:var(--shadow);font-size:14px;table-layout:fixed}
+/* 표 머리줄(안뜯·뜯)은 내려도 고정 바 아래에 붙어 있다 */
+.grid thead th{position:sticky;top:calc(var(--bar-h,56px) + env(safe-area-inset-top,0px));z-index:2}
 .grid th,.grid td{padding:7px 8px;border-top:1px solid var(--line);text-align:left;vertical-align:middle}
 .grid th{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;background:var(--surface-2);border-top:0}
 .grid th.n,.grid td.n{text-align:right;font-variant-numeric:tabular-nums;width:56px}
@@ -179,6 +235,16 @@ main{min-width:0}
 .grid tr.s-last td:first-child,.grid tr.s-low td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
 .grid td .nmwrap{display:flex;align-items:center;gap:8px;min-width:0}
 .grid td .nm{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.grid td .sub{display:flex;flex-wrap:wrap;gap:2px 6px;align-items:center;margin-top:2px;font-size:12px;color:var(--muted);line-height:1.3}
+.grid td .sub .when{display:none}
+/* 폰: 수정 칸을 빼고 이름을 두 줄까지, 상태·수정 시각은 이름 아래에 */
+@media (max-width:480px){
+  .grid th.m,.grid td.m{display:none}
+  .grid th.p,.grid td.p{width:42px}
+  .grid th.n,.grid td.n{width:48px}
+  .grid td .sub .when{display:inline}
+  .grid td .nm{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all;overflow-wrap:anywhere;line-height:1.3}
+}
 .grid th.p,.grid td.p{width:46px;padding-right:0}
 .grid td .tag{margin-left:0;font-size:10.5px;padding:1px 6px}
 .grid td.n.s-none{color:var(--crit)}
@@ -191,8 +257,13 @@ main{min-width:0}
 .cardbox h2{font-family:var(--font-display);font-weight:400;font-size:24px;color:var(--accent);margin-bottom:4px}
 .cardbox p{margin:0 0 16px;color:var(--muted);font-size:14px}
 .err{color:var(--crit);font-size:13.5px;margin:-4px 0 12px}
-.scrim{position:fixed;inset:0;background:rgba(10,14,12,.45);z-index:20}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:720px;margin-inline:auto;background:var(--surface);color:var(--ink);border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 30px rgba(0,0,0,.18);max-height:90vh;overflow:auto}
+.scrim{position:fixed;inset:0;background:rgba(10,14,12,.45);z-index:20;touch-action:none}
+body.sheet-open{overflow:hidden}
+.sheet{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:21;max-width:720px;margin-inline:auto;background:var(--surface);color:var(--ink);border-radius:16px 16px 0 0;padding:16px 16px 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);max-height:90vh;max-height:calc(var(--vvh,100dvh) * .92);overflow:auto;overscroll-behavior:contain}
+/* 시트 아래 버튼 줄: 늘 보이게 아래에 붙인다 */
+.sheet-foot{position:sticky;bottom:0;z-index:1;background:var(--surface);margin:12px -16px 0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.sheet-foot .actions{margin-top:0}
+.sheet{scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .sheet h3{font-size:17px;margin-bottom:12px}
 .sheet h4{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.02em;margin:16px 0 8px}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
@@ -227,8 +298,10 @@ main{min-width:0}
 }
 @media (prefers-reduced-motion:reduce){.item.flash{animation:none;background:var(--accent-soft)}}
 /* 토스트는 글자 부분은 누름이 그대로 아래로 지나가고(되돌리기 버튼만 눌림), 방금 누른 줄이 화면 아래쪽이면 위에 뜬다 */
-.toast{position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;max-width:520px;bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:18px;font-size:14px;box-shadow:var(--shadow);text-align:center;display:flex;align-items:center;gap:4px;pointer-events:none}
-.toast.top{bottom:auto}
+.toast{position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;max-width:min(520px,calc(100vw - 24px));top:8px;bottom:auto;z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;min-height:40px;border-radius:18px;font-size:14px;box-shadow:var(--shadow);text-align:center;display:flex;align-items:center;gap:4px;pointer-events:none}
+.toast.one{padding:4px 4px 4px 14px;white-space:nowrap}
+.toast .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toast .ch{flex:none;white-space:nowrap}
 /* PDF로 저장: 화면 밖에서 A4 쪽(794×1123px)을 그려 PDF로 옮긴다. 테마와 상관없이 흰 바탕 */
 #pdfStage{position:fixed;left:-10000px;top:0;width:794px;pointer-events:none}
 .pg{width:794px;height:1123px;box-sizing:border-box;padding:40px 38px 30px;background:#fff;color:#16181a;font-family:var(--font-body);font-size:12px;line-height:1.35;display:flex;flex-direction:column;overflow:hidden}
@@ -250,7 +323,10 @@ main{min-width:0}
 .pg .pe{color:#666;padding:8px 6px}
 .pg .pf{color:#999;font-size:10px;line-height:14px;height:14px;text-align:right;margin-top:6px}
 @media print{body.pdfprint{background:#fff}@page{size:A4;margin:0}body.pdfprint>*:not(#pdfStage){display:none!important}body.pdfprint #pdfStage{position:static;left:auto}.pg{break-after:page}}
-.toast .act{pointer-events:auto;margin-left:10px;padding:4px 2px;border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;white-space:nowrap}
+/* 숫자를 바꾼 줄 안에 '전 → 후 · 되돌리기'(다른 줄·위 도구 줄 버튼을 가리지 않음) */
+.undo{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.undo .undo-btn{height:30px;padding:0 10px;border:1px solid var(--accent);border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:12.5px}
+.toast .act{pointer-events:auto;margin-left:6px;min-height:36px;padding:0 10px;border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;white-space:nowrap}
 .hist,.feed{list-style:none;margin:0;padding:0}
 .hist li,.feed li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
 .hist li:last-child,.feed li:last-child{border-bottom:0}
@@ -259,6 +335,8 @@ main{min-width:0}
 .hist .undo{flex:none;height:30px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12.5px;color:var(--accent)}
 .feed{padding:4px 14px 8px}
 .feed li{cursor:pointer}
+.feed .chg.cnt{white-space:nowrap}
+@media (max-width:480px){#table .feed li{flex-direction:column;align-items:flex-start;gap:1px;min-height:44px}#table .feed .when{order:2;min-width:0}}
 .check{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0 4px}
 .check input{width:18px;height:18px}
 .topic{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:2px 6px;user-select:all;overflow-wrap:anywhere}
@@ -310,6 +388,7 @@ main{min-width:0}
       <button class="btn" id="installClose" type="button">닫기</button>
     </div>
 
+    <div id="barAnchor"></div>
     <div class="bar">
       <div class="tools">
         <div class="seg" role="tablist" aria-label="보기">
@@ -318,8 +397,9 @@ main{min-width:0}
         </div>
         <label class="search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input type="search" id="q" placeholder="검색" autocomplete="off" aria-label="항목 검색">
+          <input type="search" id="q" placeholder="검색" autocomplete="off" enterkeyhint="search" aria-label="항목 검색">
         </label>
+        <button class="chip" id="qCancel" type="button" hidden>취소</button>
         <button class="chip" id="lowBtn" type="button" aria-pressed="false" title="없음·마지막·부족 항목만 보기">부족만</button>
         <button class="chip icon" id="addBtn" type="button" title="항목 추가" aria-label="항목 추가">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -330,22 +410,22 @@ main{min-width:0}
 
     <main id="list"></main>
     <main id="table" hidden></main>
-    <div class="addrow" id="addrow" hidden><button type="button" id="addBtn2">+ 이 구역에 항목 추가</button></div>
+    <div class="addrow" id="addrow" hidden><button type="button" id="addBtn2">+ 이 구역에 항목 추가</button><button type="button" class="next" id="nextSec" hidden></button></div>
   </div>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
 
 <form class="sheet" id="editor" hidden autocomplete="off">
-  <h3 id="ed-title">항목 편집</h3>
-  <label class="field"><span>이름</span><input id="ed-name" required maxlength="60" placeholder="예: 바닐라시럽"></label>
+  <h3 id="ed-title" tabindex="-1">항목 편집</h3>
+  <label class="field"><span>이름</span><input id="ed-name" enterkeyhint="next" required maxlength="60" placeholder="예: 바닐라시럽"></label>
   <div class="row2">
-    <label class="field"><span>구역</span><input id="ed-sec" list="ed-secs" maxlength="30" placeholder="예: 윤호 정리"><datalist id="ed-secs"></datalist></label>
-    <label class="field"><span>분류</span><input id="ed-group" list="ed-groups" maxlength="30" placeholder="예: 시럽"><datalist id="ed-groups"></datalist></label>
+    <label class="field"><span>구역</span><input id="ed-sec" enterkeyhint="next" list="ed-secs" maxlength="30" placeholder="예: 윤호 정리"><datalist id="ed-secs"></datalist></label>
+    <label class="field"><span>분류</span><input id="ed-group" enterkeyhint="next" list="ed-groups" maxlength="30" placeholder="예: 시럽"><datalist id="ed-groups"></datalist></label>
   </div>
-  <label class="field"><span>메모</span><input id="ed-note" maxlength="120" placeholder="예: 절반 남으면 수첩에 적기"></label>
-  <label class="field"><span>최소 수량 (안뜯은거가 이보다 적으면 '부족' 표시)</span><input id="ed-min" inputmode="numeric" placeholder="비워두면 표시 안 함"></label>
-  <label class="field"><span>사진 주소 (비워두면 기본 사진)</span><input id="ed-img" inputmode="url" maxlength="1000" placeholder="https://… 로 시작하는 이미지 주소"></label>
+  <label class="field"><span>메모</span><input id="ed-note" enterkeyhint="next" maxlength="120" placeholder="예: 절반 남으면 수첩에 적기"></label>
+  <label class="field"><span>최소 수량 (안뜯은거가 이보다 적으면 '부족' 표시)</span><input id="ed-min" enterkeyhint="next" inputmode="numeric" placeholder="비워두면 표시 안 함"></label>
+  <label class="field"><span>사진 주소 (비워두면 기본 사진)</span><input id="ed-img" enterkeyhint="done" inputmode="url" maxlength="1000" placeholder="https://… 로 시작하는 이미지 주소"></label>
   <div class="imgrow">
     <span class="thumb" id="ed-img-prev"></span>
     <a class="btn sm" id="ed-img-search" target="_blank" rel="noopener" href="https://www.google.com/search?tbm=isch">구글 이미지에서 찾기</a>
@@ -355,6 +435,7 @@ main{min-width:0}
     <h4>최근 기록</h4>
     <ul class="hist" id="ed-hist-list"></ul>
   </div>
+  <div class="sheet-foot">
   <div class="actions">
     <button type="button" class="btn danger" id="ed-delete">삭제</button>
     <span class="spacer"></span>
@@ -365,6 +446,7 @@ main{min-width:0}
     <span>이 항목을 정말 삭제할까요? 연결된 폰에서도 사라져요.</span>
     <button type="button" class="btn danger solid" id="ed-del-yes">삭제</button>
     <button type="button" class="btn" id="ed-del-no">아니요</button>
+  </div>
   </div>
 </form>
 
@@ -383,6 +465,8 @@ main{min-width:0}
     <label class="field"><span>이름</span><input id="st-name" maxlength="20"></label>
     <label class="field" id="st-code-f"><span>다른 가게 코드로 바꾸기</span><input id="st-code" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX"></label>
   </div>
+  <h4>화면</h4>
+  <label class="check"><input type="checkbox" id="roomy"> 버튼 크게 보기 (한 화면에 보이는 항목은 줄어요)</label>
   <h4>알림 (사장님 폰)</h4>
   <p class="hint">재고가 <b>없음·마지막·부족</b>이 되면 ntfy 앱을 깐 폰으로 푸시 알림이 가요. 처음 한 번만 설정하면 돼요.</p>
   <p class="hint">① ntfy 앱 설치: <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">안드로이드</a> · <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">아이폰</a><br>
@@ -403,6 +487,7 @@ main{min-width:0}
     <input type="file" id="restoreFile" accept="application/json,.json" hidden>
   </div>
   <p class="hint" id="dataLine"></p>
+  <div class="sheet-foot">
   <div class="actions">
     <button type="button" class="btn danger" id="resetBtn">시트 값으로 초기화</button>
     <span class="spacer"></span>
@@ -414,6 +499,7 @@ main{min-width:0}
     <button type="button" class="btn danger solid" id="resetYes">초기화</button>
     <button type="button" class="btn" id="resetNo">아니요</button>
   </div>
+  </div>
 </div>
 
 <div class="sheet" id="viewer" hidden>
@@ -421,11 +507,11 @@ main{min-width:0}
   <h3 id="vw-name"></h3>
   <p class="hint" id="vw-sub"></p>
   <p class="credit" id="vw-credit"></p>
-  <div class="actions">
+  <div class="sheet-foot"><div class="actions">
     <button type="button" class="btn" id="vw-edit">사진 바꾸기</button>
     <span class="spacer"></span>
     <button type="button" class="btn primary" id="vw-close">닫기</button>
-  </div>
+  </div></div>
 </div>
 
 <div class="sheet" id="pdfSheet" hidden>
@@ -443,7 +529,7 @@ main{min-width:0}
   <div class="btnrow" id="pdfPrintRow" hidden>
     <button type="button" class="btn sm" id="pdfPrint">인쇄 → PDF로 저장</button>
   </div>
-  <div class="actions"><span class="spacer"></span><button type="button" class="btn" id="pdf-close">닫기</button></div>
+  <div class="sheet-foot"><div class="actions"><span class="spacer"></span><button type="button" class="btn" id="pdf-close">닫기</button></div></div>
 </div>
 
 <div id="pdfStage" aria-hidden="true"></div>
@@ -645,12 +731,26 @@ main{min-width:0}
   const editedAt = it => { const ts = lastTouched(it); return ts > 1e12 ? ts : 0; };
   const lastBy = it => { const t = it.t, b = it.b; const mx = editedAt(it); if (!mx) return ''; return mx === t.u ? b.u : mx === t.o ? b.o : b.m; };
   let toastTimer = 0;
+  // 안내는 늘 위쪽, 셀 때는 쓰지 않는 도구 줄(입력·한눈에·검색) 위에 띄운다 → 목록의 다른 줄 버튼을 가리지 않는다.
+  // msg는 글자 또는 { nm(이름, 길면 …), ch(바뀐 내용) } — 한 줄로.
+  function placeToast(el) {
+    const safe = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
+    let y = safe + 8;
+    if ($('#scrim').hidden && !$('#app').hidden) {
+      const tools = $('#app .bar .tools').getBoundingClientRect(), tabs = $('#tabs').getBoundingClientRect();
+      const t = tools.bottom > safe + 8 ? tools : (!$('#tabs').hidden && tabs.height ? tabs : null);
+      if (t) y = Math.max(safe + 4, Math.round(t.top + (t.height - el.offsetHeight) / 2));
+    }
+    el.style.top = y + 'px';
+  }
+  let toastRaf = 0;
+  const replaceToast = () => { const el = $('#toast'); if (el.hidden || toastRaf) return; toastRaf = requestAnimationFrame(() => { toastRaf = 0; placeToast(el); }); };
+  window.addEventListener('scroll', replaceToast, { passive: true }); window.addEventListener('resize', replaceToast);
   function toast(msg, ms = 2400, action = null, near = null) {
-    const el = $('#toast'); el.textContent = msg;
-    // 방금 누른 줄을 가리지 않게: 그 줄이 화면 아래쪽이면 위(검색줄 바로 밑)에 띄운다
-    const r = near && near.getBoundingClientRect(), top = !!r && r.bottom > window.innerHeight * 0.55;
-    el.classList.toggle('top', top);
-    el.style.top = top ? Math.max(12, Math.round((($('#app .bar') || el).getBoundingClientRect().bottom || 0) + 8)) + 'px' : '';
+    const el = $('#toast'); el.textContent = '';
+    if (msg && typeof msg === 'object') { for (const k of ['nm', 'ch']) { const sp = document.createElement('span'); sp.className = k; sp.textContent = msg[k] || ''; el.appendChild(sp); } }
+    else el.textContent = msg;
+    el.classList.add('top'); el.classList.toggle('one', !!(msg && typeof msg === 'object'));
     if (action) {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'act'; b.textContent = action.label;
       const armedAt = now() + 600;
@@ -664,7 +764,7 @@ main{min-width:0}
       });
       el.appendChild(b);
     }
-    el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+    el.hidden = false; placeToast(el); clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
   }
   const SYNC_TEXT = { connecting: '연결 중…', ok: '동기화 중', sending: '보내는 중…', retry: '다시 연결 중…', offline: '오프라인', error: '연결 안 됨' };
   function setSync(s, title) { S.status = s; const el = $('#sync'); el.dataset.state = s; el.textContent = SYNC_TEXT[s] || s; el.title = title || ''; }
@@ -1244,7 +1344,9 @@ main{min-width:0}
     if (!secs.includes(S.cfg.tab)) { S.cfg.tab = secs[0] || ''; saveCfg(); }
     const nav = $('#tabs'); const key = secs.join('\u0000');
     if (nav.dataset.key !== key) { nav.innerHTML = secs.map((s, i) => `<button type="button" role="tab" data-sec="${esc(s)}" id="tab-${i}">${esc(s)}<span class="n"></span></button>`).join(''); nav.dataset.key = key; }
-    for (const b of $$('button', nav)) { b.setAttribute('aria-selected', String(b.dataset.sec === S.cfg.tab)); b.querySelector('.n').textContent = counts[b.dataset.sec] || ''; }
+    const cross = !!S.q.trim() || S.low;   // 검색·부족만: 모든 구역에서 모아 보는 중 → 탭은 흐리게
+    nav.classList.toggle('cross', cross);
+    for (const b of $$('button', nav)) { b.setAttribute('aria-selected', String(!cross && b.dataset.sec === S.cfg.tab)); b.querySelector('.n').textContent = counts[b.dataset.sec] || ''; }
     nav.hidden = S.cfg.view !== 'list';
   }
   function peerLine() {
@@ -1288,7 +1390,7 @@ main{min-width:0}
   function counterHTML(id, f, label) {
     return `<div class="counter"><span class="lbl">${label}</span><div class="stepper">
       <button type="button" class="dec" data-f="${f}" aria-label="${label} 하나 빼기">−</button>
-      <input type="text" inputmode="decimal" id="${f}-${esc(id)}" data-f="${f}" placeholder="–" aria-label="${label}">
+      <input type="text" inputmode="decimal" id="${f}-${esc(id)}" data-f="${f}" placeholder=" " aria-label="${label}">
       <button type="button" class="inc" data-f="${f}" aria-label="${label} 하나 더하기">+</button></div></div>`;
   }
   function buildRow(it) {
@@ -1307,6 +1409,12 @@ main{min-width:0}
     if (th.dataset.k !== pk) { th.dataset.k = pk; th.innerHTML = picHTML(it); }
     const tag = li.querySelector('.tag'); tag.hidden = !st.label; tag.textContent = st.label; tag.className = 'tag' + (st.key ? ' s-' + st.key : '');
     const meta = li.querySelector('.meta'); const lt = editedAt(it);
+    const off = S.undoOffer && S.undoOffer.id === it.id ? S.undoOffer : null; let ub = li.querySelector('.undo');
+    if (off) {
+      if (!ub) { ub = document.createElement('span'); ub.className = 'undo'; li.querySelector('.head').appendChild(ub); }
+      if (ub.dataset.k !== off.hid + off.text) { ub.dataset.k = off.hid + off.text; ub.innerHTML = `<span class="chg">${esc(off.text)}</span><button type="button" class="undo-btn" data-h="${esc(off.hid)}" aria-label="${esc(it.name)} ${esc(off.text)} 되돌리기">되돌리기</button>`; }
+    } else if (ub) ub.remove();
+    meta.hidden = !!off;
     const metaText = lt ? fmtWhen(lt) + (lastBy(it) ? ' · ' + lastBy(it) : '') + (S.dirty.has(it.id) ? ' · 보내는 중' : '') : '시트에서 가져옴';
     if (meta.textContent !== metaText) meta.textContent = metaText;
     for (const [f, key] of [['u', 'unopened'], ['o', 'opened']]) { const inp = li.querySelector(`input[data-f="${f}"]`); const v = fmtNum(num(it[key])); if (document.activeElement !== inp && inp.value !== v) inp.value = v; }
@@ -1317,6 +1425,8 @@ main{min-width:0}
     const list = $('#list'), addrow = $('#addrow');
     const { groups, cross } = visibleGroups();
     addrow.hidden = cross || !S.cfg.tab;
+    const secs = sectionsList(), nx = secs[secs.indexOf(S.cfg.tab) + 1], nb = $('#nextSec');   // 구역 끝: 다음 구역으로
+    nb.hidden = !nx || cross; if (nx) { nb.dataset.sec = nx; nb.textContent = `다음 구역: ${nx} →`; }
     if (!groups.length) {
       const msg = S.low ? `<h3>부족한 항목이 없어요</h3>없음·마지막·부족으로 표시된 항목이 없습니다.` : (S.q ? `<h3>검색 결과가 없어요</h3>다른 이름으로 검색해 보세요.` : `<h3>항목이 없어요</h3>오른쪽 위 + 버튼으로 추가해 보세요.`);
       list.innerHTML = `<div class="empty">${msg}</div>`; S.lastStructure = ''; return;
@@ -1329,7 +1439,7 @@ main{min-width:0}
       const frag = document.createDocumentFragment();
       for (const g of groups) {
         const sec = document.createElement('section'); sec.className = 'group';
-        sec.innerHTML = `<h2>${groupHeadHTML(g)}</h2><ul></ul>`;
+        sec.innerHTML = `<h2>${groupHeadHTML(g)}</h2><ul><li class="colhead" aria-hidden="true"><span></span><span>안뜯은거</span><span>뜯은거</span></li></ul>`;
         const ul = sec.querySelector('ul');
         for (const it of g.items) { const li = buildRow(it); fillRow(li, it); ul.appendChild(li); }
         frag.appendChild(sec);
@@ -1373,22 +1483,24 @@ main{min-width:0}
     const ol = orderList().filter(d => matches(d, q));
     let html = `<div class="card"><div class="hd"><h2>주문 목록<span class="sub">없음·마지막·부족 ${ol.length}</span></h2><span class="btns"><button type="button" class="btn sm" id="pdfBtn">PDF</button><button type="button" class="btn sm" id="copyOrdersBtn">복사</button></span></div>`;
     if (ol.length) {
-      html += '<ul class="orders">' + groupsOf(ol, true).flatMap(g => g.items.map(it => { const st = statusOf(it); return `<li data-id="${esc(it.id)}"><button type="button" class="mini" aria-label="사진 크게 보기">${picHTML(it)}</button><span class="txt"><span class="nm">${esc(it.name)}</span><span class="sec">${esc(g.section)} · ${esc(g.group)}</span></span><span class="st s-${st.key}">${st.label} <span>${fmtNum(num(it.unopened)) || '–'}/${fmtNum(num(it.opened)) || '–'}</span></span></li>`; })).join('') + '</ul>';
+      html += '<ul class="orders">' + groupsOf(ol, true).flatMap(g => g.items.map(it => { const st = statusOf(it); return `<li data-id="${esc(it.id)}"><button type="button" class="mini" aria-label="사진 크게 보기">${picHTML(it)}</button><span class="txt"><span class="nm">${esc(it.name)}</span><span class="sec">${esc(g.section)} · ${esc(g.group)}</span></span><span class="st s-${st.key}">${st.label} <span>안뜯 ${fmtNum(num(it.unopened)) || '–'} · 뜯 ${fmtNum(num(it.opened)) || '–'}</span></span></li>`; })).join('') + '</ul>';
     } else html += '<div class="orders"><div class="ok">부족한 항목이 없어요.</div></div>';
     html += '</div>';
     const feed = recentChanges(15);
-    if (feed.length) html += `<div class="card"><div class="hd"><h2>최근 변경<span class="sub">최근 7일</span></h2></div><ul class="feed">${feed.map(({ it, e }) => `<li data-id="${esc(it.id)}"><span class="when">${tsSpan(e[1])}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt"><b>${esc(it.name)}</b> ${esc(histText(e))}</span></li>`).join('')}</ul></div>`;
+    if (feed.length) html += `<div class="card"><div class="hd"><h2>최근 변경<span class="sub">최근 7일</span></h2></div><ul class="feed">${feed.map(({ it, e }) => `<li data-id="${esc(it.id)}"><span class="when">${tsSpan(e[1])}${e[5] ? ' · ' + esc(e[5]) : ''}</span><span class="txt"><b>${esc(it.name)}</b> <span class="chg${isCountF(e[2]) ? ' cnt' : ''}">${esc(histText(e))}</span></span></li>`).join('')}</ul></div>`;
     const secs = sectionsList();
     const all = liveItems().filter(d => matches(d, q) && (!S.low || LOW_KEYS.has(statusOf(d).key)));
+    const withItems = secs.filter(sec => all.some(d => secOf(d) === sec));
+    if (withItems.length > 1) html = `<nav class="secjump" aria-label="구역 바로가기">${withItems.map(sec => `<button type="button" class="chip" data-jump="${esc(sec)}">${esc(sec)}</button>`).join('')}</nav>` + html;
     for (const sec of secs) {
       const items = all.filter(d => secOf(d) === sec); if (!items.length) continue;
       const groups = groupsOf(items, false);
-      html += `<section class="tsec"><h2>${esc(sec)} <span class="n">${items.length}</span></h2><table class="grid"><thead><tr><th class="p"><span class="sr">사진</span></th><th>항목</th><th class="n">안뜯</th><th class="n">뜯</th><th class="m">수정</th></tr></thead><tbody>`;
+      html += `<section class="tsec" data-sec="${esc(sec)}"><h2 tabindex="-1">${esc(sec)} <span class="n">${items.length}</span></h2><table class="grid"><thead><tr><th class="p"><span class="sr">사진</span></th><th>항목</th><th class="n">안뜯</th><th class="n">뜯</th><th class="m">수정</th></tr></thead><tbody>`;
       for (const g of groups) {
-        html += `<tr class="grp"><td colspan="5">${esc(g.group)}</td></tr>`;
+        html += `<tr class="grp"><td colspan="4">${esc(g.group)}</td><td class="m"></td></tr>`;
         for (const it of g.items) {
           const st = statusOf(it); const u = num(it.unopened), o = num(it.opened); const lt = editedAt(it);
-          html += `<tr class="row${st.key ? ' s-' + st.key : ''}" data-id="${esc(it.id)}"><td class="p"><button type="button" class="mini" aria-label="${esc(it.name)} 사진 크게 보기">${picHTML(it)}</button></td><td><span class="nm">${esc(it.name)}${st.label ? ` <span class="tag s-${st.key}">${st.label}</span>` : ''}</span></td><td class="n${u === null ? ' blank' : ''}${st.key ? ' s-' + st.key : ''}">${u === null ? '–' : u}</td><td class="n${o === null ? ' blank' : ''}">${o === null ? '–' : o}</td><td class="m" title="${esc(lt ? new Date(lt).toLocaleString('ko-KR') + (lastBy(it) ? ' · ' + lastBy(it) : '') : '시트에서 가져옴')}">${lt ? `<span class="d" data-ts="${lt}" data-s="1">${esc(fmtWhen(lt, true))}</span>${lastBy(it) ? `<span class="by">${esc(lastBy(it))}</span>` : ''}` : '시트'}</td></tr>`;
+          html += `<tr class="row${st.key ? ' s-' + st.key : ''}" data-id="${esc(it.id)}"><td class="p"><button type="button" class="mini" aria-label="${esc(it.name)} 사진 크게 보기">${picHTML(it)}</button></td><td><span class="nm">${esc(it.name)}</span><span class="sub">${st.label ? `<span class="tag s-${st.key}">${st.label}</span>` : ''}${lt ? `<span class="when">${tsSpan(lt)}${lastBy(it) ? ' · ' + esc(lastBy(it)) : ''}</span>` : ''}</span></td><td class="n${u === null ? ' blank' : ''}${st.key ? ' s-' + st.key : ''}">${u === null ? '–' : u}</td><td class="n${o === null ? ' blank' : ''}">${o === null ? '–' : o}</td><td class="m" title="${esc(lt ? new Date(lt).toLocaleString('ko-KR') + (lastBy(it) ? ' · ' + lastBy(it) : '') : '시트에서 가져옴')}">${lt ? `<span class="d" data-ts="${lt}" data-s="1">${esc(fmtWhen(lt, true))}</span>${lastBy(it) ? `<span class="by">${esc(lastBy(it))}</span>` : ''}` : '시트'}</td></tr>`;
         }
       }
       html += '</tbody></table></section>';
@@ -1399,14 +1511,23 @@ main{min-width:0}
   $('#table').addEventListener('click', ev => {
     if (ev.target.closest('#copyOrdersBtn')) { copyText(orderText(), '주문 목록을 복사했어요'); return; }
     if (ev.target.closest('#pdfBtn')) { openPdf(); return; }
+    const j = ev.target.closest('[data-jump]');
+    if (j) {
+      const t = $('#table').querySelector(`.tsec[data-sec="${CSS.escape(j.dataset.jump)}"]`); if (!t) return;
+      const safe = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
+      window.scrollTo(0, Math.max(0, Math.round(t.getBoundingClientRect().top + scrollY - $('#app .bar').offsetHeight - 6 - safe)));
+      const h = t.querySelector('h2'); if (h) h.focus({ preventScroll: true });
+      return;
+    }
     const row = ev.target.closest('[data-id]'); if (!row) return;
-    if (ev.target.closest('.mini')) { openViewer(row.dataset.id); return; }
+    if (ev.target.closest('.mini, td.p')) { openViewer(row.dataset.id); return; }
     const it = S.items.get(row.dataset.id); if (!it || isDeleted(it)) return;
-    jumpTo(row.dataset.id);
+    jumpTo(row.dataset.id, !!ev.target.closest('tr.row'));
   });
-  function jumpTo(id) {
+  function jumpTo(id, fromGrid = false) {
     const it = S.items.get(id); if (!it) return;
-    S.cfg.view = 'list'; S.cfg.tab = secOf(it); S.q = ''; $('#q').value = ''; S.low = false; $('#lowBtn').setAttribute('aria-pressed', 'false'); saveCfg();
+    if (S.cfg.view === 'table') S.tableReturn = { y: scrollY, id: fromGrid ? id : null, q: S.q, low: S.low };   // 한눈에로 돌아오면 이 자리로
+    S.cfg.view = 'list'; S.cfg.tab = secOf(it); S.q = ''; $('#q').value = ''; S.low = false; $('#lowBtn').setAttribute('aria-pressed', 'false'); setSearching(false); S.searchHit = null; saveCfg();
     render();
     const li = $('#list').querySelector(`.item[data-id="${CSS.escape(id)}"]`);
     if (li) { li.scrollIntoView({ block: 'center' }); li.classList.add('flash'); setTimeout(() => li.classList.remove('flash'), 1700); }
@@ -1490,8 +1611,19 @@ main{min-width:0}
 
   // ---------- 설정 시트 ----------
   const sheets = { editor: $('#editor'), settings: $('#settings'), viewer: $('#viewer'), pdf: $('#pdfSheet'), scrim: $('#scrim') };
-  function openSheet(el) { for (const k of ['editor', 'settings', 'viewer', 'pdf']) sheets[k].hidden = sheets[k] !== el; sheets.scrim.hidden = false; }
-  function closeSheets() { sheets.editor.hidden = true; sheets.settings.hidden = true; sheets.viewer.hidden = true; sheets.pdf.hidden = true; sheets.scrim.hidden = true; S.editing = null; S.viewing = null; $('#ed-confirm').hidden = true; $('#resetConfirm').hidden = true; $('#pdfStage').innerHTML = ''; S.pdfGen = (S.pdfGen || 0) + 1; $('#pdfOrders').disabled = $('#pdfAll').disabled = false; }
+  // 안드로이드 '뒤로'는 열린 시트를 닫는다(앱이 꺼지지 않게). history.back()은 늦게 도착하므로 상태를 따로 센다.
+  let sheetHist = false, backPending = false, pushAfterPop = false;
+  function pushSheetState() { if (sheetHist) return; if (backPending) { pushAfterPop = true; return; } try { history.pushState({ sheet: 1 }, ''); sheetHist = true; } catch (e) { /* 무시 */ } }
+  window.addEventListener('popstate', () => {
+    if (backPending) { backPending = false; if (pushAfterPop) { pushAfterPop = false; if (!sheets.scrim.hidden) pushSheetState(); } return; }
+    if (sheetHist) { sheetHist = false; closeSheets(true); }
+  });
+  if (history.state && history.state.sheet) { backPending = true; try { history.back(); } catch (e) { backPending = false; } }
+  function openSheet(el) { for (const k of ['editor', 'settings', 'viewer', 'pdf']) sheets[k].hidden = sheets[k] !== el; sheets.scrim.hidden = false; document.body.classList.add('sheet-open'); pushSheetState(); }
+  function closeSheets(fromPop) {
+    document.body.classList.remove('sheet-open'); pushAfterPop = false;
+    if (fromPop !== true && sheetHist) { sheetHist = false; backPending = true; try { history.back(); } catch (e) { backPending = false; } }
+    sheets.editor.hidden = true; sheets.settings.hidden = true; sheets.viewer.hidden = true; sheets.pdf.hidden = true; sheets.scrim.hidden = true; S.editing = null; S.viewing = null; $('#ed-confirm').hidden = true; $('#resetConfirm').hidden = true; $('#pdfStage').innerHTML = ''; S.pdfGen = (S.pdfGen || 0) + 1; $('#pdfOrders').disabled = $('#pdfAll').disabled = false; }
 
   // ---------- PDF로 저장 (재고표·주문 목록) ----------
   // 화면 밖에 A4 쪽을 직접 나눠 그린 뒤(html2canvas) 쪽마다 이미지로 PDF에 넣는다(jsPDF). 한글 글꼴을 따로 넣지 않아도 화면 글꼴 그대로 나온다.
@@ -1649,7 +1781,7 @@ main{min-width:0}
     S.viewing = id; openSheet(sheets.viewer);
   }
   $('#vw-close').addEventListener('click', closeSheets);
-  $('#vw-edit').addEventListener('click', () => { const id = S.viewing; closeSheets(); if (id) { openEditor(id); setTimeout(() => { $('#ed-img').focus(); $('#ed-img').scrollIntoView({ block: 'center' }); }, 80); } });
+  $('#vw-edit').addEventListener('click', () => { const id = S.viewing; S.viewing = null; if (!id) { closeSheets(); return; } openEditor(id); setTimeout(() => { $('#ed-img').focus(); $('#ed-img').scrollIntoView({ block: 'center' }); }, 80); });   // 시트끼리 바로 바꿈(뒤로 가기 기록이 꼬이지 않게)
   sheets.scrim.addEventListener('click', closeSheets);
   document.addEventListener('keydown', ev => { if (ev.key === 'Escape') closeSheets(); });
   function openSettings() {
@@ -1660,7 +1792,7 @@ main{min-width:0}
     const host = (() => { try { return new URL(NTFY).host; } catch (e) { return 'ntfy.sh'; } })();
     $('#alertTopic').textContent = S.alertTopic || '연결 중…';
     $('#alertSub').href = S.alertTopic ? `ntfy://${host}/${S.alertTopic}?display=${encodeURIComponent('카페드명 재고')}` : '#';
-    $('#alertSend').checked = !S.cfg.alertsOff;
+    $('#alertSend').checked = !S.cfg.alertsOff; $('#roomy').checked = !!S.cfg.roomy;
     const ids = Object.keys(S.peers);
     const peerText = ids.length ? '연결된 폰: ' + ids.map(id => `${S.peers[id].name || '이름 없음'} (${ago(S.peers[id].seen)})`).join(', ') : '';
     $('#peersLine').textContent = SHARED ? '이 주소를 열면 누구나 코드 없이 같은 화면을 봐요.' + (peerText ? ' ' + peerText : '')
@@ -1676,9 +1808,11 @@ main{min-width:0}
     if (codeRaw && !SHARED) { const code = normCode(codeRaw); if (!code || code.length !== 14) { toast('가게 코드는 영문·숫자 12자예요'); return; } if (code !== S.cfg.code) { closeSheets(); await switchCode(code); toast('가게 코드를 바꿨어요. 상대 폰의 데이터를 받아옵니다.'); return; } }
     closeSheets(); render(); toast('저장했어요');
   });
+  $('#st-name').addEventListener('change', () => { const v = $('#st-name').value.trim(); if (v && v !== S.cfg.name) { S.cfg.name = v; saveCfg(); render(); toast('이름을 저장했어요'); } });
   $('#shareBtn').addEventListener('click', shareLink);
   $('#alertCopy').addEventListener('click', () => { if (S.alertTopic) copyText(S.alertTopic, '주제 이름을 복사했어요. ntfy 앱에서 + 를 눌러 붙여넣으세요.'); });
   $('#alertTest').addEventListener('click', async () => { const ok = await sendAlert('테스트', `카페드명 재고 알림이 이 폰에 잘 와요. (${S.cfg.name || '누군가'}가 보냄)`, 3); toast(ok ? '테스트 알림을 보냈어요' : '알림을 보내지 못했어요. 인터넷을 확인해 주세요'); });
+  $('#roomy').addEventListener('change', ev => { S.cfg.roomy = ev.target.checked; saveCfg(); document.body.classList.toggle('roomy', S.cfg.roomy); });
   $('#alertSend').addEventListener('change', ev => { S.cfg.alertsOff = !ev.target.checked; saveCfg(); toast(ev.target.checked ? '이 폰에서 알림을 보내요' : '이 폰에서는 알림을 보내지 않아요'); });
   $('#pairShareBtn').addEventListener('click', shareLink);
   $('#pairClose').addEventListener('click', () => { S.cfg.hints.pair = true; saveCfg(); $('#pairHint').hidden = true; });
@@ -1750,9 +1884,15 @@ main{min-width:0}
     ed.group.value = it ? grpOf(it) : ''; ed.note.value = it ? String(it.note || '') : ''; ed.min.value = it ? fmtNum(num(it.min)) : '';
     ed.img.value = it ? String(it.img || '') : ''; updateImgPreview(); fillHist();
     ed.del.hidden = !it; ed.confirm.hidden = true;
-    openSheet(sheets.editor); setTimeout(() => ed.name.focus(), 50);
+    openSheet(sheets.editor); if (!it) setTimeout(() => ed.name.focus(), 50); else $('#ed-title').focus({ preventScroll: true });   // 새 항목만 바로 이름 칸에(있는 항목은 기록만 보러 열 때가 많음)
   }
   $('#ed-cancel').addEventListener('click', closeSheets);
+  sheets.editor.addEventListener('keydown', ev => {   // Enter: 저장하지 않고 다음 칸으로(마지막 칸이면 키보드만 내림)
+    if (ev.key !== 'Enter' || ev.isComposing || ev.keyCode === 229 || !(ev.target instanceof HTMLInputElement)) return;
+    ev.preventDefault();
+    const ins = $$('input', sheets.editor).filter(i => i.offsetParent !== null); const i = ins.indexOf(ev.target);
+    if (i >= 0 && i < ins.length - 1) ins[i + 1].focus(); else ev.target.blur();
+  });
   ed.del.addEventListener('click', () => { ed.confirm.hidden = false; });
   $('#ed-del-no').addEventListener('click', () => { ed.confirm.hidden = true; });
   $('#ed-del-yes').addEventListener('click', () => { const id = S.editing && S.editing.id; if (id && !canEdit()) return; closeSheets(); if (id) { deleteItem(id); toast('삭제했어요'); } });
@@ -1777,12 +1917,14 @@ main{min-width:0}
     const li = btn.closest('.item'); if (!li) return; const id = li.dataset.id;
     if (btn.classList.contains('name')) { openEditor(id); return; }
     if (btn.classList.contains('thumb')) { openViewer(id); return; }
+    if (btn.classList.contains('undo-btn')) { const h = btn.dataset.h; S.undoOffer = null; clearTimeout(undoTimer); undoEntry(id, h); return; }
     const f = btn.dataset.f; if (!f) return; const key = f === 'u' ? 'unopened' : 'opened';
     if (!canEdit()) return;
     const it = S.items.get(id); if (!it) return; const cur = num(it[key]);
     const next = btn.classList.contains('inc') ? (cur === null ? 1 : cur + 1) : (cur === null ? 0 : Math.max(0, cur - 1));
     if (next === cur) return;   // 0에서 − 처럼 바뀌는 게 없으면 그대로
-    editCounts(id, { [key]: next }); countToast(id, f);
+    if (S.q.trim()) S.searchHit = id;
+    editCounts(id, { [key]: next }); offerUndo(id, f);
   });
   list.addEventListener('change', ev => {
     const inp = ev.target; if (!(inp instanceof HTMLInputElement) || !inp.dataset.f) return;
@@ -1790,21 +1932,28 @@ main{min-width:0}
     if (!canEdit()) { const it = S.items.get(id); inp.value = it ? fmtNum(num(it[key])) : ''; return; }
     const raw = inp.value.trim().replace(/,/g, '');
     const it0 = S.items.get(id); const cur = it0 ? num(it0[key]) : null;
-    if (raw === '') { if (cur !== null) { editCounts(id, { [key]: null }); countToast(id, inp.dataset.f); } return; }
+    if (raw === '') { if (cur !== null) { editCounts(id, { [key]: null }); offerUndo(id, inp.dataset.f); } return; }
     const n = Number(raw);
     if (!Number.isFinite(n) || n < 0) { inp.value = fmtNum(cur); toast('숫자만 적어주세요'); return; }
     const v = Math.round(n * 10) / 10;
     if (v === cur) { inp.value = fmtNum(cur); return; }
-    editCounts(id, { [key]: v }); countToast(id, inp.dataset.f);
+    if (S.q.trim()) S.searchHit = id;
+    editCounts(id, { [key]: v }); offerUndo(id, inp.dataset.f);
   });
   // 숫자를 바꾸면 "전 → 후 · 되돌리기"를 잠깐 보여준다. 되돌리기는 1분 안에 연달아 바꾼 것을 한꺼번에 되돌린다.
-  function countToast(id, f) {
-    // 방금 이 수정이 쓰거나 이어 쓴 줄일 때만(시각이 그 칸의 마지막 수정 시각과 같음). 오래된 줄을 되돌리라고 내밀지 않는다.
-    const it = S.items.get(id); const e = it && latestOf(it, f); if (!e || !e[0].startsWith(myTag()) || e[1] !== it.t[f]) return;
-    const row = list.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
-    if (!histShown(e)) { toast(`${it.name} ${fLabel(f)} ${fmtV(e[4])} (원래대로)`, 1500, null, row); return; }
-    const hid = e[0];
-    toast(`${it.name} ${fLabel(f)} ${fmtV(e[3])} → ${fmtV(e[4])}`, 4500, { label: '되돌리기', fn: () => undoEntry(id, hid) }, row);
+  // 숫자를 바꾸면 그 줄 안에 '전 → 후 · 되돌리기'를 5초 보여 준다(한 번에 한 줄). 1분 안에 연달아 바꾼 건 한 줄로 묶여 한꺼번에 되돌린다.
+  // 방금 이 수정이 쓰거나 이어 쓴 기록일 때만(시각이 그 칸의 마지막 수정 시각과 같음) — 오래된 기록을 되돌리라고 내밀지 않는다.
+  let undoTimer = 0;
+  function refreshUndoRow(id) { const li = list.querySelector(`.item[data-id="${CSS.escape(id)}"]`), it = S.items.get(id); if (li && it) fillRow(li, it); }
+  function offerUndo(id, f) {
+    const it = S.items.get(id), e = it && latestOf(it, f), prev = S.undoOffer;
+    S.undoOffer = null; clearTimeout(undoTimer);
+    if (e && e[0].startsWith(myTag()) && e[1] === it.t[f] && histShown(e)) {
+      S.undoOffer = { id, hid: e[0], text: `${fLabel(f)} ${fmtV(e[3])} → ${fmtV(e[4])}` };
+      undoTimer = setTimeout(() => { const o = S.undoOffer; S.undoOffer = null; if (o) refreshUndoRow(o.id); }, 5000);
+    }
+    if (prev && prev.id !== id) refreshUndoRow(prev.id);
+    refreshUndoRow(id);
   }
   // 기록 한 줄을 되돌린다. 그 뒤에 (다른 폰에서라도) 숫자가 또 바뀌었으면 덮어쓰지 않는다.
   function undoEntry(id, hid) {
@@ -1814,13 +1963,42 @@ main{min-width:0}
     editCounts(id, { [keyOf(e[2])]: e[3] }); fillHist();
     toast(`되돌렸어요: ${it.name} ${fLabel(e[2])} ${fmtV(e[3])}`);
   }
-  list.addEventListener('keydown', ev => { if (ev.key === 'Enter' && ev.target instanceof HTMLInputElement) ev.target.blur(); });
+  list.addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.isComposing && ev.keyCode !== 229 && ev.target instanceof HTMLInputElement) ev.target.blur(); });
   list.addEventListener('focusin', ev => { if (ev.target instanceof HTMLInputElement) ev.target.select(); });
-  $('#tabs').addEventListener('click', ev => { const b = ev.target.closest('button[data-sec]'); if (!b) return; S.cfg.tab = b.dataset.sec; saveCfg(); render(); window.scrollTo({ top: 0 }); });
-  $$('.seg button').forEach(b => b.addEventListener('click', () => { S.cfg.view = b.dataset.view; saveCfg(); render(); window.scrollTo({ top: 0 }); }));
+  // 구역 고르기: 검색·부족만은 끄고, 위 제목·요약은 다시 내려오지 않게 고정 바 위치까지만 올린다
+  function selectTab(sec) {
+    if (S.q.trim() || S.low) { S.q = ''; qInput.value = ''; S.low = false; $('#lowBtn').setAttribute('aria-pressed', 'false'); setSearching(false); S.searchHit = null; }
+    S.cfg.tab = sec; saveCfg(); render();
+    const a = $('#barAnchor').getBoundingClientRect().top + scrollY - (parseFloat(getComputedStyle(document.body).paddingTop) || 0);
+    window.scrollTo(0, Math.min(scrollY, Math.max(0, Math.round(a))));
+  }
+  $('#tabs').addEventListener('click', ev => { const b = ev.target.closest('button[data-sec]'); if (b) selectTab(b.dataset.sec); });
+  $('#nextSec').addEventListener('click', ev => selectTab(ev.currentTarget.dataset.sec));
+  $$('.seg button').forEach(b => b.addEventListener('click', () => {
+    const back = b.dataset.view === 'table' && S.cfg.view !== 'table' ? S.tableReturn : null; S.tableReturn = null; S.searchHit = null;
+    if (back) { S.q = back.q; $('#q').value = back.q; S.low = back.low; $('#lowBtn').setAttribute('aria-pressed', String(back.low)); if (typeof setSearching === 'function') setSearching(!!back.q.trim()); }
+    S.cfg.view = b.dataset.view; saveCfg(); render();
+    if (back) { const tr = back.id && $('#table').querySelector(`.grid tr.row[data-id="${CSS.escape(back.id)}"]`); if (tr) tr.scrollIntoView({ block: 'center' }); else window.scrollTo(0, back.y); }
+    else window.scrollTo({ top: 0 });
+  }));
   const qInput = $('#q');
-  qInput.addEventListener('input', () => { S.q = qInput.value; render(); });
-  $('#lowBtn').addEventListener('click', ev => { S.low = !S.low; ev.currentTarget.setAttribute('aria-pressed', String(S.low)); render(); });
+  // 결과가 위에서부터 보이게(아래로 내려와 있었으면 목록 맨 위로)
+  function toResultsTop() {
+    const m = S.cfg.view === 'table' ? $('#table') : $('#list');
+    const y = m.getBoundingClientRect().top + scrollY - $('#app .bar').offsetHeight - 8 - (parseFloat(getComputedStyle(document.body).paddingTop) || 0);
+    if (scrollY > y) window.scrollTo(0, Math.max(0, Math.round(y)));
+  }
+  function setSearching(on) { $('#app .tools').classList.toggle('searching', on); $('#qCancel').hidden = !on; }
+  qInput.addEventListener('input', () => { S.q = qInput.value; if (!S.q.trim()) S.searchHit = null; render(); toResultsTop(); });
+  qInput.addEventListener('focus', () => setSearching(true));
+  qInput.addEventListener('blur', () => setSearching(!!S.q.trim()));
+  qInput.addEventListener('keydown', ev => { if (ev.key === 'Enter') qInput.blur(); });
+  // 검색 취소: 검색해서 센 항목이 있으면 그 항목 자리로 돌아간다
+  $('#qCancel').addEventListener('click', () => {
+    const hit = S.searchHit, it = hit && S.items.get(hit); S.searchHit = null; S.q = ''; qInput.value = ''; setSearching(false);
+    if (it && !isDeleted(it) && S.cfg.view === 'list') jumpTo(hit); else render();
+  });
+  $('#lowBtn').addEventListener('click', ev => { S.low = !S.low; ev.currentTarget.setAttribute('aria-pressed', String(S.low)); render(); toResultsTop(); });
   $('#addBtn').addEventListener('click', () => openEditor(null, S.cfg.tab));
   $('#addBtn2').addEventListener('click', () => openEditor(null, S.cfg.tab));
 
@@ -1843,6 +2021,29 @@ main{min-width:0}
   // ---------- 시작 ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
   loadStore();
+  document.body.classList.toggle('roomy', !!S.cfg.roomy);   // 설정: 버튼 크게 보기
+  {   // 고정 바 높이를 CSS 변수로: 칸 이름 줄·표 머리줄이 그 아래에 붙고, 숫자를 칠 때는 도구 줄만큼 올라간다
+    const bar = $('#app .bar'), rs = document.documentElement.style;
+    const setBar = () => {
+      if (!bar.offsetHeight) return;
+      rs.setProperty('--bar-h', bar.offsetHeight + 'px');
+      const tb = $('#tabs'); if (!tb.hidden) rs.setProperty('--tools-h', Math.round(tb.getBoundingClientRect().top - bar.getBoundingClientRect().top) + 'px');
+    };
+    if ('ResizeObserver' in window) new ResizeObserver(setBar).observe(bar);
+    setBar();
+  }
+  document.addEventListener('touchstart', () => {}, { passive: true });   // 아이폰에서 누를 때 색(:active)이 보이게
+  {   // 숫자 칸에 커서가 있는 동안 body.typing. 나갈 때는 조금 늦게 풀어서, 누르는 순간 바가 내려와 탭이 빗나가지 않게
+    let offT = 0; const isNum = el => el instanceof HTMLInputElement && !!el.closest('.stepper');
+    const setTyping = on => { document.body.classList.toggle('typing', on); document.documentElement.classList.toggle('typing', on); replaceToast(); };
+    document.addEventListener('focusin', ev => { if (isNum(ev.target)) { clearTimeout(offT); setTyping(true); } });
+    document.addEventListener('focusout', ev => { if (isNum(ev.target)) { clearTimeout(offT); offT = setTimeout(() => { if (!isNum(document.activeElement)) setTyping(false); }, 350); } });
+  }
+  if (window.visualViewport) {   // 키보드가 올라오면 시트를 키보드 위로, 시트 높이는 보이는 화면 기준으로
+    const vv = window.visualViewport, rs2 = document.documentElement.style;
+    const fit = () => { rs2.setProperty('--kb', (vv.scale > 1.01 ? 0 : Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop))) + 'px'); rs2.setProperty('--vvh', Math.round(vv.height) + 'px'); };
+    vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); fit();
+  }
   migrateLayout();
   loadImages();
   if (!S.cfg.deviceId) { S.cfg.deviceId = newId('d'); saveCfg(); }
